@@ -2,7 +2,7 @@
     "name": "slr-membership",
     "version": "1.0.0",
     "private": false,
-    "website": "https://dashboard-kaltara-shadcn.vercel.app/",
+    "website": "/",
     "license": "MIT",
     "scripts": {
         "dev": "next dev --turbopack",
