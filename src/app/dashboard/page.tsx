@@ -1,8 +1,8 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { getServerApi } from '@/lib/server-api';
 
-import { CommodityApiResponse } from './(routes)/master-data/commodity/page';
-import { WilayahApiResponse } from './(routes)/master-data/wilayah/page';
+// import { CommodityApiResponse } from './(routes)/master-data/commodity/page';
+// import { WilayahApiResponse } from './(routes)/master-data/wilayah/page';
 import { UsersApiResponse } from './(routes)/users/page';
 import { Boxes, MapPinned, UserCog, Users } from 'lucide-react';
 
@@ -15,45 +15,45 @@ export default async function AdminPage() {
 
     const api = await getServerApi();
 
-    const users = await api.get<UsersApiResponse>('/api/users', {
-        params: {
-            page,
-            limit,
-            search: search || undefined,
-            sort,
-            order
-        }
-    });
+    // const users = await api.get<UsersApiResponse>('/api/users', {
+    //     params: {
+    //         page,
+    //         limit,
+    //         search: search || undefined,
+    //         sort,
+    //         order
+    //     }
+    // });
 
-    const wilayah = await api.get<WilayahApiResponse>('/api/regions', {
-        params: {
-            page,
-            limit,
-            search: search || undefined,
-            sort,
-            order
-        }
-    });
+    // const wilayah = await api.get<WilayahApiResponse>('/api/regions', {
+    //     params: {
+    //         page,
+    //         limit,
+    //         search: search || undefined,
+    //         sort,
+    //         order
+    //     }
+    // });
 
-    const commodities = await api.get<CommodityApiResponse>('/api/commodities', {
-        params: {
-            page,
-            limit,
-            search: search || undefined,
-            sort,
-            order
-        }
-    });
+    // const commodities = await api.get<CommodityApiResponse>('/api/commodities', {
+    //     params: {
+    //         page,
+    //         limit,
+    //         search: search || undefined,
+    //         sort,
+    //         order
+    //     }
+    // });
 
-    const usersSPV = users.data.data.filter((u) => {
-        const currentUserRole = u.roles[0]?.name;
-        return currentUserRole === 'ROLE_SPV';
-    });
+    // const usersSPV = users.data.data.filter((u) => {
+    //     const currentUserRole = u.roles[0]?.name;
+    //     return currentUserRole === 'ROLE_SPV';
+    // });
 
-    const wilayahFilter = wilayah.data.data.filter((r) => {
-        const currentRegion = r.code;
-        return currentRegion !== 'PROV_KALTARA';
-    });
+    // const wilayahFilter = wilayah.data.data.filter((r) => {
+    //     const currentRegion = r.code;
+    //     return currentRegion !== 'PROV_KALTARA';
+    // });
 
     return (
         <div className='flex flex-col'>
@@ -67,8 +67,7 @@ export default async function AdminPage() {
                         Dashboard ini digunakan untuk mengelola, memperbarui, dan memvalidasi data ketersediaan,
                         kebutuhan, serta neraca pangan secara terintegrasi dan berkelanjutan.
                     </p>
-                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-                        {/* USERS */}
+                    {/* <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
                         <Card>
                             <CardHeader className='flex flex-row items-center justify-between'>
                                 <CardDescription>Total Users</CardDescription>
@@ -84,7 +83,6 @@ export default async function AdminPage() {
                             </CardFooter>
                         </Card>
 
-                        {/* SPV */}
                         <Card>
                             <CardHeader className='flex flex-row items-center justify-between'>
                                 <CardDescription>Supervisor (SPV)</CardDescription>
@@ -98,7 +96,6 @@ export default async function AdminPage() {
                             <CardFooter className='text-muted-foreground text-sm'>Users dengan role SPV</CardFooter>
                         </Card>
 
-                        {/* WILAYAH */}
                         <Card>
                             <CardHeader className='flex flex-row items-center justify-between'>
                                 <CardDescription>Wilayah</CardDescription>
@@ -112,7 +109,6 @@ export default async function AdminPage() {
                             <CardFooter className='text-muted-foreground text-sm'>Total wilayah terdaftar</CardFooter>
                         </Card>
 
-                        {/* COMMODITY */}
                         <Card>
                             <CardHeader className='flex flex-row items-center justify-between'>
                                 <CardDescription>Commodity</CardDescription>
@@ -125,7 +121,7 @@ export default async function AdminPage() {
                             </CardContent>
                             <CardFooter className='text-muted-foreground text-sm'>Jenis komoditas aktif</CardFooter>
                         </Card>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
