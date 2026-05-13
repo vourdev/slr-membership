@@ -27,7 +27,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 // import { months } from '@/data/months';
 // import { Month } from '@/types/month';
 
-import { DateRangePicker } from './range-date-picker';
+// import { DateRangePicker } from './range-date-picker';
 import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Search, Trash2 } from 'lucide-react';
@@ -575,7 +575,7 @@ export function DataTable({
                                 </Select>
                             )}
 
-                            {useDatePicker && (
+                            {/* {useDatePicker && (
                                 <DateRangePicker
                                     startDate={filters?.start_date}
                                     endDate={filters?.end_date}
@@ -589,7 +589,7 @@ export function DataTable({
                                     }}
                                     className='w-full'
                                 />
-                            )}
+                            )} */}
 
                             {/* year */}
                             {!useDatePicker && (
