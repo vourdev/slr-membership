@@ -50,7 +50,7 @@ const DiscountPartnerSection = () => {
                 {/* SLR Circle Badge */}
                 <div className='mt-12 flex justify-center'>
                     <div className='relative'>
-                        <div className='border-slr-gold/60 from-slr-blue-tier/50 to-slr-navy-deep shadow-[0_0_60px_-10px_var(--slr-gold)] flex aspect-square w-56 flex-col items-center justify-center rounded-full border-4 bg-gradient-to-br'>
+                        <div className='border-slr-gold/60 from-slr-blue-tier/50 to-slr-navy-deep slr-gold-glow flex aspect-square w-56 flex-col items-center justify-center rounded-full border-4 bg-gradient-to-br'>
                             <p className='text-slr-navy-foreground/60 text-[10px] tracking-[0.3em] uppercase'>
                                 Rewards
                             </p>

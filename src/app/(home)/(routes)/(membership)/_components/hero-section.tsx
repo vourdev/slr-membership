@@ -7,7 +7,7 @@ const HeroSection = () => {
     return (
         <section className='slr-stars-bg relative overflow-hidden pt-28 pb-16 md:pt-32 md:pb-20'>
             {/* Spotlight effect */}
-            <div className='pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,_color-mix(in_oklch,var(--slr-gold)_25%,transparent),_transparent_60%)]' />
+            <div className='slr-hero-spotlight pointer-events-none absolute inset-x-0 top-0 h-72' />
 
             <div className='relative mx-auto max-w-6xl px-4'>
                 {/* Logo */}

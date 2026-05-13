@@ -21,7 +21,7 @@ const WelcomeSection = () => {
                 <div className='mt-12 grid grid-cols-1 items-center gap-10 lg:grid-cols-2'>
                     {/* Family image with golden frame */}
                     <div className='flex justify-center'>
-                        <div className='border-slr-gold/50 bg-slr-navy-card relative aspect-square w-full max-w-md overflow-hidden rounded-full border-4 shadow-[0_0_60px_-15px_var(--slr-gold)]'>
+                        <div className='border-slr-gold/50 bg-slr-navy-card slr-gold-glow relative aspect-square w-full max-w-md overflow-hidden rounded-full border-4'>
                             <Image
                                 src='/images/smart-life.webp'
                                 alt='Smart Life Rewards Family'

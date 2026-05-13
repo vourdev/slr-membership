@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 const MembershipCtaSection = () => {
     return (
         <section id='join' className='slr-stars-bg relative overflow-hidden py-16 md:py-24'>
-            <div className='pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,_color-mix(in_oklch,var(--slr-gold)_20%,transparent),_transparent_60%)]' />
+            <div className='slr-hero-spotlight pointer-events-none absolute inset-x-0 top-0 h-72' />
 
             <div className='relative mx-auto max-w-4xl px-4 text-center'>
                 <p className='text-slr-gold text-[10px] font-semibold tracking-[0.4em] uppercase md:text-xs'>

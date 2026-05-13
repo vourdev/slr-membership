@@ -185,28 +185,31 @@
 
 @layer utilities {
     .slr-section-bg {
-        background:
-            radial-gradient(ellipse at top, color-mix(in oklch, var(--slr-blue-tier) 14%, transparent), transparent 60%),
-            var(--slr-navy-deep);
+        background-color: var(--slr-navy-deep);
+        background-image: radial-gradient(ellipse at top, rgba(60, 90, 200, 0.18), transparent 60%);
     }
 
     .slr-stars-bg {
         background-color: var(--slr-navy-deep);
         background-image:
-            radial-gradient(1px 1px at 20% 30%, color-mix(in oklch, white 60%, transparent), transparent),
-            radial-gradient(1px 1px at 70% 60%, color-mix(in oklch, white 50%, transparent), transparent),
-            radial-gradient(1px 1px at 40% 80%, color-mix(in oklch, white 70%, transparent), transparent),
-            radial-gradient(1.5px 1.5px at 85% 20%, color-mix(in oklch, white 60%, transparent), transparent),
-            radial-gradient(1px 1px at 10% 70%, color-mix(in oklch, white 50%, transparent), transparent);
+            radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.5), transparent 70%),
+            radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.4), transparent 70%),
+            radial-gradient(1.5px 1.5px at 85% 20%, rgba(255, 255, 255, 0.5), transparent 70%);
         background-size:
             300px 300px,
             420px 420px,
-            520px 520px,
-            240px 240px,
-            360px 360px;
+            240px 240px;
     }
 
     .slr-gold-gradient {
         background: linear-gradient(135deg, oklch(82% 0.16 90), oklch(72% 0.16 70));
+    }
+
+    .slr-hero-spotlight {
+        background: radial-gradient(ellipse at top, rgba(230, 180, 60, 0.22), transparent 60%);
+    }
+
+    .slr-gold-glow {
+        box-shadow: 0 0 60px -15px rgba(230, 180, 60, 0.55);
     }
 }
