@@ -40,10 +40,9 @@ export function useObjectURLPreviews(items: Array<string | File | Blob | ImageMe
             }
         }
 
-        // ⬇️ hanya update state kalau bener-bener berubah
         setUrls((prev) => {
             if (prev.length === out.length && prev.every((v, i) => v === out[i])) {
-                return prev; // jangan trigger re-render
+                return prev;
             }
 
             return out;
