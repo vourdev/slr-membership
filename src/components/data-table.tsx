@@ -23,8 +23,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { months } from '@/data/months';
-import { Month } from '@/types/month';
+
+// import { months } from '@/data/months';
+// import { Month } from '@/types/month';
 
 import { DateRangePicker } from './range-date-picker';
 import { Badge } from './ui/badge';
@@ -297,11 +298,11 @@ const TableRowComponent = ({
                     );
                 }
 
-                if (column.key === 'month') {
-                    const shortLabelMonth = months.filter((m: Month) => m.value == item.month)[0].shortLabel;
+                // if (column.key === 'month') {
+                //     const shortLabelMonth = months.filter((m: Month) => m.value == item.month)[0].shortLabel;
 
-                    return <TableCell key={column.key}>{shortLabelMonth}</TableCell>;
-                }
+                //     return <TableCell key={column.key}>{shortLabelMonth}</TableCell>;
+                // }
 
                 if (column.key === 'action') {
                     return (
