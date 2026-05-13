@@ -60,8 +60,8 @@ export default async function AdminPage() {
             <div className='flex-1 space-y-4 px-4 py-8 pt-6'>
                 <div className='space-y-2'>
                     <div>
-                        <h2 className='text-3xl font-bold tracking-tight'>Dashboard Admin Pangan Kaltara</h2>
-                        <div className='text-base'>Pusat pengelolaan data pangan Provinsi Kalimantan Utara.</div>
+                        <h2 className='text-3xl font-bold tracking-tight'>Dashboard Admin SLR</h2>
+                        <div className='text-base'>Pusat pengelolaan data SLR.</div>
                     </div>
                     <p>
                         Dashboard ini digunakan untuk mengelola, memperbarui, dan memvalidasi data ketersediaan,

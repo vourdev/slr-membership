@@ -5,6 +5,25 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+    /* SLR Membership Brand Colors */
+    --slr-navy: oklch(20% 0.06 250);
+    --slr-navy-foreground: oklch(98% 0 0);
+    --slr-navy-deep: oklch(14% 0.04 250);
+    --slr-navy-card: oklch(22% 0.05 250);
+    --slr-navy-border: oklch(30% 0.04 250);
+    --slr-blue-tier: oklch(50% 0.2 250);
+    --slr-blue-tier-foreground: oklch(98% 0 0);
+    --slr-blue-tier-light: oklch(94% 0.04 250);
+    --slr-red-tier: oklch(52% 0.22 25);
+    --slr-red-tier-foreground: oklch(98% 0 0);
+    --slr-red-tier-light: oklch(95% 0.04 25);
+    --slr-gold: oklch(78% 0.16 83);
+    --slr-gold-foreground: oklch(15% 0 0);
+    --slr-gold-light: oklch(96% 0.04 83);
+    --slr-smart: oklch(54% 0.15 155);
+    --slr-smart-foreground: oklch(98% 0 0);
+    --slr-smart-light: oklch(94% 0.04 155);
+
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
@@ -75,28 +94,6 @@
     --sidebar-ring: oklch(0.439 0 0);
 }
 
-.region {
-    cursor: pointer;
-    transition:
-        fill 120ms ease,
-        stroke 120ms ease,
-        filter 120ms ease;
-    stroke: #ffffff;
-    stroke-width: 1;
-}
-
-.region:hover {
-    filter: brightness(1.07);
-    stroke-width: 1.6;
-}
-
-.tooltip {
-    position: fixed;
-    pointer-events: none;
-    z-index: 50;
-    transform: translate(12px, -12px);
-}
-
 @theme inline {
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
@@ -139,6 +136,25 @@
     --animate-accordion-down: accordion-down 0.2s ease-out;
     --animate-accordion-up: accordion-up 0.2s ease-out;
 
+    /* SLR Color Tokens */
+    --color-slr-navy: var(--slr-navy);
+    --color-slr-navy-foreground: var(--slr-navy-foreground);
+    --color-slr-navy-deep: var(--slr-navy-deep);
+    --color-slr-navy-card: var(--slr-navy-card);
+    --color-slr-navy-border: var(--slr-navy-border);
+    --color-slr-blue-tier: var(--slr-blue-tier);
+    --color-slr-blue-tier-foreground: var(--slr-blue-tier-foreground);
+    --color-slr-blue-tier-light: var(--slr-blue-tier-light);
+    --color-slr-red-tier: var(--slr-red-tier);
+    --color-slr-red-tier-foreground: var(--slr-red-tier-foreground);
+    --color-slr-red-tier-light: var(--slr-red-tier-light);
+    --color-slr-gold: var(--slr-gold);
+    --color-slr-gold-foreground: var(--slr-gold-foreground);
+    --color-slr-gold-light: var(--slr-gold-light);
+    --color-slr-smart: var(--slr-smart);
+    --color-slr-smart-foreground: var(--slr-smart-foreground);
+    --color-slr-smart-light: var(--slr-smart-light);
+
     @keyframes accordion-down {
         from {
             height: 0;
@@ -164,5 +180,33 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    .slr-section-bg {
+        background:
+            radial-gradient(ellipse at top, color-mix(in oklch, var(--slr-blue-tier) 14%, transparent), transparent 60%),
+            var(--slr-navy-deep);
+    }
+
+    .slr-stars-bg {
+        background-color: var(--slr-navy-deep);
+        background-image:
+            radial-gradient(1px 1px at 20% 30%, color-mix(in oklch, white 60%, transparent), transparent),
+            radial-gradient(1px 1px at 70% 60%, color-mix(in oklch, white 50%, transparent), transparent),
+            radial-gradient(1px 1px at 40% 80%, color-mix(in oklch, white 70%, transparent), transparent),
+            radial-gradient(1.5px 1.5px at 85% 20%, color-mix(in oklch, white 60%, transparent), transparent),
+            radial-gradient(1px 1px at 10% 70%, color-mix(in oklch, white 50%, transparent), transparent);
+        background-size:
+            300px 300px,
+            420px 420px,
+            520px 520px,
+            240px 240px,
+            360px 360px;
+    }
+
+    .slr-gold-gradient {
+        background: linear-gradient(135deg, oklch(82% 0.16 90), oklch(72% 0.16 70));
     }
 }
