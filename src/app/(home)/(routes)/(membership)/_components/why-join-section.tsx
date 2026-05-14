@@ -38,15 +38,25 @@ const stats = [
 
 const WhyJoinSection = () => {
     return (
-        <section className='slr-section-bg py-16 md:py-24'>
-            <div className='mx-auto max-w-6xl px-4'>
-                <div className='text-center'>
-                    <p className='text-slr-navy-foreground/60 text-[10px] font-semibold tracking-[0.3em] uppercase md:text-xs'>
-                        Members Benefits
+        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
+            <div className='mx-auto max-w-7xl px-4'>
+                <div className='flex flex-col items-center justify-center xl:flex-row xl:justify-between'>
+                    <div className='flex flex-col'>
+                        <div className='mt-4 flex w-full items-center justify-center gap-2 xl:justify-start'>
+                            <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
+                            <p className='text-xs font-semibold text-[#E2B42B] uppercase md:text-sm'>Member Benefits</p>
+                            <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
+                        </div>
+                        <h2 className='font-bebas-neue mt-3 text-center text-[56px] leading-[0.90] font-medium tracking-wider text-white uppercase md:text-[72px] md:leading-none'>
+                            Why Members
+                            <span className='block bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-transparent md:ml-3 md:inline'>
+                                Join SLR?
+                            </span>
+                        </h2>
+                    </div>
+                    <p className='mt-3 max-w-sm text-center text-sm leading-relaxed text-[#CDCECF] xl:max-w-xs xl:text-right xl:text-base'>
+                        More than just a rewards club — a smarter way to live and save in Australia.
                     </p>
-                    <h2 className='text-slr-navy-foreground mt-3 text-3xl font-extrabold md:text-4xl'>
-                        WHY MEMBERS JOIN <span className='text-slr-gold'>SLR?</span>
-                    </h2>
                 </div>
 
                 <div className='mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2'>
@@ -55,7 +65,7 @@ const WhyJoinSection = () => {
                         {benefits.map((benefit) => (
                             <li
                                 key={benefit.title}
-                                className='border-slr-navy-border/50 bg-slr-navy-card/60 flex items-start gap-4 rounded-2xl border p-5 backdrop-blur-sm transition-colors hover:border-slr-gold/40'>
+                                className='border-slr-navy-border/50 bg-slr-navy-card/60 hover:border-slr-gold/40 flex items-start gap-4 rounded-2xl border p-5 backdrop-blur-sm transition-colors'>
                                 <div className='shrink-0'>
                                     <Image
                                         src={benefit.icon}

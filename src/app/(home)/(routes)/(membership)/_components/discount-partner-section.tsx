@@ -34,7 +34,7 @@ const categories = [
 const DiscountPartnerSection = () => {
     return (
         <section className='slr-section-bg py-16 md:py-24'>
-            <div className='mx-auto max-w-6xl px-4'>
+            <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <p className='text-slr-navy-foreground/60 text-[10px] font-semibold tracking-[0.3em] uppercase md:text-xs'>
                         Member Access To
@@ -76,7 +76,7 @@ const DiscountPartnerSection = () => {
                     {categories.map((cat) => (
                         <div
                             key={cat.title}
-                            className='border-slr-navy-border/60 bg-slr-navy-card/60 flex flex-col items-center gap-3 rounded-xl border p-4 text-center backdrop-blur-sm transition-colors hover:border-slr-gold/40'>
+                            className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-gold/40 flex flex-col items-center gap-3 rounded-xl border p-4 text-center backdrop-blur-sm transition-colors'>
                             <Image
                                 src={cat.icon}
                                 alt={cat.title}

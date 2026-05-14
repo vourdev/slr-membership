@@ -8,7 +8,6 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     return (
         <div>
             <Navbar user={session} />
-            {/* <FloatingNavDemo /> */}
             {children}
             <Footer />
         </div>

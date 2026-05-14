@@ -97,8 +97,8 @@
 @theme inline {
     --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
     --font-montserrat: var(--font-montserrat);
+    --font-bebas-neue: var(--font-bebas-neue), sans-serif;
     --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
-    --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
     --color-background: var(--background);
     --color-foreground: var(--foreground);

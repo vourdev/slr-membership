@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { Metadata } from 'next';
-import { Montserrat } from 'next/font/google';
+import { Bebas_Neue, Montserrat } from 'next/font/google';
 
 import '@/app/globals.css';
 import { Toaster } from '@/components/ui/sonner';
@@ -11,6 +11,13 @@ const montserrat = Montserrat({
     display: 'swap',
     variable: '--font-montserrat',
     weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
+});
+
+const bebasNeue = Bebas_Neue({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-bebas-neue',
+    weight: '400'
 });
 
 export const metadata: Metadata = {
@@ -23,7 +30,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <html suppressHydrationWarning lang='en'>
             <body
                 suppressHydrationWarning
-                className={`${montserrat.variable} text-foreground overscroll-none bg-[#131619] antialiased`}>
+                className={`${montserrat.variable} ${bebasNeue.variable} text-foreground overscroll-none bg-[#131619] antialiased`}>
                 {children}
                 <Toaster />
             </body>

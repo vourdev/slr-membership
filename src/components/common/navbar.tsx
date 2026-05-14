@@ -79,7 +79,7 @@ export function Navbar({ user }: NavbarProps) {
     return (
         <header
             className={cn(
-                'fixed top-0 right-0 left-0 z-50 mx-auto max-w-300 bg-transparent lg:px-4',
+                'fixed top-0 right-0 left-0 z-50 mx-auto max-w-7xl bg-transparent lg:px-4',
                 scrolled ? 'lg:pt-0' : 'lg:pt-1'
             )}>
             <Container className='px-0!'>
@@ -140,7 +140,7 @@ export function Navbar({ user }: NavbarProps) {
                             </div>
                         ) : (
                             <Link
-                                href='#cta'
+                                href='/sign-up'
                                 style={goldButtonStyle}
                                 className='hidden rounded-xl px-8 py-2.5 font-bold text-[#1a1408] shadow-md transition-opacity hover:opacity-90 xl:block'>
                                 Join Now

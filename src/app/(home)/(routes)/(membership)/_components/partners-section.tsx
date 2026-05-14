@@ -8,7 +8,7 @@ const partners = Array.from({ length: 10 }, (_, idx) => ({
 const PartnersSection = () => {
     return (
         <section id='partners' className='slr-section-bg py-16 md:py-20'>
-            <div className='mx-auto max-w-6xl px-4'>
+            <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <h2 className='text-slr-navy-foreground text-2xl font-extrabold md:text-3xl'>
                         OUR PARTNERS AND <span className='text-slr-gold'>DISCOUNTS</span>

@@ -11,6 +11,19 @@ import { cn } from '@/lib/utils';
 
 import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
 
+// Glassmorphism style per design system
+const glassStyle: React.CSSProperties = {
+    background: 'linear-gradient(117.58deg, rgba(215, 237, 237, 0.16) -47.79%, rgba(204, 235, 235, 0) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    backdropFilter: 'blur(50px)',
+    WebkitBackdropFilter: 'blur(50px)'
+};
+
+// Gold gradient button style per design system
+const goldButtonStyle: React.CSSProperties = {
+    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)'
+};
+
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
     const [state, formAction, isPending] = React.useActionState(signInCredentials, null);
 
@@ -22,36 +35,57 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
     return (
         <div className={cn('font-body flex flex-col gap-6', className)} {...props}>
-            <Card>
+            <Card style={glassStyle} className='gap-4 border-0 text-white shadow-2xl'>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
-                    <CardDescription>Enter your email below to login to your account</CardDescription>
-                    {state?.message && <div className='text-sm text-red-500'>{state?.message}</div>}
+                    <CardTitle className='font-bebas-neue text-3xl tracking-wider text-white md:text-4xl'>
+                        Sign In
+                    </CardTitle>
+                    <CardDescription className='text-[#CDCECF]'>
+                        Enter your email below to login to your account
+                    </CardDescription>
+                    {state?.message && (
+                        <div className='mt-2 rounded-md border border-red-500/30 bg-red-500/10 p-2 text-sm text-red-400'>
+                            {state?.message}
+                        </div>
+                    )}
                 </CardHeader>
                 <CardContent>
                     <form action={formAction}>
-                        <div className='flex flex-col gap-6'>
-                            <div className='grid gap-3'>
-                                <Label htmlFor='email'>Email</Label>
-                                <Input id='email' type='email' name='email' placeholder='email@example.com' required />
-                                <div className='text-sm text-red-500'>{state?.error?.email}</div>
+                        <div className='flex flex-col gap-5'>
+                            <div className='grid gap-2'>
+                                <Label htmlFor='email' className='text-sm font-medium text-white'>
+                                    Email
+                                </Label>
+                                <Input
+                                    id='email'
+                                    type='email'
+                                    name='email'
+                                    placeholder='email@example.com'
+                                    required
+                                    className='h-11 rounded-lg border-white/10 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20'
+                                />
+                                {state?.error?.email && (
+                                    <span className='text-xs text-red-400'>{state?.error?.email}</span>
+                                )}
                             </div>
 
-                            <div className='grid gap-3'>
-                                <Label htmlFor='password'>Password</Label>
+                            <div className='grid gap-2'>
+                                <Label htmlFor='password' className='text-sm font-medium text-white'>
+                                    Password
+                                </Label>
                                 <div className='relative'>
                                     <Input
                                         id='password'
                                         type={showPassword ? 'text' : 'password'}
                                         name='password'
                                         required
-                                        placeholder='password'
-                                        className='pr-10'
+                                        placeholder='Enter your password'
+                                        className='h-11 rounded-lg border-white/10 bg-white/5 pr-10 text-white placeholder:text-white/40 focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20'
                                     />
                                     <button
                                         type='button'
                                         onClick={togglePasswordVisibility}
-                                        className='absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 focus:outline-none'
+                                        className='absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-white/50 transition-colors hover:text-white focus:outline-none'
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}>
                                         {showPassword ? (
                                             <EyeOffIcon className='h-4 w-4' />
@@ -60,17 +94,25 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                         )}
                                     </button>
                                 </div>
-                                <div className='text-sm text-red-500'>{state?.error?.password}</div>
+                                {state?.error?.password && (
+                                    <span className='text-xs text-red-400'>{state?.error?.password}</span>
+                                )}
                             </div>
 
-                            <div className='flex flex-col gap-3'>
+                            <div className='flex flex-col gap-3 pt-2'>
                                 {isPending ? (
-                                    <Button disabled>
+                                    <Button
+                                        disabled
+                                        style={goldButtonStyle}
+                                        className='h-11 w-full rounded-full font-bold text-[#1a1408] opacity-80 shadow-md'>
                                         <Loader2Icon className='animate-spin' />
                                         Loading
                                     </Button>
                                 ) : (
-                                    <Button type='submit' className='w-full'>
+                                    <Button
+                                        type='submit'
+                                        style={goldButtonStyle}
+                                        className='h-11 w-full rounded-xl font-bold text-[#1a1408] shadow-md transition-opacity hover:opacity-90'>
                                         Login
                                     </Button>
                                 )}

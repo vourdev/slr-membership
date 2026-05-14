@@ -7,20 +7,17 @@ const trustedFeatures = [
     {
         icon: '/icons/ic-list-trusted-1.webp',
         title: 'Built for Australians',
-        description:
-            'Up to 7 prize draws every week — cash, gift cards, and exclusive member giveaways for Aussies.'
+        description: 'Up to 7 prize draws every week — cash, gift cards, and exclusive member giveaways for Aussies.'
     },
     {
         icon: '/icons/ic-list-trusted-2.webp',
         title: 'Transparent Prize System',
-        description:
-            'Know exactly when prizes are drawn and how every entry counts. No hidden fees, no surprises.'
+        description: 'Know exactly when prizes are drawn and how every entry counts. No hidden fees, no surprises.'
     },
     {
         icon: '/icons/ic-list-trusted-3.webp',
         title: 'Partner Discounts',
-        description:
-            'Meaningful savings with trusted brands on groceries, fuel, food & dining, and more.'
+        description: 'Meaningful savings with trusted brands on groceries, fuel, food & dining, and more.'
     },
     {
         icon: '/icons/ic-list-trusted-4.webp',
@@ -32,7 +29,7 @@ const trustedFeatures = [
 const TrustedSection = () => {
     return (
         <section className='slr-section-bg py-16 md:py-24'>
-            <div className='mx-auto max-w-6xl px-4'>
+            <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <p className='text-slr-navy-foreground/60 text-[10px] font-semibold tracking-[0.3em] uppercase md:text-xs'>
                         Trusted by Members
@@ -48,7 +45,7 @@ const TrustedSection = () => {
                     {trustedFeatures.map((feature) => (
                         <div
                             key={feature.title}
-                            className='border-slr-navy-border/60 bg-slr-navy-card/60 flex flex-col gap-4 rounded-2xl border p-6 backdrop-blur-sm transition-colors hover:border-slr-gold/40'>
+                            className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-gold/40 flex flex-col gap-4 rounded-2xl border p-6 backdrop-blur-sm transition-colors'>
                             <Image
                                 src={feature.icon}
                                 alt={feature.title}

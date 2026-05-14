@@ -29,7 +29,7 @@ const upgrades = [
 const BlueTiersSection = () => {
     return (
         <section className='slr-section-bg py-16 md:py-24'>
-            <div className='mx-auto max-w-6xl px-4'>
+            <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <p className='text-slr-navy-foreground/60 text-[10px] font-semibold tracking-[0.3em] uppercase md:text-xs'>
                         Premium Tier
@@ -44,7 +44,7 @@ const BlueTiersSection = () => {
 
                 <div className='mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2'>
                     {/* Main blue card */}
-                    <div className='relative overflow-hidden rounded-2xl border border-slr-blue-tier/60 bg-gradient-to-br from-slr-blue-tier/90 via-slr-blue-tier/70 to-slr-navy-deep p-6 shadow-xl'>
+                    <div className='border-slr-blue-tier/60 from-slr-blue-tier/90 via-slr-blue-tier/70 to-slr-navy-deep relative overflow-hidden rounded-2xl border bg-gradient-to-br p-6 shadow-xl'>
                         <div className='flex items-center justify-between'>
                             <div className='flex items-center gap-3'>
                                 <Image
@@ -112,7 +112,7 @@ const BlueTiersSection = () => {
                             return (
                                 <div
                                     key={tier.label}
-                                    className='border-slr-navy-border/60 bg-slr-navy-card/60 flex items-center justify-between rounded-xl border px-5 py-4 backdrop-blur-sm transition-colors hover:border-slr-blue-tier/50'>
+                                    className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-blue-tier/50 flex items-center justify-between rounded-xl border px-5 py-4 backdrop-blur-sm transition-colors'>
                                     <div className='flex items-center gap-4'>
                                         <Image
                                             src={iconSrc}
