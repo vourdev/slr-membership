@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import Footer from '@/components/common/footer';
-import Navbar from '@/components/common/navbar';
+import { Navbar } from '@/components/common/navbar';
 
 export default async function HomeLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -8,6 +8,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     return (
         <div>
             <Navbar user={session} />
+            {/* <FloatingNavDemo /> */}
             {children}
             <Footer />
         </div>

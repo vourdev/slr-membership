@@ -8,7 +8,7 @@
     /* SLR Membership Brand Colors */
     --slr-navy: oklch(20% 0.06 250);
     --slr-navy-foreground: oklch(98% 0 0);
-    --slr-navy-deep: oklch(14% 0.04 250);
+    --slr-navy-deep: #131619;
     --slr-navy-card: oklch(22% 0.05 250);
     --slr-navy-border: oklch(30% 0.04 250);
     --slr-blue-tier: oklch(50% 0.2 250);
@@ -95,6 +95,9 @@
 }
 
 @theme inline {
+    --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+    --font-montserrat: var(--font-montserrat);
+    --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
     --color-background: var(--background);
@@ -172,6 +175,17 @@
             height: 0;
         }
     }
+
+    @keyframes spotlight {
+        0% {
+            opacity: 0;
+            transform: translate(-72%, -62%) scale(0.5);
+        }
+        100% {
+            opacity: 1;
+            transform: translate(-50%, -40%) scale(1);
+        }
+    }
 }
 
 @layer base {
@@ -180,6 +194,7 @@
     }
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-sans);
     }
 }
 

@@ -1,22 +1,16 @@
 import type { ReactNode } from 'react';
 
 import type { Metadata } from 'next';
-import localFont from 'next/font/local';
+import { Montserrat } from 'next/font/google';
 
 import '@/app/globals.css';
 import { Toaster } from '@/components/ui/sonner';
 
-import { SessionProvider } from 'next-auth/react';
-
-const geistSans = localFont({
-    src: './fonts/GeistVF.woff',
-    variable: '--font-geist-sans',
-    weight: '100 900'
-});
-const geistMono = localFont({
-    src: './fonts/GeistMonoVF.woff',
-    variable: '--font-geist-mono',
-    weight: '100 900'
+const montserrat = Montserrat({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-montserrat',
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
 });
 
 export const metadata: Metadata = {
@@ -29,7 +23,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <html suppressHydrationWarning lang='en'>
             <body
                 suppressHydrationWarning
-                className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground overscroll-none antialiased`}>
+                className={`${montserrat.variable} text-foreground overscroll-none bg-[#131619] antialiased`}>
                 {children}
                 <Toaster />
             </body>

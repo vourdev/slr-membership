@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 const WelcomeSection = () => {
     return (
-        <section className='slr-section-bg relative overflow-hidden py-16 md:py-24'>
+        <section className='relative overflow-hidden bg-[#131619] py-16 md:py-24'>
             <div className='mx-auto max-w-6xl px-4'>
                 <div className='text-center'>
                     <p className='text-slr-navy-foreground/70 text-[10px] font-semibold tracking-[0.35em] uppercase md:text-xs'>
@@ -37,9 +37,7 @@ const WelcomeSection = () => {
                             <h3 className='text-slr-navy-foreground mb-1 text-lg font-bold'>
                                 AUSTRALIA&apos;S BEST VALUE REWARDS CLUB
                             </h3>
-                            <p className='text-slr-navy-foreground/60 text-xs'>
-                                Low fees · More value · More wins
-                            </p>
+                            <p className='text-slr-navy-foreground/60 text-xs'>Low fees · More value · More wins</p>
 
                             <div className='mt-6 grid grid-cols-3 gap-3'>
                                 <div className='bg-slr-navy-deep/80 rounded-xl p-4 text-center'>
