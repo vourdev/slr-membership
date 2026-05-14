@@ -26,7 +26,7 @@ const benefits = [
 const stats = [
     {
         icon: '/icons/ic-member-benefit-1.webp',
-        title: 'Visitors get weekly draws',
+        title: 'Visitors $50 Weekly Draws',
         description: 'Sign up to get a chance to win prizes.'
     },
     {
@@ -65,19 +65,37 @@ const WhyJoinSection = () => {
                         {benefits.map((benefit) => (
                             <li
                                 key={benefit.title}
-                                className='border-slr-navy-border/50 bg-slr-navy-card/60 hover:border-slr-gold/40 flex items-start gap-4 rounded-2xl border p-5 backdrop-blur-sm transition-colors'>
-                                <div className='shrink-0'>
+                                className='relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-5 shadow-[0px_0px_20px_0px_#776D6D26] backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_25px_0px_#776D6D36]'>
+                                {/* Background Grid Decoration */}
+                                <div className='pointer-events-none absolute top-0 -right-15 xl:right-5'>
                                     <Image
-                                        src={benefit.icon}
-                                        alt={benefit.title}
-                                        width={56}
-                                        height={56}
-                                        className='h-12 w-12 object-contain'
+                                        src='/images/grid-background-list-card.webp'
+                                        alt='Grid Decoration'
+                                        width={300}
+                                        height={300}
+                                        className='object-contain'
                                     />
                                 </div>
-                                <div>
-                                    <h3 className='text-slr-navy-foreground text-base font-bold'>{benefit.title}</h3>
-                                    <p className='text-slr-navy-foreground/70 mt-1 text-sm leading-relaxed'>
+
+                                {/* Icon Section */}
+                                <div className='relative z-10 shrink-0'>
+                                    <div className='relative h-20 w-20 sm:h-24 sm:w-24 lg:h-30 lg:w-30'>
+                                        <Image
+                                            src={benefit.icon}
+                                            alt={benefit.title}
+                                            fill
+                                            sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
+                                            className='object-contain'
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Content Section */}
+                                <div className='relative z-10 space-y-2'>
+                                    <h3 className='text-slr-navy-foreground font-bebas-neue text-xl font-bold uppercase md:text-2xl'>
+                                        {benefit.title}
+                                    </h3>
+                                    <p className='text-slr-navy-foreground/60 text-xs font-normal uppercase sm:text-sm md:text-base'>
                                         {benefit.description}
                                     </p>
                                 </div>
@@ -86,37 +104,44 @@ const WhyJoinSection = () => {
                     </ul>
 
                     {/* Pie chart and stats */}
-                    <div className='space-y-6'>
-                        <div className='border-slr-navy-border/50 bg-slr-navy-card/60 rounded-2xl border p-6 backdrop-blur-sm'>
-                            <h3 className='text-slr-navy-foreground text-center text-lg font-bold tracking-wide uppercase'>
-                                Transparent System & Chart
-                            </h3>
-                            <div className='mt-4 flex justify-center'>
-                                <Image
-                                    src='/images/transparent-system-pie-chart.webp'
-                                    alt='Transparent System Pie Chart'
-                                    width={420}
-                                    height={420}
-                                    className='h-auto w-full max-w-sm object-contain'
-                                />
-                            </div>
+                    <div className='space-y-18'>
+                        <h3 className='text-slr-navy-foreground font-bebas-neue text-center text-4xl font-bold tracking-wide uppercase md:text-5xl'>
+                            Transparent System & Chart
+                        </h3>
+                        <div className='mt-4 flex justify-center'>
+                            <Image
+                                src='/images/transparent-system-pie-chart.webp'
+                                alt='Transparent System Pie Chart'
+                                width={540}
+                                height={361}
+                                className='h-auto w-full max-w-sm object-contain'
+                            />
                         </div>
 
                         <div className='space-y-3'>
                             {stats.map((stat) => (
                                 <div
                                     key={stat.title}
-                                    className='border-slr-navy-border/50 bg-slr-navy-card/60 flex items-center gap-4 rounded-xl border p-4 backdrop-blur-sm'>
-                                    <Image
-                                        src={stat.icon}
-                                        alt={stat.title}
-                                        width={48}
-                                        height={48}
-                                        className='h-12 w-12 object-contain'
-                                    />
-                                    <div>
-                                        <p className='text-slr-navy-foreground text-sm font-bold'>{stat.title}</p>
-                                        <p className='text-slr-navy-foreground/60 text-xs'>{stat.description}</p>
+                                    className='relative flex items-center gap-4 overflow-hidden rounded-xl p-4'>
+                                    <div className='pointer-events-none absolute -right-15 xl:right-5'>
+                                        <Image
+                                            src='/images/grid-background-card.webp'
+                                            alt='Grid Decoration'
+                                            width={400}
+                                            height={300}
+                                            className='object-contain'
+                                        />
+                                    </div>
+                                    <div className='relative h-20 w-20 shrink-0 sm:h-24 sm:w-24 lg:h-30 lg:w-30'>
+                                        <Image src={stat.icon} alt={stat.title} fill className='object-contain' />
+                                    </div>
+                                    <div className='space-y-2'>
+                                        <p className='text-slr-navy-foreground font-bebas-neue text-xl font-bold uppercase md:text-2xl'>
+                                            {stat.title}
+                                        </p>
+                                        <p className='text-slr-navy-foreground/60 text-xs uppercase sm:text-sm md:text-base'>
+                                            {stat.description}
+                                        </p>
                                     </div>
                                 </div>
                             ))}

@@ -17,7 +17,7 @@ const MembershipPage = () => {
             <HeroSection />
             <div className='relative'>
                 <WelcomeSection />
-                <div className='pointer-events-none absolute top-[55%] right-0 z-50 hidden -translate-y-1/2 xl:block'>
+                <div className='pointer-events-none absolute top-[55%] right-0 z-20 hidden -translate-y-1/2 xl:block'>
                     <Image
                         src='/images/grid-decoration.webp'
                         alt='Grid Decoration'
