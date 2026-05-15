@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -70,9 +72,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                             </div>
 
                             <div className='grid gap-2'>
-                                <Label htmlFor='password' className='text-sm font-medium text-white'>
-                                    Password
-                                </Label>
+                                <div className='flex items-baseline justify-between'>
+                                    <Label htmlFor='password' className='text-sm font-medium text-white'>
+                                        Password
+                                    </Label>
+                                    <Link
+                                        href='/forgot-password'
+                                        className='text-xs font-medium text-[#FFDC75] hover:underline'>
+                                        Forgot password?
+                                    </Link>
+                                </div>
                                 <div className='relative'>
                                     <Input
                                         id='password'

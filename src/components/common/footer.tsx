@@ -9,23 +9,23 @@ import { ChevronUp, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
     const membershipLinks = [
-        { name: 'Join Now', href: '#join' },
-        { name: 'Pricing', href: '#pricing' },
-        { name: 'Reward Tiers', href: '#tiers' },
-        { name: 'Discount Partners', href: '#partners' }
+        { name: 'Join Now', href: '/sign-up' },
+        { name: 'Compare Plans', href: '/membership' },
+        { name: 'E-Books', href: '/ebooks' },
+        { name: 'Discount Partners', href: '/#partners' }
     ];
 
     const informationLinks = [
-        { name: 'About SLR', href: '#about' },
-        { name: 'Terms & Conditions', href: '#terms' },
-        { name: 'Privacy Policy', href: '#privacy' },
-        { name: 'FAQ', href: '#faq' }
+        { name: 'About SLR', href: '/about' },
+        { name: 'FAQ', href: '/faq' },
+        { name: 'Contact', href: '/contact' },
+        { name: 'Giveaway Rules', href: '/giveaway-rules' }
     ];
 
     const legalLinks = [
-        { name: 'Terms of Service', href: '#terms' },
-        { name: 'Privacy Policy', href: '#privacy' },
-        { name: 'Disclaimer', href: '#disclaimer' }
+        { name: 'Terms & Conditions', href: '/terms' },
+        { name: 'Privacy Policy', href: '/privacy' },
+        { name: 'Disclaimer', href: '/disclaimer' }
     ];
 
     const scrollToTop = () => {
