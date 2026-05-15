@@ -33,7 +33,6 @@ const MembershipPage = () => {
                 <BlueTiersSection />
             </div>
             <DiscountPartnerSection />
-            <PricingSection />
             <TrustedSection />
             <PartnersSection />
             <MembershipCtaSection />

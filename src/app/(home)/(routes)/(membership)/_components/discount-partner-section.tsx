@@ -1,25 +1,27 @@
 import Image from 'next/image';
 
+import PricingSection from './pricing-section';
+
 const categories = [
     {
         icon: '/icons/ic-list-slr-smart-life-reward-1.webp',
-        title: 'Member & Community'
+        title: 'Member \n& Community'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-2.webp',
-        title: 'Rewards & Draws'
+        title: 'Rewards \n& Draws'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-3.webp',
-        title: 'Discounts & Contests'
+        title: 'Discounts \n& Contests'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-4.webp',
-        title: 'Prize Draws & ODDS'
+        title: 'Prize Draws \n& ODDS'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-5.webp',
-        title: 'Chart Benefits'
+        title: 'Chart \nBenefits'
     }
 ];
 
@@ -57,7 +59,7 @@ const DiscountPartnerSection = () => {
                 <div className='mt-12 grid grid-cols-2 gap-4 md:grid-cols-5'>
                     {categories.map((cat) => (
                         <div className='flex w-full flex-col items-center' key={cat.title}>
-                            <div className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-gold/40 flex w-full flex-col items-center gap-3 rounded-xl border p-4 text-center backdrop-blur-sm transition-colors'>
+                            <div className='flex w-full flex-col items-center justify-center gap-3 rounded-xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#0C0E1C_49.73%,#161A30_98.65%)] p-4 text-center shadow-[0px_0px_13px_0px_#00000080] backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_20px_0px_#000000A0]'>
                                 <Image
                                     src={cat.icon}
                                     alt={cat.title}
@@ -66,7 +68,7 @@ const DiscountPartnerSection = () => {
                                     className='h-35 w-35 object-contain'
                                 />
                             </div>
-                            <p className='mt-4 bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-center font-extrabold text-transparent'>
+                            <p className='font-bebas-neue mt-4 bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-center text-xl leading-none font-extrabold whitespace-pre-line text-transparent'>
                                 {cat.title}
                             </p>
                         </div>
@@ -74,8 +76,8 @@ const DiscountPartnerSection = () => {
                 </div>
 
                 {/* Star */}
-                <div className='mt-16 md:mt-24'>
-                    <div className='mt-4 flex w-full items-center justify-center gap-2'>
+                <div className='my-16 md:my-24'>
+                    <div className='flex w-full items-center justify-center gap-2'>
                         <div className='h-px w-75 bg-[linear-gradient(270deg,#E2B42B_0%,rgba(255,255,255,0)_100%)]'></div>
                         <Image
                             src='/icons/ic-star.png'
@@ -101,6 +103,7 @@ const DiscountPartnerSection = () => {
                         <div className='h-px w-75 bg-[linear-gradient(90deg,#E2B42B_0%,rgba(255,255,255,0)_100%)]'></div>
                     </div>
                 </div>
+                <PricingSection />
             </div>
         </section>
     );
