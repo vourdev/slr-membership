@@ -1,9 +1,11 @@
 import React from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
+import GoldCtaButton from '@/components/common/gold-cta-button';
+import SectionEyebrow from '@/components/common/section-eyebrow';
+import SectionHeading from '@/components/common/section-heading';
+import TierUpgradeCard from '@/components/common/tier-upgrade-card';
 
 const redBenefits = {
     perks: [
@@ -65,22 +67,20 @@ const RedTiersSection = () => {
 
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
-                    <div className='mt-4 flex w-full items-center justify-center gap-2'>
-                        <div className='h-px w-16 bg-[linear-gradient(270deg,#D0302F_0%,rgba(255,255,255,0)_100%)]'></div>
-                        <p className='text-xs font-semibold text-red-600 uppercase md:text-sm'> Member Prize Tiers</p>
-                        <div className='h-px w-16 bg-[linear-gradient(90deg,#D0302F_0%,rgba(255,255,255,0)_100%)]'></div>
-                    </div>
+                    <SectionEyebrow label='Member Prize Tiers' color='#DC2626' lineColor='#D0302F' className='mt-4' />
 
-                    <h2 className='font-bebas-neue mt-2 text-center text-[56px] leading-[0.90] font-medium tracking-wider text-white uppercase md:text-[72px] md:leading-none'>
+                    <SectionHeading className='mt-2'>
                         SLR <span className='text-red-600'>RED</span> Reward Tiers
-                    </h2>
+                    </SectionHeading>
+
                     <p className='mt-2 text-center text-sm leading-relaxed text-[#CDCECF] xl:text-base'>
                         Member prize tickets are base on your tier level.
                     </p>
                 </div>
 
                 <div className='mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2'>
-                    <div className='relative isolate rounded-2xl p-1.25 shadow-[0px_0px_20px_0px_#776D6D26]'>
+                    {/* Main red card — gradient border via masked overlay */}
+                    <div className='shadow-card-warm-lg relative isolate rounded-2xl p-1.25'>
                         <div
                             className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#FF6B7A_10%,#C8152E_25%,#8B0010_75.24%,#C8152E_87.62%,#FF6B7A_100%)] mask-exclude p-1.25 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]'
                             aria-hidden='true'
@@ -100,9 +100,7 @@ const RedTiersSection = () => {
                                         <div className='flex flex-wrap items-baseline gap-1 sm:gap-2'>
                                             <p className='font-bebas-neue text-2xl font-extrabold text-white sm:text-3xl'>
                                                 SLR RED{' '}
-                                                <span className='bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text font-extrabold text-transparent'>
-                                                    10$
-                                                </span>
+                                                <span className='text-gradient-gold font-extrabold'>10$</span>
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>
@@ -178,137 +176,44 @@ const RedTiersSection = () => {
                             </div>
 
                             {/* Button */}
-                            <Link href='/sign-up' className='mt-4 block sm:mt-6'>
-                                <Button
-                                    className='h-10 w-full rounded-xl font-bold uppercase sm:h-11'
-                                    style={{
-                                        color: '#0C1132',
-                                        background:
-                                            'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-                                        borderTop: '2px solid #FFDC75'
-                                    }}>
-                                    Join Now - $10/mo
-                                </Button>
-                            </Link>
+                            <GoldCtaButton href='/sign-up' className='mt-4 sm:mt-6'>
+                                Join Now - $10/mo
+                            </GoldCtaButton>
                         </div>
                     </div>
 
-                    {/* Upgrade cards - kanan
-                        Each tier (Red/Gold/Black) has its own unique gradient, border, and inner-badge palette. */}
+                    {/* Upgrade cards - kanan */}
                     <div className='flex flex-col gap-3 sm:gap-4'>
-                        {/* Card 1 — Red $10 */}
-                        <div
-                            style={redCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-red-reward-1.webp'
-                                    alt='Red'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] sm:text-sm sm:tracking-[0.3em]'>
-                                            Red
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $10
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={redBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#E88888] uppercase sm:text-base md:text-lg'>
-                                    1 chance
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    MEMBER ENTRIES
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Card 2 — Gold $20 */}
-                        <div
-                            style={goldCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-red-reward-2.webp'
-                                    alt='Gold'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] sm:text-sm sm:tracking-[0.3em]'>
-                                            Gold
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $20
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={goldBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#FFD147] uppercase sm:text-base md:text-lg'>
-                                    4 chances
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    MEMBER ENTRIES
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Card 3 — Black $30 */}
-                        <div
-                            style={blackCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-red-reward-3.webp'
-                                    alt='Black'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] sm:text-sm sm:tracking-[0.3em]'>
-                                            Black
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $30
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={blackBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#E8E9E9] uppercase sm:text-base md:text-lg'>
-                                    7 chances
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    MEMBER ENTRIES
-                                </p>
-                            </div>
-                        </div>
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-red-reward-1.webp'
+                            iconAlt='Red'
+                            label='Red'
+                            price='$10'
+                            badgeLabel='1 chance'
+                            badgeLabelColor='#E88888'
+                            cardStyle={redCardStyle}
+                            badgeStyle={redBadgeStyle}
+                        />
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-red-reward-2.webp'
+                            iconAlt='Gold'
+                            label='Gold'
+                            price='$20'
+                            badgeLabel='4 chances'
+                            badgeLabelColor='#FFD147'
+                            cardStyle={goldCardStyle}
+                            badgeStyle={goldBadgeStyle}
+                        />
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-red-reward-3.webp'
+                            iconAlt='Black'
+                            label='Black'
+                            price='$30'
+                            badgeLabel='7 chances'
+                            badgeLabelColor='#E8E9E9'
+                            cardStyle={blackCardStyle}
+                            badgeStyle={blackBadgeStyle}
+                        />
                     </div>
                 </div>
             </div>

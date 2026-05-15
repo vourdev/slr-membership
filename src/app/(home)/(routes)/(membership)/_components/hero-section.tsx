@@ -34,7 +34,7 @@ const HeroSection = () => {
                 <div className='pointer-events-none absolute inset-0 flex items-center justify-center bg-[#131619] mask-[radial-gradient(ellipse_at_center,transparent_20%,black)]' />
             </div>
 
-            <StarsBackground />
+            <StarsBackground starDensity={0.0003} />
 
             <div
                 aria-hidden='true'

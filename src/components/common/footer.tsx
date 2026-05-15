@@ -34,19 +34,6 @@ const Footer: React.FC = () => {
 
     return (
         <footer className='bg-slr-navy-deep text-slr-navy-foreground border-slr-navy-border/40 border-t'>
-            {/* Top brand band */}
-            <div className='border-slr-navy-border/40 border-b py-8'>
-                <div className='mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 px-6'>
-                    <Image
-                        src='/images/slr-rewards-logo.webp'
-                        alt='SLR Rewards'
-                        width={80}
-                        height={80}
-                        className='h-14 w-auto'
-                    />
-                </div>
-            </div>
-
             {/* Links */}
             <div className='mx-auto max-w-7xl px-6 py-12'>
                 <div className='grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4'>
@@ -59,7 +46,9 @@ const Footer: React.FC = () => {
                                 height={56}
                                 className='h-12 w-auto'
                             />
-                            <div className='text-base leading-tight font-extrabold tracking-wide'>SMART LIFE REWARDS</div>
+                            <div className='text-base leading-tight font-extrabold tracking-wide'>
+                                SMART LIFE REWARDS
+                            </div>
                         </div>
                         <p className='text-slr-navy-foreground/70 text-sm leading-relaxed'>
                             Australia&apos;s Best Value Rewards Club. Helping Australians beat the cost of living with

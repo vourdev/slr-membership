@@ -1,9 +1,11 @@
 import React from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
+import GoldCtaButton from '@/components/common/gold-cta-button';
+import SectionEyebrow from '@/components/common/section-eyebrow';
+import SectionHeading from '@/components/common/section-heading';
+import TierUpgradeCard from '@/components/common/tier-upgrade-card';
 
 const bluePerks = {
     perks: [
@@ -85,17 +87,12 @@ const BlueTiersSection = () => {
             <div className='mx-auto max-w-7xl px-4'>
                 {/* Header */}
                 <div className='text-center'>
-                    <div className='mt-4 flex w-full items-center justify-center gap-2'>
-                        <div className='h-px w-16 bg-[linear-gradient(270deg,#4D62E5_0%,rgba(255,255,255,0)_100%)]'></div>
-                        <p className='text-xs font-semibold text-[#4D62E5] uppercase md:text-sm'>
-                            Premium Member Tiers
-                        </p>
-                        <div className='h-px w-16 bg-[linear-gradient(90deg,#4D62E5_0%,rgba(255,255,255,0)_100%)]'></div>
-                    </div>
+                    <SectionEyebrow label='Premium Member Tiers' color='#4D62E5' className='mt-4' />
 
-                    <h2 className='font-bebas-neue mt-2 text-center text-[56px] leading-[0.90] font-medium tracking-wider text-white uppercase md:text-[72px] md:leading-none'>
+                    <SectionHeading className='mt-2'>
                         SLR <span className='text-[#4D62E5]'>BLUE</span> Reward Tiers
-                    </h2>
+                    </SectionHeading>
+
                     <p className='mt-2 text-center text-sm leading-relaxed text-[#CDCECF] xl:text-base'>
                         Higher tiers — more chances to win every month.
                     </p>
@@ -103,8 +100,8 @@ const BlueTiersSection = () => {
 
                 {/* Grid */}
                 <div className='mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2'>
-                    {/* Main blue card — gradient border via masked overlay (same technique as red) */}
-                    <div className='relative isolate rounded-2xl p-1.25 shadow-[0px_0px_20px_0px_#776D6D26]'>
+                    {/* Main blue card — gradient border via masked overlay */}
+                    <div className='shadow-card-warm-lg relative isolate rounded-2xl p-1.25'>
                         <div
                             className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#6AACFF_10%,#1A62C0_25%,#0A2E80_75.24%,#1A62C0_87.62%,#6AACFF_100%)] mask-exclude p-1.25 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]'
                             aria-hidden='true'
@@ -124,9 +121,7 @@ const BlueTiersSection = () => {
                                         <div className='flex flex-wrap items-baseline gap-1 sm:gap-2'>
                                             <p className='font-bebas-neue text-2xl font-extrabold text-white sm:text-3xl'>
                                                 SLR BLUE{' '}
-                                                <span className='bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text font-extrabold text-transparent'>
-                                                    26$
-                                                </span>
+                                                <span className='text-gradient-gold font-extrabold'>26$</span>
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>
@@ -202,176 +197,50 @@ const BlueTiersSection = () => {
                             </div>
 
                             {/* Button */}
-                            <Link href='/sign-up' className='mt-auto block'>
-                                <Button
-                                    className='h-10 w-full rounded-xl font-bold uppercase sm:h-11'
-                                    style={{
-                                        color: '#0C1132',
-                                        background:
-                                            'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-                                        borderTop: '2px solid #FFDC75'
-                                    }}>
-                                    Join Now - $26/mo
-                                </Button>
-                            </Link>
+                            <GoldCtaButton href='/sign-up' className='mt-auto'>
+                                Join Now - $26/mo
+                            </GoldCtaButton>
                         </div>
                     </div>
 
-                    {/* Upgrade cards - kanan
-                        Each tier (Silver / Platinum / Black / Black Plus) has its own unique
-                        gradient, border, and inner-badge palette. */}
+                    {/* Upgrade cards - kanan */}
                     <div className='flex flex-col gap-3 sm:gap-4'>
-                        {/* Card 1 — Silver $26 */}
-                        <div
-                            style={silverCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-blue-reward-1.webp'
-                                    alt='Silver'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] whitespace-nowrap sm:text-sm sm:tracking-[0.3em]'>
-                                            Silver
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $26
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={silverBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
-                                    1 Token
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Card 2 — Platinum $52 */}
-                        <div
-                            style={platinumCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-blue-reward-2.webp'
-                                    alt='Platinum'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] whitespace-nowrap sm:text-sm sm:tracking-[0.3em]'>
-                                            Platinum
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $52
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={platinumBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
-                                    4 Tokens
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Card 3 — Black $78 */}
-                        <div
-                            style={blackCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-blue-reward-3.webp'
-                                    alt='Black'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] whitespace-nowrap sm:text-sm sm:tracking-[0.3em]'>
-                                            Black
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $78
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={blackBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
-                                    7 Tokens
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Card 4 — Black Plus $99 */}
-                        <div
-                            style={blackPlusCardStyle}
-                            className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
-                            <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
-                                <Image
-                                    src='/icons/ic-list-slr-blue-reward-4.webp'
-                                    alt='Black Plus'
-                                    width={80}
-                                    height={80}
-                                    className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
-                                />
-                                <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                                    <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                                        <span className='text-xs leading-none font-semibold tracking-[0.18em] whitespace-nowrap sm:text-sm sm:tracking-[0.3em]'>
-                                            Black Plus
-                                        </span>
-                                        <span className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-2xl leading-none font-extrabold tracking-normal text-transparent sm:text-3xl'>
-                                            $99
-                                        </span>
-                                    </div>
-                                    <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>
-                                        /month
-                                    </span>
-                                </div>
-                            </div>
-                            <div
-                                style={blackPlusBadgeStyle}
-                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
-                                    10 Tokens
-                                </p>
-                                <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
-                                </p>
-                            </div>
-                        </div>
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-blue-reward-1.webp'
+                            iconAlt='Silver'
+                            label='Silver'
+                            price='$26'
+                            badgeLabel='1 Token'
+                            cardStyle={silverCardStyle}
+                            badgeStyle={silverBadgeStyle}
+                        />
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-blue-reward-2.webp'
+                            iconAlt='Platinum'
+                            label='Platinum'
+                            price='$52'
+                            badgeLabel='4 Tokens'
+                            cardStyle={platinumCardStyle}
+                            badgeStyle={platinumBadgeStyle}
+                        />
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-blue-reward-3.webp'
+                            iconAlt='Black'
+                            label='Black'
+                            price='$78'
+                            badgeLabel='7 Tokens'
+                            cardStyle={blackCardStyle}
+                            badgeStyle={blackBadgeStyle}
+                        />
+                        <TierUpgradeCard
+                            iconSrc='/icons/ic-list-slr-blue-reward-4.webp'
+                            iconAlt='Black Plus'
+                            label='Black Plus'
+                            price='$99'
+                            badgeLabel='10 Tokens'
+                            cardStyle={blackPlusCardStyle}
+                            badgeStyle={blackPlusBadgeStyle}
+                        />
                     </div>
                 </div>
             </div>

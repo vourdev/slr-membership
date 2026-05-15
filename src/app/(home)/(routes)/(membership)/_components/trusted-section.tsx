@@ -1,7 +1,9 @@
 import Image from 'next/image';
-import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
+import GoldCtaButton from '@/components/common/gold-cta-button';
+import SectionEyebrow from '@/components/common/section-eyebrow';
+import SectionHeading from '@/components/common/section-heading';
+import { StarsBackground } from '@/components/ui/stars-background';
 
 const trustedFeatures = [
     {
@@ -28,17 +30,18 @@ const trustedFeatures = [
 
 const TrustedSection = () => {
     return (
-        <section className='slr-section-bg py-16 md:py-24'>
+        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
+            <StarsBackground starDensity={0.0003} />
+
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
-                    <p className='text-slr-navy-foreground/60 text-[10px] font-semibold tracking-[0.3em] uppercase md:text-xs'>
-                        Trusted by Members
-                    </p>
-                    <h2 className='text-slr-navy-foreground mt-3 text-3xl font-extrabold md:text-4xl'>
+                    <SectionEyebrow label='TRUSTED BY THOUSANDS' color='#E2B42B' className='mt-4' />
+
+                    <SectionHeading className='mt-2 text-[42px] leading-none md:text-[50px] lg:text-[60px]'>
                         SEE WHY THOUSANDS OF AUSTRALIANS
                         <br />
-                        LOVE <span className='text-slr-gold'>SMART LIFE REWARDS</span>
-                    </h2>
+                        LOVE <span className='text-gradient-gold font-extrabold'>SMART LIFE REWARDS</span>
+                    </SectionHeading>
                 </div>
 
                 <div className='mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4'>
@@ -60,11 +63,7 @@ const TrustedSection = () => {
                 </div>
 
                 <div className='mt-10 flex justify-center'>
-                    <Link href='/sign-up'>
-                        <Button className='slr-gold-gradient text-slr-gold-foreground h-12 rounded-full px-8 font-bold'>
-                            Join Now — It&apos;s Free to Start
-                        </Button>
-                    </Link>
+                    <GoldCtaButton href='/sign-up'>JOIN NOW - IT`S FREE TO START</GoldCtaButton>
                 </div>
             </div>
         </section>

@@ -227,4 +227,37 @@
     .slr-gold-glow {
         box-shadow: 0 0 60px -15px rgba(230, 180, 60, 0.55);
     }
+
+    /* ─── Brand gradients ────────────────────────────────────────────────── */
+
+    /* Gold gradient applied as text fill — pair with no extra classes needed */
+    .text-gradient-gold {
+        background: linear-gradient(89.12deg, #f5d78e 3.07%, #d4af37 41.36%, #ffe066 60.5%, #a07018 98.79%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    /* Gold gradient as solid background — used for CTAs, badges, accents */
+    .bg-gradient-gold {
+        background: linear-gradient(89.12deg, #f5d78e 3.07%, #d4af37 41.36%, #ffe066 60.5%, #a07018 98.79%);
+    }
+
+    /* Dark navy card gradient — used for tier/pricing cards */
+    .bg-card-dark-navy {
+        background: linear-gradient(154.36deg, #141820 0.82%, #1e2530 49.73%, #141820 98.65%);
+    }
+
+    /* ─── Common shadows ─────────────────────────────────────────────────── */
+    .shadow-card-soft {
+        box-shadow: 0px 0px 13px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    .shadow-card-warm {
+        box-shadow: 0px 0px 13px 0px rgba(119, 109, 109, 0.15);
+    }
+
+    .shadow-card-warm-lg {
+        box-shadow: 0px 0px 20px 0px rgba(119, 109, 109, 0.15);
+    }
 }

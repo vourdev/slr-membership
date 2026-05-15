@@ -1,5 +1,8 @@
 import Image from 'next/image';
 
+import SectionEyebrow from '@/components/common/section-eyebrow';
+import SectionHeading from '@/components/common/section-heading';
+
 const benefits = [
     {
         icon: '/icons/ic-list-member-benefit-1.webp',
@@ -42,17 +45,16 @@ const WhyJoinSection = () => {
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='flex flex-col items-center justify-center xl:flex-row xl:justify-between'>
                     <div className='flex flex-col'>
-                        <div className='mt-4 flex w-full items-center justify-center gap-2 xl:justify-start'>
-                            <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
-                            <p className='text-xs font-semibold text-[#E2B42B] uppercase md:text-sm'>Member Benefits</p>
-                            <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
-                        </div>
-                        <h2 className='font-bebas-neue mt-3 text-center text-[56px] leading-[0.90] font-medium tracking-wider text-white uppercase md:text-[72px] md:leading-none'>
+                        <SectionEyebrow
+                            label='Member Benefits'
+                            color='#E2B42B'
+                            lineColor='#B08A20'
+                            className='mt-4 xl:justify-start'
+                        />
+                        <SectionHeading className='mt-3'>
                             Why Members
-                            <span className='block bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-transparent md:ml-3 md:inline'>
-                                Join SLR?
-                            </span>
-                        </h2>
+                            <span className='text-gradient-gold block md:ml-3 md:inline'>Join SLR?</span>
+                        </SectionHeading>
                     </div>
                     <p className='mt-3 max-w-sm text-center text-sm leading-relaxed text-[#CDCECF] xl:max-w-xs xl:text-right xl:text-base'>
                         More than just a rewards club — a smarter way to live and save in Australia.
@@ -65,7 +67,7 @@ const WhyJoinSection = () => {
                         {benefits.map((benefit) => (
                             <li
                                 key={benefit.title}
-                                className='relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-5 shadow-[0px_0px_20px_0px_#776D6D26] backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_25px_0px_#776D6D36]'>
+                                className='bg-card-dark-navy shadow-card-warm-lg relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#A0B4D259] p-5 backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_25px_0px_#776D6D36]'>
                                 {/* Background Grid Decoration */}
                                 <div className='pointer-events-none absolute top-0 -right-15 xl:right-5'>
                                     <Image

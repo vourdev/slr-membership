@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 
+import SectionHeading from '@/components/common/section-heading';
+
 import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 
 const partners = Array.from({ length: 10 }, (_, idx) => ({
@@ -84,10 +86,11 @@ const PartnersSection = () => {
 
     return (
         <section id='partners' className='bg-slr-navy-deep relative overflow-hidden py-16 md:py-24'>
-            <div className='px-4 text-center'>
-                <h2 className='text-slr-navy-foreground text-2xl font-extrabold md:text-3xl'>
-                    OUR PARTNERS AND <span className='text-slr-gold'>DISCOUNTS</span>
-                </h2>
+            <div className='px-4 pb-12 text-center'>
+                <SectionHeading className='mt-2 text-[42px] leading-none md:text-[50px] lg:text-[60px]'>
+                    OUR PARTNERS AND{' '}
+                    <span className='text-gradient-gold font-extrabold'>DISCOUNTS</span>
+                </SectionHeading>
             </div>
 
             <motion.div
