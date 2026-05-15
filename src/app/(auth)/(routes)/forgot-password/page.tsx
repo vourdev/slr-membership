@@ -1,23 +1,21 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { RegisterForm } from './components/register-form';
+import ForgotPasswordForm from './components/forgot-password-form';
 
-const SignUp = () => {
+const ForgotPasswordPage = () => {
     return (
         <div className='relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-[#131619] p-6 md:p-10'>
-            {/* Decorative gradients — soft glow consistent with hero/welcome styling */}
             <div
                 aria-hidden='true'
-                className='pointer-events-none absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.30)_0%,rgba(147,51,234,0.12)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-[560px] md:w-[560px]'
+                className='pointer-events-none absolute -top-32 -left-32 h-105 w-105 rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.30)_0%,rgba(147,51,234,0.12)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-140 md:w-140'
             />
             <div
                 aria-hidden='true'
-                className='pointer-events-none absolute -right-32 -bottom-32 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(255,255,255,0.08)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-[560px] md:w-[560px]'
+                className='pointer-events-none absolute -right-32 -bottom-32 h-105 w-105 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(255,255,255,0.08)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-140 md:w-140'
             />
 
-            <div className='relative z-10 w-full max-w-3xl'>
-                {/* Brand */}
+            <div className='relative z-10 w-full max-w-md'>
                 <div className='mb-8 flex flex-col items-center gap-3 text-center'>
                     <Link href='/'>
                         <Image
@@ -29,17 +27,15 @@ const SignUp = () => {
                             className='h-16 w-auto md:h-20'
                         />
                     </Link>
-                    <p className='text-xs font-medium tracking-[0.3em] text-[#CDCECF] uppercase'>
-                        Join the Rewards Club
-                    </p>
+                    <p className='text-xs font-medium tracking-[0.3em] text-[#CDCECF] uppercase'>Reset your password</p>
                 </div>
 
-                <RegisterForm />
+                <ForgotPasswordForm />
 
                 <p className='mt-6 text-center text-sm text-[#CDCECF]'>
-                    Already have an account?{' '}
+                    Remembered it?{' '}
                     <Link href='/sign-in' className='font-semibold text-white transition-colors hover:underline'>
-                        Sign in
+                        Back to sign in
                     </Link>
                 </p>
             </div>
@@ -47,4 +43,4 @@ const SignUp = () => {
     );
 };
 
-export default SignUp;
+export default ForgotPasswordPage;

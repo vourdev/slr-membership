@@ -195,7 +195,7 @@ export function Navbar({ user }: NavbarProps) {
                         })}
                         <li className='pt-2'>
                             <Link
-                                href='#cta'
+                                href='/sign-up'
                                 style={goldButtonStyle}
                                 className='block w-full rounded-xl px-5 py-2 text-center font-bold text-[#1a1408] shadow-md'
                                 onClick={toggleMenu}>
