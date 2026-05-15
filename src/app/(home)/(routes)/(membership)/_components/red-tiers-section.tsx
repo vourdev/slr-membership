@@ -1,3 +1,5 @@
+import React from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,17 +15,54 @@ const redBenefits = {
     rewards: ['Digital offers', '$10 cash credit', '$50 voucher', '$100 prize ballot']
 };
 
-// Shared style for upgrade cards — each card will eventually get its own gradient,
-// for now they all share this temporary look:
-const upgradeCardStyle: React.CSSProperties = {
+// ─── Upgrade card styles — each tier has its own gradient + border ──────────
+
+const redCardStyle: React.CSSProperties = {
     background: 'linear-gradient(154.36deg, #1C0308 0.82%, #2A0810 49.73%, #1A0306 98.65%)',
     border: '1px solid #C8152E66',
     boxShadow: '0px 0px 13px 0px #776D6D26'
 };
 
+const redBadgeStyle: React.CSSProperties = {
+    background: '#C8152E1A',
+    border: '1px solid #C8152E4D'
+};
+
+const goldCardStyle: React.CSSProperties = {
+    background: 'linear-gradient(154.36deg, #140E00 0.82%, #1E1600 49.73%, #140E00 98.65%)',
+    border: '1px solid #D4AF3759',
+    boxShadow: '0px 0px 13px 0px #776D6D26'
+};
+
+const goldBadgeStyle: React.CSSProperties = {
+    background: '#D4AF370D',
+    border: '1px solid #D4AF374D'
+};
+
+const blackCardStyle: React.CSSProperties = {
+    background: 'linear-gradient(154.36deg, #0A0A0A 0.82%, #181818 49.73%)',
+    border: '1px solid',
+    borderImageSource:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%)',
+    borderImageSlice: 1,
+    boxShadow: '0px 0px 13px 0px #776D6D26'
+};
+
+const blackBadgeStyle: React.CSSProperties = {
+    background: '#FFFFFF0D',
+    border: '1px solid #FFFFFF1A'
+};
+
 const RedTiersSection = () => {
     return (
-        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
+        <section className='bg-slr-navy-deep relative isolate overflow-hidden py-16 md:py-24'>
+            {/* Decorative background — red-300 radial glow, left side, slightly raised
+                behind the SLR Red main card. Hidden on mobile to avoid clutter. */}
+            <div
+                aria-hidden='true'
+                className='pointer-events-none absolute top-30 left-0 -z-10 hidden h-143 w-143 rounded-full bg-[radial-gradient(circle,rgba(252,165,165,0.45)_0%,rgba(252,165,165,0.18)_1%,transparent_70%)] mix-blend-screen blur-3xl xl:block'
+            />
+
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <div className='mt-4 flex w-full items-center justify-center gap-2'>
@@ -155,13 +194,11 @@ const RedTiersSection = () => {
                     </div>
 
                     {/* Upgrade cards - kanan
-                        Each card is written explicitly (no map) so that each can later get its own
-                        unique gradient/border/shadow without conditional logic. For now they all
-                        share `upgradeCardStyle`. */}
+                        Each tier (Red/Gold/Black) has its own unique gradient, border, and inner-badge palette. */}
                     <div className='flex flex-col gap-3 sm:gap-4'>
-                        {/* Card 1 — Red */}
+                        {/* Card 1 — Red $10 */}
                         <div
-                            style={upgradeCardStyle}
+                            style={redCardStyle}
                             className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
                             <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
                                 <Image
@@ -185,19 +222,21 @@ const RedTiersSection = () => {
                                     </span>
                                 </div>
                             </div>
-                            <div className='flex shrink-0 flex-col items-center justify-center rounded-xl border border-[#C8152E4D] bg-[#C8152E1A] p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
+                            <div
+                                style={redBadgeStyle}
+                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
+                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#E88888] uppercase sm:text-base md:text-lg'>
                                     1 chance
                                 </p>
                                 <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
+                                    MEMBER ENTRIES
                                 </p>
                             </div>
                         </div>
 
-                        {/* Card 2 — Gold */}
+                        {/* Card 2 — Gold $20 */}
                         <div
-                            style={upgradeCardStyle}
+                            style={goldCardStyle}
                             className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
                             <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
                                 <Image
@@ -221,19 +260,21 @@ const RedTiersSection = () => {
                                     </span>
                                 </div>
                             </div>
-                            <div className='flex shrink-0 flex-col items-center justify-center rounded-xl border border-[#C8152E4D] bg-[#C8152E1A] p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
+                            <div
+                                style={goldBadgeStyle}
+                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
+                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#FFD147] uppercase sm:text-base md:text-lg'>
                                     4 chances
                                 </p>
                                 <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
+                                    MEMBER ENTRIES
                                 </p>
                             </div>
                         </div>
 
-                        {/* Card 3 — Black */}
+                        {/* Card 3 — Black $30 */}
                         <div
-                            style={upgradeCardStyle}
+                            style={blackCardStyle}
                             className='flex flex-1 items-center justify-between gap-2 rounded-xl px-3 py-3 transition-colors sm:gap-3 sm:px-4 sm:py-4 md:px-5'>
                             <div className='flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4'>
                                 <Image
@@ -257,12 +298,14 @@ const RedTiersSection = () => {
                                     </span>
                                 </div>
                             </div>
-                            <div className='flex shrink-0 flex-col items-center justify-center rounded-xl border border-[#C8152E4D] bg-[#C8152E1A] p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
-                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#F5D78E] uppercase sm:text-base md:text-lg'>
+                            <div
+                                style={blackBadgeStyle}
+                                className='flex shrink-0 flex-col items-center justify-center rounded-xl p-2 text-center sm:rounded-2xl sm:p-3 md:p-4'>
+                                <p className='text-sm leading-none font-extrabold whitespace-nowrap text-[#E8E9E9] uppercase sm:text-base md:text-lg'>
                                     7 chances
                                 </p>
                                 <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
-                                    Membership entries
+                                    MEMBER ENTRIES
                                 </p>
                             </div>
                         </div>

@@ -1,102 +1,105 @@
 import Image from 'next/image';
-import Link from 'next/link';
-
-import { Button } from '@/components/ui/button';
 
 const categories = [
     {
         icon: '/icons/ic-list-slr-smart-life-reward-1.webp',
-        title: 'Hospitality',
-        subtitle: '& Community'
+        title: 'Member & Community'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-2.webp',
-        title: 'Rewards',
-        subtitle: 'Saving'
+        title: 'Rewards & Draws'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-3.webp',
-        title: 'Discounts',
-        subtitle: '& Contests'
+        title: 'Discounts & Contests'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-4.webp',
-        title: 'Prize Draws',
-        subtitle: 'In Australia'
+        title: 'Prize Draws & ODDS'
     },
     {
         icon: '/icons/ic-list-slr-smart-life-reward-5.webp',
-        title: 'Member',
-        subtitle: 'Benefits'
+        title: 'Chart Benefits'
     }
 ];
 
 const DiscountPartnerSection = () => {
     return (
-        <section className='slr-section-bg py-16 md:py-24'>
+        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
-                <div className='text-center'>
-                    <p className='text-slr-navy-foreground/60 text-[10px] font-semibold tracking-[0.3em] uppercase md:text-xs'>
-                        Member Access To
-                    </p>
-                    <h2 className='text-slr-navy-foreground mt-3 text-3xl font-extrabold md:text-4xl'>
-                        EXCLUSIVE <span className='text-slr-gold'>DISCOUNT PARTNER</span> PROGRAM
+                <div className='mb-8 text-center'>
+                    <div className='mt-4 flex w-full items-center justify-center gap-2'>
+                        <div className='h-px w-16 bg-[linear-gradient(270deg,#E2B42B_0%,rgba(255,255,255,0)_100%)]'></div>
+                        <p className='text-xs font-semibold text-[#E2B42B] uppercase md:text-sm'>Gain Access To Our</p>
+                        <div className='h-px w-16 bg-[linear-gradient(90deg,#E2B42B_0%,rgba(255,255,255,0)_100%)]'></div>
+                    </div>
+
+                    <h2 className='font-bebas-neue mt-2 text-center text-[56px] leading-[0.90] font-medium tracking-wider text-white uppercase md:text-[72px] md:leading-none'>
+                        Exclusive Discount Partner Program
                     </h2>
-                    <p className='text-slr-navy-foreground/60 mx-auto mt-3 max-w-xl text-sm'>
-                        Save thousands with our partner discounts.
+                    <p className='mt-2 text-center text-sm leading-relaxed text-[#AA8720] xl:text-base'>
+                        And Community Support & Discounts
                     </p>
                 </div>
 
                 {/* SLR Circle Badge */}
-                <div className='mt-12 flex justify-center'>
-                    <div className='relative'>
-                        <div className='border-slr-gold/60 from-slr-blue-tier/50 to-slr-navy-deep slr-gold-glow flex aspect-square w-56 flex-col items-center justify-center rounded-full border-4 bg-gradient-to-br'>
-                            <p className='text-slr-navy-foreground/60 text-[10px] tracking-[0.3em] uppercase'>
-                                Rewards
-                            </p>
-                            <p className='text-slr-gold mt-1 text-4xl font-extrabold tracking-wider'>SLR</p>
-                            <p className='text-slr-navy-foreground/80 mt-1 text-[10px] tracking-widest uppercase'>
-                                Smart Life Rewards
-                            </p>
-                            <p className='text-slr-navy-foreground/50 mt-3 text-[9px] tracking-widest uppercase'>
-                                Membership
-                            </p>
-                            <p className='text-slr-gold text-lg font-extrabold'>4 LIFE</p>
-                            <Link href='/sign-up'>
-                                <Button className='slr-gold-gradient text-slr-gold-foreground mt-3 h-8 rounded-full px-4 text-[10px] font-bold tracking-wider uppercase'>
-                                    Start Here
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+                <div className='mt-4 flex justify-center'>
+                    <Image
+                        src='/images/slr-rewards-partner-program.webp'
+                        alt='Transparent System Pie Chart'
+                        width={540}
+                        height={361}
+                        className='h-auto w-full max-w-sm object-contain'
+                    />
                 </div>
 
                 {/* Category cards */}
                 <div className='mt-12 grid grid-cols-2 gap-4 md:grid-cols-5'>
                     {categories.map((cat) => (
-                        <div
-                            key={cat.title}
-                            className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-gold/40 flex flex-col items-center gap-3 rounded-xl border p-4 text-center backdrop-blur-sm transition-colors'>
-                            <Image
-                                src={cat.icon}
-                                alt={cat.title}
-                                width={56}
-                                height={56}
-                                className='h-12 w-12 object-contain'
-                            />
-                            <div>
-                                <p className='text-slr-navy-foreground text-xs font-bold'>{cat.title}</p>
-                                <p className='text-slr-navy-foreground/60 text-[10px]'>{cat.subtitle}</p>
+                        <div className='flex w-full flex-col items-center' key={cat.title}>
+                            <div className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-gold/40 flex w-full flex-col items-center gap-3 rounded-xl border p-4 text-center backdrop-blur-sm transition-colors'>
+                                <Image
+                                    src={cat.icon}
+                                    alt={cat.title}
+                                    width={140}
+                                    height={140}
+                                    className='h-35 w-35 object-contain'
+                                />
                             </div>
+                            <p className='mt-4 bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-center font-extrabold text-transparent'>
+                                {cat.title}
+                            </p>
                         </div>
                     ))}
                 </div>
 
-                {/* Pagination dots */}
-                <div className='mt-8 flex items-center justify-center gap-2'>
-                    <span className='bg-slr-gold h-2 w-6 rounded-full' />
-                    <span className='bg-slr-navy-foreground/30 h-2 w-2 rounded-full' />
-                    <span className='bg-slr-navy-foreground/30 h-2 w-2 rounded-full' />
+                {/* Star */}
+                <div className='mt-16 md:mt-24'>
+                    <div className='mt-4 flex w-full items-center justify-center gap-2'>
+                        <div className='h-px w-75 bg-[linear-gradient(270deg,#E2B42B_0%,rgba(255,255,255,0)_100%)]'></div>
+                        <Image
+                            src='/icons/ic-star.png'
+                            alt='Star Icon'
+                            width={20}
+                            height={20}
+                            className='mt-0.5 h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5'
+                        />
+                        <Image
+                            src='/icons/ic-star.png'
+                            alt='Star Icon'
+                            width={20}
+                            height={20}
+                            className='mt-0.5 h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5'
+                        />
+                        <Image
+                            src='/icons/ic-star.png'
+                            alt='Star Icon'
+                            width={20}
+                            height={20}
+                            className='mt-0.5 h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5'
+                        />
+                        <div className='h-px w-75 bg-[linear-gradient(90deg,#E2B42B_0%,rgba(255,255,255,0)_100%)]'></div>
+                    </div>
                 </div>
             </div>
         </section>

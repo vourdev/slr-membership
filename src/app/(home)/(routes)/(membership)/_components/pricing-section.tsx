@@ -32,32 +32,43 @@ const plans = [
 
 const PricingSection = () => {
     return (
-        <section id='pricing' className='slr-section-bg py-16 md:py-20'>
-            <div className='mx-auto max-w-5xl px-4'>
-                <div className='grid grid-cols-1 gap-5 md:grid-cols-3'>
-                    {plans.map((plan) => (
-                        <div
-                            key={plan.label}
-                            className={cn(
-                                'flex flex-col items-center justify-between rounded-2xl border p-8 text-center shadow-lg',
-                                plan.accentClass
-                            )}>
-                            <p className='text-slr-navy-foreground/80 text-[10px] font-semibold tracking-[0.3em] uppercase'>
-                                {plan.label}
-                            </p>
-                            <p className={cn('mt-4 text-5xl font-extrabold', plan.priceClass)}>{plan.price}</p>
-                            <p className='text-slr-navy-foreground/70 mt-1 text-xs'>{plan.note}</p>
-                            <Link href={plan.href} className='mt-6 w-full'>
-                                <Button className='slr-gold-gradient text-slr-gold-foreground h-10 w-full rounded-full font-bold'>
-                                    Select Plan
-                                </Button>
-                            </Link>
-                        </div>
-                    ))}
+        <section id='pricing' className='bg-slr-navy-deep relative mx-auto max-w-7xl px-4 py-16 md:py-24'>
+            <div className='grid grid-cols-3 gap-2 sm:gap-3'>
+                {/* Visitor */}
+                <div className='flex flex-col items-center justify-between rounded-xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-3 text-center shadow-[0px_0px_13px_0px_#00000080] sm:p-4'>
+                    <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase sm:text-xs md:text-sm'>
+                        Visitor
+                    </p>
+                    <p className='font-bebas-neue mt-2 text-[40px] font-extrabold text-white sm:text-[52px] md:text-[60px] lg:text-[50px] xl:text-[60px]'>
+                        FREE
+                    </p>
+                    <p className='mt-1 text-[10px] text-[#8EA0B8] sm:text-sm'>No credit card</p>
+                </div>
+
+                {/* Red */}
+                <div className='flex flex-col items-center justify-between rounded-xl border border-[#C8152E66] bg-[linear-gradient(154.36deg,#1C0308_0.82%,#2A0810_49.73%,#1A0306_98.65%)] p-3 text-center shadow-[0px_0px_13px_0px_#776D6D26] sm:p-4'>
+                    <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase sm:text-xs md:text-sm'>
+                        Red
+                    </p>
+                    <p className='font-bebas-neue mt-2 text-[40px] leading-none font-extrabold text-white sm:text-[52px] md:text-[60px] lg:text-[50px] xl:text-[60px]'>
+                        $10
+                    </p>
+                    <p className='mt-1 text-[10px] text-[#8EA0B8] sm:text-sm'>/Month</p>
+                </div>
+
+                {/* SLR Premium */}
+                <div className='flex flex-col items-center justify-between rounded-xl border border-[#2878E84D] bg-[linear-gradient(154.36deg,#0E1828_0.82%,#142034_49.73%,#0E1828_98.65%)] p-3 text-center shadow-[0px_0px_13px_0px_#00000080] sm:p-4'>
+                    <p className='text-[10px] font-semibold tracking-widest text-[#2878E8] uppercase sm:text-xs md:text-sm'>
+                        SLR Premium
+                    </p>
+                    <p className='font-bebas-neue mt-2 text-[40px] leading-none font-extrabold text-white sm:text-[52px] md:text-[60px] lg:text-[50px] xl:text-[60px]'>
+                        $26
+                    </p>
+                    <p className='mt-1 text-[10px] tracking-wide text-[#8EA0B8] uppercase sm:text-xs'>/ Month</p>
                 </div>
             </div>
 
-            <p className='text-slr-navy-foreground/60 mx-auto mt-10 max-w-2xl text-center text-xs px-4'>
+            <p className='text-slr-navy-foreground/60 mx-auto mt-10 max-w-2xl px-4 text-center text-xs'>
                 Smart Life Rewards is a membership platform designed to help Australians access value through rewards,
                 promotional prizes, partner discounts, and digital offers.
             </p>
