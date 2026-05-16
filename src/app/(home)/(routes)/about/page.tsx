@@ -119,7 +119,7 @@ const AboutPage = () => {
                         </span>
                     </>
                 }
-                description="A homegrown rewards club, built to help everyday Australians beat the rising cost of living — one cycle at a time."
+                description='A homegrown rewards club, built to help everyday Australians beat the rising cost of living — one cycle at a time.'
             />
 
             <section className='bg-slr-navy-deep relative py-12 md:py-20'>
@@ -141,8 +141,8 @@ const AboutPage = () => {
                             <div className='mt-5 space-y-4 text-sm leading-relaxed text-[#CDCECF] md:text-base'>
                                 <p>
                                     Rewards programs in Australia were either tied to a single retailer or buried inside
-                                    loyalty schemes nobody could actually use. Meanwhile the cost of living kept rising —
-                                    fuel, groceries, energy, everything.
+                                    loyalty schemes nobody could actually use. Meanwhile the cost of living kept rising
+                                    — fuel, groceries, energy, everything.
                                 </p>
                                 <p>
                                     We wanted a membership that worked the other way around. One flat monthly fee. Real
@@ -157,7 +157,9 @@ const AboutPage = () => {
                             </div>
                             <div className='mt-7 flex flex-wrap gap-3'>
                                 <Link href='/sign-up'>
-                                    <Button style={goldButtonStyle} className='h-11 rounded-xl px-7 font-bold uppercase'>
+                                    <Button
+                                        style={goldButtonStyle}
+                                        className='h-11 rounded-xl px-7 font-bold uppercase'>
                                         Join Now
                                     </Button>
                                 </Link>
@@ -286,6 +288,7 @@ const AboutPage = () => {
                     <div className='mt-12 grid grid-cols-1 gap-5 md:grid-cols-2'>
                         {values.map(({ icon: Icon, title, body, accent }) => {
                             const s = accentStyles[accent];
+
                             return (
                                 <div
                                     key={title}
@@ -344,7 +347,7 @@ const AboutPage = () => {
                 <div className='mx-auto max-w-4xl px-4'>
                     <div className='relative isolate rounded-2xl p-1.25 shadow-[0px_0px_20px_0px_#776D6D26]'>
                         <div
-                            className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#FFE066_10%,#D4AF37_25%,#A07018_75%,#D4AF37_87%,#FFE066_100%)] [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] mask-exclude p-1.25'
+                            className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#FFE066_10%,#D4AF37_25%,#A07018_75%,#D4AF37_87%,#FFE066_100%)] mask-exclude p-1.25 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]'
                             aria-hidden='true'
                         />
                         <div className='rounded-[calc(1rem-5px)] bg-[linear-gradient(180deg,#1A1408_0%,#0C0A04_50%,#1A1408_100%)] p-8 text-center md:p-12'>

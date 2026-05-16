@@ -38,11 +38,11 @@ const HeroSection = () => {
 
             <div
                 aria-hidden='true'
-                className='pointer-events-none absolute top-[15%] z-10 hidden h-105 w-200 rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.45)_0%,rgba(147,51,234,0.18)_1%,transparent_70%)] mix-blend-screen blur-3xl md:-left-20 md:h-180 xl:block'
+                className='animate-studio-fade-in pointer-events-none absolute top-[15%] z-10 hidden h-105 w-200 rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.45)_0%,rgba(147,51,234,0.18)_1%,transparent_70%)] opacity-0 mix-blend-screen blur-3xl md:-left-10 md:h-180 xl:block'
             />
             <div
                 aria-hidden='true'
-                className='pointer-events-none absolute top-[15%] z-10 hidden h-105 w-200 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0.12)_1%,transparent_70%)] mix-blend-screen blur-3xl md:-right-20 md:h-180 xl:block'
+                className='animate-studio-fade-in pointer-events-none absolute top-[15%] z-10 hidden h-105 w-200 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0.12)_1%,transparent_70%)] opacity-0 mix-blend-screen blur-3xl md:-right-10 md:h-180 xl:block'
             />
 
             <div

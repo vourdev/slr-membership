@@ -37,6 +37,7 @@ const PartnersSection = () => {
         };
         // Wait one frame for layout
         const t = window.requestAnimationFrame(init);
+
         return () => window.cancelAnimationFrame(t);
     }, [xRow1]);
 
@@ -85,11 +86,10 @@ const PartnersSection = () => {
     };
 
     return (
-        <section id='partners' className='bg-slr-navy-deep relative overflow-hidden py-16 md:py-24'>
+        <section id='partners' className='bg-slr-navy-deep relative overflow-hidden pt-16 md:pt-24'>
             <div className='px-4 pb-12 text-center'>
                 <SectionHeading className='mt-2 text-[42px] leading-none md:text-[50px] lg:text-[60px]'>
-                    OUR PARTNERS AND{' '}
-                    <span className='text-gradient-gold font-extrabold'>DISCOUNTS</span>
+                    OUR PARTNERS AND <span className='text-gradient-gold font-extrabold'>DISCOUNTS</span>
                 </SectionHeading>
             </div>
 

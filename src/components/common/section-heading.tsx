@@ -20,7 +20,8 @@ type SectionHeadingProps = {
  */
 const SectionHeading: FC<SectionHeadingProps> = ({ children, className, as = 'h2' }) => {
     const Tag = as;
-    return (
+    
+return (
         <Tag
             className={cn(
                 'font-bebas-neue text-center text-[56px] leading-[0.90] font-medium tracking-wider text-white uppercase md:text-[72px] md:leading-none',

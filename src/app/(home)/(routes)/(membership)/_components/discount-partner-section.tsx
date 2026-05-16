@@ -30,7 +30,7 @@ const categories = [
 
 const DiscountPartnerSection = () => {
     return (
-        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
+        <section className='bg-slr-navy-deep relative pt-16 md:pt-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='mb-8 text-center'>
                     <SectionEyebrow label='Gain Access To Our' color='#E2B42B' className='mt-4' />

@@ -19,6 +19,7 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: any[] }) {
                     <BreadcrumbList>
                         {breadcrumbs.map((item, index) => {
                             const isLast = index === breadcrumbs.length - 1;
+
                             return (
                                 <Fragment key={index}>
                                     <BreadcrumbItem>

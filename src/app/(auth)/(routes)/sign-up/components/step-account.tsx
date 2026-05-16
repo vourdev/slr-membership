@@ -5,18 +5,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AU_STATES, AuStateCode } from '@/constant/au-states';
 import { SignUpSchema } from '@/lib/zod';
 
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { SignUpFormData } from './types';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 const goldButtonStyle: React.CSSProperties = {
     color: '#0C1132',
@@ -59,6 +53,7 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                 state: fieldErrors.state?.[0],
                 phone: fieldErrors.phone?.[0]
             });
+
             return;
         }
         onNext(values);
@@ -137,12 +132,10 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                     <Label htmlFor='state' className='text-sm font-medium text-white'>
                         State / territory
                     </Label>
-                    <Select
-                        value={values.state || undefined}
-                        onValueChange={(v) => update('state', v as AuStateCode)}>
+                    <Select value={values.state || undefined} onValueChange={(v) => update('state', v as AuStateCode)}>
                         <SelectTrigger
                             id='state'
-                            className='h-11 w-full rounded-lg border-white/10 bg-white/5 text-white data-[placeholder]:text-white/40 focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20'>
+                            className='h-11 w-full rounded-lg border-white/10 bg-white/5 text-white focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20 data-placeholder:text-white/40'>
                             <SelectValue placeholder='Select…' />
                         </SelectTrigger>
                         <SelectContent className='border-white/10 bg-[#141820] text-white'>

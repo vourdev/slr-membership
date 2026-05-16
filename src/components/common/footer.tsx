@@ -46,24 +46,21 @@ const Footer: React.FC = () => {
                                 height={56}
                                 className='h-12 w-auto'
                             />
-                            <div className='text-base leading-tight font-extrabold tracking-wide'>
-                                SMART LIFE REWARDS
-                            </div>
                         </div>
-                        <p className='text-slr-navy-foreground/70 text-sm leading-relaxed'>
+                        <p className='text-sm leading-relaxed text-[#757575]'>
                             Australia&apos;s Best Value Rewards Club. Helping Australians beat the cost of living with
                             weekly rewards, partner discounts, and digital offers.
                         </p>
                     </div>
 
                     <div>
-                        <h3 className='mb-4 text-sm font-bold tracking-widest uppercase'>Membership</h3>
+                        <h3 className='mb-4 text-sm font-bold tracking-widest text-[#FFDC75] uppercase'>Membership</h3>
                         <ul className='space-y-3'>
                             {membershipLinks.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className='text-slr-navy-foreground/70 hover:text-slr-gold text-sm transition-colors'>
+                                        className='hover:text-slr-gold text-sm text-[#757575] transition-colors'>
                                         {link.name}
                                     </Link>
                                 </li>
@@ -72,13 +69,13 @@ const Footer: React.FC = () => {
                     </div>
 
                     <div>
-                        <h3 className='mb-4 text-sm font-bold tracking-widest uppercase'>Information</h3>
+                        <h3 className='mb-4 text-sm font-bold tracking-widest text-[#FFDC75] uppercase'>Information</h3>
                         <ul className='space-y-3'>
                             {informationLinks.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className='text-slr-navy-foreground/70 hover:text-slr-gold text-sm transition-colors'>
+                                        className='hover:text-slr-gold text-sm text-[#757575] transition-colors'>
                                         {link.name}
                                     </Link>
                                 </li>
@@ -87,19 +84,19 @@ const Footer: React.FC = () => {
                     </div>
 
                     <div>
-                        <h3 className='mb-4 text-sm font-bold tracking-widest uppercase'>Legal</h3>
+                        <h3 className='mb-4 text-sm font-bold tracking-widest text-[#FFDC75] uppercase'>Legal</h3>
                         <ul className='space-y-3'>
                             {legalLinks.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className='text-slr-navy-foreground/70 hover:text-slr-gold text-sm transition-colors'>
+                                        className='hover:text-slr-gold text-sm text-[#757575] transition-colors'>
                                         {link.name}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
-                        <div className='text-slr-navy-foreground/70 mt-4 flex items-center gap-2 text-sm'>
+                        <div className='mt-4 flex items-center gap-2 text-sm text-[#757575]'>
                             <Mail className='h-4 w-4' />
                             <span>support@slrrewards.com.au</span>
                         </div>
@@ -117,7 +114,7 @@ const Footer: React.FC = () => {
                     <button
                         type='button'
                         onClick={scrollToTop}
-                        className='text-slr-navy-foreground/70 hover:text-slr-gold flex cursor-pointer items-center gap-2 text-xs transition-colors'>
+                        className='hover:text-slr-gold flex cursor-pointer items-center gap-2 text-xs text-[#757575] transition-colors'>
                         <span>Back to top</span>
                         <ChevronUp className='h-4 w-4' />
                     </button>

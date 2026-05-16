@@ -75,6 +75,7 @@ const WhyJoinSection = () => {
                                         alt='Grid Decoration'
                                         width={300}
                                         height={300}
+                                        sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
                                         className='object-contain'
                                     />
                                 </div>
@@ -131,11 +132,18 @@ const WhyJoinSection = () => {
                                             alt='Grid Decoration'
                                             width={400}
                                             height={300}
+                                            sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
                                             className='object-contain'
                                         />
                                     </div>
                                     <div className='relative h-20 w-20 shrink-0 sm:h-24 sm:w-24 lg:h-30 lg:w-30'>
-                                        <Image src={stat.icon} alt={stat.title} fill className='object-contain' />
+                                        <Image
+                                            src={stat.icon}
+                                            alt={stat.title}
+                                            fill
+                                            className='object-contain'
+                                            sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
+                                        />
                                     </div>
                                     <div className='space-y-2'>
                                         <p className='text-slr-navy-foreground font-bebas-neue text-xl font-bold uppercase md:text-2xl'>

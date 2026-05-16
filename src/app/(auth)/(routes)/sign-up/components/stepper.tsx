@@ -13,7 +13,8 @@ const Stepper = ({ steps, current }: StepperProps) => {
             {steps.map((label, idx) => {
                 const isComplete = idx < current;
                 const isActive = idx === current;
-                return (
+                
+return (
                     <li key={label} className='flex flex-1 items-center gap-2'>
                         <div className='flex items-center gap-2'>
                             <span

@@ -74,7 +74,8 @@ export function UsersClient({ data, page, limit, total, search, headers }: Users
         if (!headers?.Authorization) {
             toast.error('Sesi login tidak tersedia, silakan login ulang');
             router.push('/sign-in');
-            return;
+            
+return;
         }
 
         try {

@@ -35,9 +35,11 @@ export const StarsBackground: React.FC<StarBackgroundProps> = ({
         (width: number, height: number): StarProps[] => {
             const area = width * height;
             const numStars = Math.floor(area * starDensity);
-            return Array.from({ length: numStars }, () => {
+            
+return Array.from({ length: numStars }, () => {
                 const shouldTwinkle = allStarsTwinkle || Math.random() < twinkleProbability;
-                return {
+                
+return {
                     x: Math.random() * width,
                     y: Math.random() * height,
                     radius: Math.random() * 0.05 + 0.5,

@@ -33,7 +33,7 @@ const TrustedSection = () => {
         <section className='bg-slr-navy-deep relative py-16 md:py-24'>
             <StarsBackground starDensity={0.0003} />
 
-            <div className='mx-auto max-w-7xl px-4'>
+            <div className='relative mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <SectionEyebrow label='TRUSTED BY THOUSANDS' color='#E2B42B' className='mt-4' />
 
@@ -48,16 +48,20 @@ const TrustedSection = () => {
                     {trustedFeatures.map((feature) => (
                         <div
                             key={feature.title}
-                            className='border-slr-navy-border/60 bg-slr-navy-card/60 hover:border-slr-gold/40 flex flex-col gap-4 rounded-2xl border p-6 backdrop-blur-sm transition-colors'>
+                            className='relative h-70.5 overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26] backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40'>
+                            <div className='relative z-10 flex flex-col gap-2'>
+                                <h3 className='text-base font-semibold text-[#FFDC75]'>{feature.title}</h3>
+
+                                <p className='text-base leading-relaxed text-[#CDCECF]'>{feature.description}</p>
+                            </div>
+
                             <Image
                                 src={feature.icon}
                                 alt={feature.title}
-                                width={56}
-                                height={56}
-                                className='h-12 w-12 object-contain'
+                                width={300}
+                                height={300}
+                                className='absolute right-0 -bottom-4 h-45 w-45 object-contain opacity-80'
                             />
-                            <h3 className='text-slr-navy-foreground text-base font-bold'>{feature.title}</h3>
-                            <p className='text-slr-navy-foreground/60 text-xs leading-relaxed'>{feature.description}</p>
                         </div>
                     ))}
                 </div>

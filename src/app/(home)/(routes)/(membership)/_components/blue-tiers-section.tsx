@@ -48,12 +48,10 @@ const platinumBadgeStyle: React.CSSProperties = {
 };
 
 const blackCardStyle: React.CSSProperties = {
-    background: 'linear-gradient(154.36deg, #0A0A0A 0.82%, #181818 49.73%)',
-    border: '1px solid',
-    borderImageSource:
-        'linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%)',
-    borderImageSlice: 1,
-    boxShadow: '0px 0px 13px 0px #00000080'
+    background:
+        'linear-gradient(#181818, #181818) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%) border-box',
+    border: '1px solid transparent',
+    boxShadow: '0px 0px 13px 0px #776D6D26'
 };
 
 const blackBadgeStyle: React.CSSProperties = {
@@ -62,12 +60,10 @@ const blackBadgeStyle: React.CSSProperties = {
 };
 
 const blackPlusCardStyle: React.CSSProperties = {
-    background: 'linear-gradient(154.36deg, #0A0A0E 0.82%, #141418 25.28%, #0A0A0E 49.73%)',
-    border: '1px solid',
-    borderImageSource:
-        'linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%)',
-    borderImageSlice: 1,
-    boxShadow: '0px 0px 13px 0px #00000080'
+    background:
+        'linear-gradient(154.36deg, #0A0A0E 0.82%, #141418 25.28%, #0A0A0E 49.73%) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%) border-box',
+    border: '1px solid transparent',
+    boxShadow: '0px 0px 13px 0px #776D6D26'
 };
 
 const blackPlusBadgeStyle: React.CSSProperties = {
@@ -120,8 +116,7 @@ const BlueTiersSection = () => {
                                     <div className='flex min-w-0 flex-col'>
                                         <div className='flex flex-wrap items-baseline gap-1 sm:gap-2'>
                                             <p className='font-bebas-neue text-2xl font-extrabold text-white sm:text-3xl'>
-                                                SLR BLUE{' '}
-                                                <span className='text-gradient-gold font-extrabold'>26$</span>
+                                                SLR BLUE <span className='text-gradient-gold font-extrabold'>26$</span>
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>
@@ -212,6 +207,11 @@ const BlueTiersSection = () => {
                             price='$26'
                             badgeLabel='1 Token'
                             cardStyle={silverCardStyle}
+                            badgeLabelColor='#C0CCDC'
+                            badgeSubColor='#8EA0B8'
+                            titleColor='#8EA0B8'
+                            badgeSub='ALL ACCESS'
+                            entryChanges='1 Entry Change'
                             badgeStyle={silverBadgeStyle}
                         />
                         <TierUpgradeCard
@@ -221,6 +221,11 @@ const BlueTiersSection = () => {
                             price='$52'
                             badgeLabel='4 Tokens'
                             cardStyle={platinumCardStyle}
+                            badgeLabelColor='#6AB0F0'
+                            badgeSubColor='#5080B0'
+                            titleColor='#82B4FF'
+                            badgeSub='ALL ACCESS'
+                            entryChanges='4 Entry Changes'
                             badgeStyle={platinumBadgeStyle}
                         />
                         <TierUpgradeCard
@@ -230,6 +235,10 @@ const BlueTiersSection = () => {
                             price='$78'
                             badgeLabel='7 Tokens'
                             cardStyle={blackCardStyle}
+                            badgeLabelColor='#E8E9E9'
+                            badgeSubColor='#CDCECF'
+                            badgeSub='ALL ACCESS'
+                            entryChanges='7 Entry Changes'
                             badgeStyle={blackBadgeStyle}
                         />
                         <TierUpgradeCard
@@ -239,9 +248,17 @@ const BlueTiersSection = () => {
                             price='$99'
                             badgeLabel='10 Tokens'
                             cardStyle={blackPlusCardStyle}
+                            badgeLabelColor='#DDDDDD'
+                            badgeSubColor='#8EA0B8'
+                            badgeSub='ALL ACCESS'
+                            entryChanges='10 Entry Changes'
                             badgeStyle={blackPlusBadgeStyle}
                         />
                     </div>
+                </div>
+                <div className='mt-12 w-full rounded-xl border border-[#1A62C033] bg-[#1A62C014] p-4 text-center text-sm text-[#8EA0B8] md:text-base'>
+                    Each token gives you <span className='font-bold text-[#6AB0F0]'>one entry</span> into the weekly
+                    member prize draws. Higher tiers = more chances to win every week.
                 </div>
             </div>
         </section>

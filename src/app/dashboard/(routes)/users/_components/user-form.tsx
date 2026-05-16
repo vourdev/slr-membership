@@ -16,8 +16,7 @@ import { apiClient } from '@/lib/axios-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { isAxiosError } from 'axios';
-import { Eye, EyeOff } from 'lucide-react';
-import { Trash } from 'lucide-react';
+import { Eye, EyeOff , Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import * as z from 'zod';
@@ -91,7 +90,8 @@ const UserForm: React.FC<UserProps> = ({ initialData, headers, role, codeRegion 
         if (!headers?.Authorization) {
             toast.error('Sesi login tidak tersedia, silakan login ulang');
             router.push('/sign-in');
-            return;
+            
+return;
         }
         try {
             setLoading(true);
@@ -132,7 +132,8 @@ const UserForm: React.FC<UserProps> = ({ initialData, headers, role, codeRegion 
         if (!headers?.Authorization) {
             toast.error('Sesi login tidak tersedia, silakan login ulang');
             router.push('/sign-in');
-            return;
+            
+return;
         }
 
         try {
@@ -320,7 +321,8 @@ const UserForm: React.FC<UserProps> = ({ initialData, headers, role, codeRegion 
                                                                     item.label === 'ROLE_USER'
                                                                 );
                                                             }
-                                                            return true;
+                                                            
+return true;
                                                         })
                                                         .map((filteredRole) => (
                                                             <SelectItem

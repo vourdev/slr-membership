@@ -118,7 +118,8 @@ const MembershipPage = () => {
                         {tiers.map((tier) => {
                             const s = tierCardStyles[tier.key];
                             const isFeatured = tier.key === 'red';
-                            return (
+                            
+return (
                                 <div
                                     key={tier.key}
                                     className={`relative flex flex-col rounded-2xl border p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-8 ${s.wrapper} ${isFeatured ? 'lg:-mt-4 lg:mb-4 lg:scale-[1.02]' : ''}`}>

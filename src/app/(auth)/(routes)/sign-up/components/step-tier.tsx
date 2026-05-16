@@ -74,7 +74,8 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
     const handleContinue = () => {
         if (!canContinue) {
             setTouched(true);
-            return;
+            
+return;
         }
         onNext({ tier: selected, beny: isPaid ? beny : false });
     };
@@ -93,7 +94,8 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
             <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 {tiers.map((tier) => {
                     const isSelected = selected === tier.key;
-                    return (
+                    
+return (
                         <button
                             key={tier.key}
                             type='button'

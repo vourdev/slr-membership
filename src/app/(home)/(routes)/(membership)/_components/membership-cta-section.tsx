@@ -1,50 +1,38 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import GoldCtaButton from '@/components/common/gold-cta-button';
+import SectionEyebrow from '@/components/common/section-eyebrow';
+import SectionHeading from '@/components/common/section-heading';
 import { Button } from '@/components/ui/button';
 
 const MembershipCtaSection = () => {
     return (
-        <section id='join' className='slr-stars-bg relative overflow-hidden py-16 md:py-24'>
-            <div className='slr-hero-spotlight pointer-events-none absolute inset-x-0 top-0 h-72' />
+        <section id='join' className='bg-slr-navy-deep relative overflow-hidden'>
+            <Image src='/images/pattern-cta-background.png' alt='SLR Hero Background' fill className='object-cover' />
+            <div className='sm:140 md:150 lg:160 relative mx-auto flex h-130 max-w-4xl flex-col items-center justify-center px-4 text-center xl:h-170.5'>
+                <div className='text-center'>
+                    <SectionEyebrow label='LIFETIME OPTION' color='#E2B42B' className='mt-4' />
 
-            <div className='relative mx-auto max-w-4xl px-4 text-center'>
-                <p className='text-slr-gold text-[10px] font-semibold tracking-[0.4em] uppercase md:text-xs'>
-                    Limited Offer
-                </p>
-                <h2 className='text-slr-navy-foreground mt-3 text-3xl font-extrabold leading-tight md:text-5xl'>
-                    SMART LIFE REWARDS
-                    <br />
-                    MEMBERSHIP <span className='text-slr-gold'>4 LIFE</span>
-                </h2>
-                <p className='text-slr-navy-foreground/70 mx-auto mt-4 max-w-2xl text-sm md:text-base'>
-                    Start free today. Upgrade whenever you&apos;re ready. Begin enjoying the best of living with
-                    Australia&apos;s #1 best value rewards club.
-                </p>
+                    <SectionHeading className='mt-2 text-[42px] leading-none tracking-widest md:text-[50px] lg:text-[60px]'>
+                        <span className='text-gradient-gold font-extrabold'>SMART LIFE REWARDS</span>
+                        <br />
+                        Membership <span className='text-gradient-gold font-extrabold'>4</span> LIFE
+                    </SectionHeading>
+                </div>
 
-                <div className='mt-8 flex flex-wrap items-center justify-center gap-4'>
-                    <Link href='/sign-up'>
-                        <Button className='slr-gold-gradient text-slr-gold-foreground h-12 rounded-full px-8 font-bold shadow-lg hover:opacity-90'>
-                            Join Now — It&apos;s Free to Start
-                        </Button>
-                    </Link>
-                    <Link href='#tiers'>
+                <div className='mt-8 flex w-full flex-col items-center justify-center gap-4 md:flex-row'>
+                    <GoldCtaButton className='w-full md:w-fit' href='/sign-up'>
+                        JOIN NOW - IT`S FREE TO START
+                    </GoldCtaButton>
+
+                    <Link href='#tiers' className='w-full md:w-fit'>
                         <Button
                             variant='outline'
-                            className='border-slr-navy-foreground/30 text-slr-navy-foreground hover:bg-slr-navy-foreground/10 hover:text-slr-navy-foreground h-12 rounded-full bg-transparent px-8 font-semibold'>
+                            className='h-11 w-full rounded-xl border border-[#FFD147] bg-[#FFD1471A] font-semibold text-[#FFDC75] shadow-[inset_0px_8px_12px_0px_#FFFFFF14,inset_16px_24px_64px_-24px_#FFFFFF14,0px_24px_24px_-16px_#0000001F] transition-all hover:bg-[#FFD14726] hover:text-[#FFDC75] active:scale-[0.98]'>
                             View All Plans
                         </Button>
                     </Link>
-                </div>
-
-                <div className='mt-10 flex justify-center'>
-                    <Image
-                        src='/images/slr-rewards-logo.webp'
-                        alt='SLR Rewards'
-                        width={120}
-                        height={120}
-                        className='h-16 w-auto opacity-80'
-                    />
                 </div>
             </div>
         </section>

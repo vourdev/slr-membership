@@ -186,6 +186,19 @@
             transform: translate(-50%, -40%) scale(1);
         }
     }
+
+    /* Studio fade-in — used for decorative circle glows so they appear together
+       with the spotlight animation (delay 0.75s, duration 2s, ease, forwards). */
+    --animate-studio-fade-in: studio-fade-in 2s ease 0.75s 1 forwards;
+
+    @keyframes studio-fade-in {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
 }
 
 @layer base {

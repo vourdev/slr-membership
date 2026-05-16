@@ -40,7 +40,8 @@ export function Navbar({ user }: NavbarProps) {
         const updateHash = () => setActiveHash(window.location.hash || '');
         updateHash();
         window.addEventListener('hashchange', updateHash);
-        return () => window.removeEventListener('hashchange', updateHash);
+        
+return () => window.removeEventListener('hashchange', updateHash);
     }, []);
 
     // Track scroll for subtle navbar shadow feedback
@@ -48,7 +49,8 @@ export function Navbar({ user }: NavbarProps) {
         const onScroll = () => setScrolled(window.scrollY > 8);
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
+        
+return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
     // Glassmorphism style per spec
@@ -70,7 +72,8 @@ export function Navbar({ user }: NavbarProps) {
         // hash-based item (e.g. "#pricing")
         if (url.startsWith('#')) {
             if (url === '#') return activeHash === '' || activeHash === '#';
-            return activeHash === url;
+            
+return activeHash === url;
         }
         // pathname-based item
         return pathname === url;
@@ -106,7 +109,8 @@ export function Navbar({ user }: NavbarProps) {
                     <ul className='hidden items-center gap-1 xl:flex'>
                         {menuItems.map((item) => {
                             const active = isActive(item.url);
-                            return (
+                            
+return (
                                 <li key={item.text}>
                                     <Link
                                         href={item.url}
@@ -178,7 +182,8 @@ export function Navbar({ user }: NavbarProps) {
                     <ul className='flex flex-col gap-1 px-4 py-4'>
                         {menuItems.map((item) => {
                             const active = isActive(item.url);
-                            return (
+                            
+return (
                                 <li key={item.text} onClick={toggleMenu}>
                                     <Link
                                         href={item.url}

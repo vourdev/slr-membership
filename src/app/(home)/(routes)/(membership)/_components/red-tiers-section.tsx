@@ -42,11 +42,9 @@ const goldBadgeStyle: React.CSSProperties = {
 };
 
 const blackCardStyle: React.CSSProperties = {
-    background: 'linear-gradient(154.36deg, #0A0A0A 0.82%, #181818 49.73%)',
-    border: '1px solid',
-    borderImageSource:
-        'linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%)',
-    borderImageSlice: 1,
+    background:
+        'linear-gradient(#181818, #181818) padding-box, linear-gradient(180deg, rgba(255, 255, 255, 0.096) 0%, rgba(255, 255, 255, 0.056) 50%, rgba(255, 255, 255, 0.056) 100%) border-box',
+    border: '1px solid transparent',
     boxShadow: '0px 0px 13px 0px #776D6D26'
 };
 
@@ -99,8 +97,7 @@ const RedTiersSection = () => {
                                     <div className='flex min-w-0 flex-col'>
                                         <div className='flex flex-wrap items-baseline gap-1 sm:gap-2'>
                                             <p className='font-bebas-neue text-2xl font-extrabold text-white sm:text-3xl'>
-                                                SLR RED{' '}
-                                                <span className='text-gradient-gold font-extrabold'>10$</span>
+                                                SLR RED <span className='text-gradient-gold font-extrabold'>10$</span>
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>

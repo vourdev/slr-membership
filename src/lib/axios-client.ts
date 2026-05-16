@@ -22,7 +22,8 @@ apiClient.interceptors.response.use(
         if (status === 401) {
             toast.error('Sesi login sudah berakhir, silakan login ulang');
             signOut({ redirectTo: '/sign-in' });
-            return;
+            
+return;
         }
 
         return Promise.reject(error);

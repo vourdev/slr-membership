@@ -36,12 +36,14 @@ const arcPath = (startAngle: number, endAngle: number): string => {
     const start = polarToCartesian(CENTER, CENTER, RADIUS, endAngle);
     const end = polarToCartesian(CENTER, CENTER, RADIUS, startAngle);
     const largeArc = endAngle - startAngle <= 180 ? '0' : '1';
-    return `M ${CENTER} ${CENTER} L ${start.x} ${start.y} A ${RADIUS} ${RADIUS} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
+    
+return `M ${CENTER} ${CENTER} L ${start.x} ${start.y} A ${RADIUS} ${RADIUS} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
 };
 
 const polarToCartesian = (cx: number, cy: number, r: number, angleDeg: number) => {
     const rad = ((angleDeg - 90) * Math.PI) / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+    
+return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 };
 
 const pickSegmentIndex = (): number => {
@@ -58,7 +60,8 @@ const pickSegmentIndex = (): number => {
     if (Math.random() < 0.25) {
         return winners[Math.floor(Math.random() * winners.length)];
     }
-    return losers[Math.floor(Math.random() * losers.length)];
+    
+return losers[Math.floor(Math.random() * losers.length)];
 };
 
 type StepSpinWheelProps = {
@@ -138,7 +141,8 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                                 const endAngle = startAngle + SEGMENT_ANGLE;
                                 const midAngle = startAngle + SEGMENT_ANGLE / 2;
                                 const labelPos = polarToCartesian(CENTER, CENTER, RADIUS * 0.65, midAngle);
-                                return (
+                                
+return (
                                     <g key={i}>
                                         <path
                                             d={arcPath(startAngle, endAngle)}

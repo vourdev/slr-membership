@@ -151,7 +151,8 @@ const renderCell = (value: Cell) => {
             </span>
         );
     }
-    return <span className='text-xs font-semibold text-white md:text-sm'>{value}</span>;
+    
+return <span className='text-xs font-semibold text-white md:text-sm'>{value}</span>;
 };
 
 const ComparisonMatrix = () => {

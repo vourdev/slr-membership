@@ -15,6 +15,9 @@ type TierUpgradeCardProps = {
     badgeLabel: string;
     /** Color for the badge headline text. Defaults to gold. */
     badgeLabelColor?: string;
+    badgeSubColor?: string;
+    titleColor?: string;
+    entryChanges?: string;
     /** Inner-badge sub-text. Defaults to "MEMBER ENTRIES". */
     badgeSub?: string;
     /** Outer card style — background gradient / border / shadow. */
@@ -37,8 +40,11 @@ const TierUpgradeCard: FC<TierUpgradeCardProps> = ({
     period = '/month',
     badgeLabel,
     badgeLabelColor = '#F5D78E',
+    badgeSubColor = '#CDCECF',
     badgeSub = 'MEMBER ENTRIES',
+    titleColor = '#CDCECF',
     cardStyle,
+    entryChanges,
     badgeStyle
 }) => (
     <div
@@ -53,13 +59,20 @@ const TierUpgradeCard: FC<TierUpgradeCardProps> = ({
                 className='h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16 md:h-20 md:w-20'
             />
             <div className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0 sm:gap-x-2'>
-                <div className='flex items-center gap-1.5 text-[#CDCECF] uppercase sm:gap-2'>
-                    <span className='text-xs leading-none font-semibold tracking-[0.18em] whitespace-nowrap sm:text-sm sm:tracking-[0.3em]'>
-                        {label}
-                    </span>
-                    <span className='font-bebas-neue text-gradient-gold text-2xl leading-none font-extrabold tracking-normal sm:text-3xl'>
-                        {price}
-                    </span>
+                <div className='flex flex-col'>
+                    <div className='flex items-center gap-1.5 uppercase' style={{ color: titleColor }}>
+                        <span className='text-xs leading-none font-semibold tracking-[0.18em] whitespace-nowrap sm:text-sm sm:tracking-[0.3em]'>
+                            {label}
+                        </span>
+                        <span className='font-bebas-neue text-gradient-gold text-2xl leading-none font-extrabold tracking-normal sm:text-3xl'>
+                            {price}
+                        </span>
+                    </div>
+                    {entryChanges && (
+                        <span className='text-[10px] font-normal sm:text-xs md:text-sm' style={{ color: titleColor }}>
+                            {entryChanges}
+                        </span>
+                    )}
                 </div>
                 <span className='text-[10px] font-normal text-white/60 sm:text-xs md:text-sm'>{period}</span>
             </div>
@@ -72,7 +85,9 @@ const TierUpgradeCard: FC<TierUpgradeCardProps> = ({
                 style={{ color: badgeLabelColor }}>
                 {badgeLabel}
             </p>
-            <p className='mt-1 text-[9px] tracking-widest text-[#CDCECF] uppercase sm:text-[10px] md:text-xs'>
+            <p
+                className='mt-1 text-[9px] tracking-widest uppercase sm:text-[10px] md:text-xs'
+                style={{ color: badgeSubColor }}>
                 {badgeSub}
             </p>
         </div>

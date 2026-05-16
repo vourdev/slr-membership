@@ -27,7 +27,8 @@ const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
     const handleVerify = async () => {
         if (code.length !== 6) {
             setError('Enter the 6-digit code from your email.');
-            return;
+            
+return;
         }
         setError(null);
         setVerifying(true);

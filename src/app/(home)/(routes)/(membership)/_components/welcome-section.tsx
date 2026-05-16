@@ -30,6 +30,7 @@ const WelcomeSection = () => {
                                 src='/images/smart-life.webp'
                                 alt='Smart Life Rewards Family'
                                 fill
+                                sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
                                 className='object-cover'
                             />
                         </div>
