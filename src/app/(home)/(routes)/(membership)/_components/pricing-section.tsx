@@ -2,7 +2,7 @@ import { StarsBackground } from '@/components/ui/stars-background';
 
 const PricingSection = () => {
     return (
-        <section id='pricing' className='bg-slr-navy-deep relative mx-auto max-w-7xl px-4'>
+        <section id='pricing' className='bg-slr-navy-deep relative mx-auto max-w-7xl'>
             <StarsBackground starDensity={0.0003} />
 
             <div className='relative grid grid-cols-3 gap-2 sm:gap-3'>
