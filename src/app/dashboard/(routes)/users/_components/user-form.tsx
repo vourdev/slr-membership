@@ -10,7 +10,6 @@ import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { useRegionsDropdown } from '@/hooks/use-regions-dropdown';
 import { useRolesDropdown } from '@/hooks/use-roles-dropdown';
 import { apiClient } from '@/lib/axios-client';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -60,7 +59,6 @@ const UserForm: React.FC<UserProps> = ({ initialData, headers, role, codeRegion 
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const { roles, loading: rolesLoading, error: rolesError } = useRolesDropdown({ headers });
-    const { regions, loading: regionsLoading, error: regionsError } = useRegionsDropdown({ headers });
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
@@ -248,45 +246,7 @@ const UserForm: React.FC<UserProps> = ({ initialData, headers, role, codeRegion 
                         />
 
                         {/* Wilayah */}
-                        <FormField
-                            control={form.control}
-                            name='region_id'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Wilayah</FormLabel>
 
-                                    {regionsLoading ? (
-                                        <p className='text-muted-foreground text-sm'>Memuat wilayah...</p>
-                                    ) : regionsError ? (
-                                        <p className='text-sm text-red-500'>{regionsError}</p>
-                                    ) : (
-                                        <Select
-                                            disabled={
-                                                loading || (!!role && !!codeRegion && role !== 'ROLE_SUPER_ADMIN')
-                                            }
-                                            onValueChange={field.onChange}
-                                            value={field.value ? String(field.value) : ''}
-                                            defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder='Pilih wilayah' />
-                                                </SelectTrigger>
-                                            </FormControl>
-
-                                            <SelectContent>
-                                                {regions.map((region) => (
-                                                    <SelectItem key={region.value} value={String(region.value)}>
-                                                        {region.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                         {/* Role / Peran */}
                         {(role === 'ROLE_SUPER_ADMIN' || role === 'ROLE_SPV') && (
                             <FormField

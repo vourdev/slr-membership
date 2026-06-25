@@ -9,11 +9,11 @@ const SignUp = () => {
             {/* Decorative gradients — soft glow consistent with hero/welcome styling */}
             <div
                 aria-hidden='true'
-                className='pointer-events-none absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.30)_0%,rgba(147,51,234,0.12)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-[560px] md:w-[560px]'
+                className='pointer-events-none absolute -top-32 -left-32 h-105 w-105 rounded-full bg-[radial-gradient(circle,rgba(147,51,234,0.30)_0%,rgba(147,51,234,0.12)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-140 md:w-140'
             />
             <div
                 aria-hidden='true'
-                className='pointer-events-none absolute -right-32 -bottom-32 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(255,255,255,0.08)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-[560px] md:w-[560px]'
+                className='pointer-events-none absolute -right-32 -bottom-32 h-105 w-105 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.22)_0%,rgba(255,255,255,0.08)_45%,transparent_75%)] mix-blend-screen blur-3xl md:h-140 md:w-140'
             />
 
             <div className='relative z-10 w-full max-w-3xl'>

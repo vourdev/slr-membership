@@ -87,7 +87,7 @@ const EbookGrid = () => {
                             key={book.id}
                             className='group flex flex-col overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] shadow-[0px_0px_20px_0px_#776D6D26] transition-all hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_25px_0px_#776D6D36]'>
                             <div
-                                className='relative aspect-[3/2] overflow-hidden'
+                                className='relative aspect-3/2 overflow-hidden'
                                 style={{
                                     background: `linear-gradient(154.36deg, ${book.cover.from} 0.82%, ${book.cover.to} 98.65%)`
                                 }}>
