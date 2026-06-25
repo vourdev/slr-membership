@@ -4,9 +4,9 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 
-import { motion, useAnimationControls } from 'motion/react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
 import { SpinPrize } from './types';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { motion, useAnimationControls } from 'motion/react';
 
 const goldButtonStyle: React.CSSProperties = {
     color: '#0C1132',
@@ -36,14 +36,14 @@ const arcPath = (startAngle: number, endAngle: number): string => {
     const start = polarToCartesian(CENTER, CENTER, RADIUS, endAngle);
     const end = polarToCartesian(CENTER, CENTER, RADIUS, startAngle);
     const largeArc = endAngle - startAngle <= 180 ? '0' : '1';
-    
-return `M ${CENTER} ${CENTER} L ${start.x} ${start.y} A ${RADIUS} ${RADIUS} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
+
+    return `M ${CENTER} ${CENTER} L ${start.x} ${start.y} A ${RADIUS} ${RADIUS} 0 ${largeArc} 0 ${end.x} ${end.y} Z`;
 };
 
 const polarToCartesian = (cx: number, cy: number, r: number, angleDeg: number) => {
     const rad = ((angleDeg - 90) * Math.PI) / 180;
-    
-return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 };
 
 const pickSegmentIndex = (): number => {
@@ -60,8 +60,8 @@ const pickSegmentIndex = (): number => {
     if (Math.random() < 0.25) {
         return winners[Math.floor(Math.random() * winners.length)];
     }
-    
-return losers[Math.floor(Math.random() * losers.length)];
+
+    return losers[Math.floor(Math.random() * losers.length)];
 };
 
 type StepSpinWheelProps = {
@@ -107,7 +107,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     One free spin
                 </h2>
-                <p className='mt-1 text-sm text-[#CDCECF]'>
+                <p className='mt-1 text-sm text-[#ADB0B5]'>
                     Every new paid member gets one spin. You might win a discount on your first month.
                 </p>
             </div>
@@ -141,8 +141,8 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                                 const endAngle = startAngle + SEGMENT_ANGLE;
                                 const midAngle = startAngle + SEGMENT_ANGLE / 2;
                                 const labelPos = polarToCartesian(CENTER, CENTER, RADIUS * 0.65, midAngle);
-                                
-return (
+
+                                return (
                                     <g key={i}>
                                         <path
                                             d={arcPath(startAngle, endAngle)}
@@ -170,11 +170,14 @@ return (
                         <circle cx={CENTER} cy={CENTER} r='5' fill='#FFDC75' />
                     </svg>
 
-                    <div
-                        className='absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1'
-                        aria-hidden='true'>
+                    <div className='absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1' aria-hidden='true'>
                         <svg width='28' height='32' viewBox='0 0 28 32'>
-                            <path d='M 14 30 L 0 6 A 14 14 0 0 1 28 6 Z' fill='#FFDC75' stroke='#0C1132' strokeWidth='1.5' />
+                            <path
+                                d='M 14 30 L 0 6 A 14 14 0 0 1 28 6 Z'
+                                fill='#FFDC75'
+                                stroke='#0C1132'
+                                strokeWidth='1.5'
+                            />
                         </svg>
                     </div>
                 </div>
@@ -192,7 +195,7 @@ return (
                                 <p className='font-bebas-neue mt-2 text-2xl tracking-wider text-white uppercase'>
                                     You won {result.segment.label}!
                                 </p>
-                                <p className='mt-1 text-xs text-[#CDCECF]'>
+                                <p className='mt-1 text-xs text-[#ADB0B5]'>
                                     Your discount will be applied at checkout.
                                 </p>
                             </>
@@ -201,7 +204,7 @@ return (
                                 <p className='font-bebas-neue text-xl tracking-wider text-white uppercase'>
                                     Better luck next cycle
                                 </p>
-                                <p className='mt-1 text-xs text-[#CDCECF]'>
+                                <p className='mt-1 text-xs text-[#ADB0B5]'>
                                     You can spin again at the start of your next billing cycle.
                                 </p>
                             </>

@@ -45,8 +45,8 @@ const EbookGrid = () => {
 
     const filtered = useMemo(() => {
         if (filter === 'all') return ebooks;
-        
-return ebooks.filter((b) => b.category === filter);
+
+        return ebooks.filter((b) => b.category === filter);
     }, [filter]);
 
     const filters: FilterValue[] = ['all', ...ebookCategories];
@@ -56,8 +56,8 @@ return ebooks.filter((b) => b.category === filter);
             <div className='flex flex-wrap items-center gap-2'>
                 {filters.map((f) => {
                     const isActive = filter === f;
-                    
-return (
+
+                    return (
                         <button
                             key={f}
                             type='button'
@@ -81,8 +81,8 @@ return (
             <div className='mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
                 {filtered.map((book) => {
                     const cfg = accessConfig[book.access];
-                    
-return (
+
+                    return (
                         <article
                             key={book.id}
                             className='group flex flex-col overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] shadow-[0px_0px_20px_0px_#776D6D26] transition-all hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_25px_0px_#776D6D36]'>
@@ -123,7 +123,7 @@ return (
 
                             <div className='flex flex-1 flex-col p-5'>
                                 <p className='text-xs font-medium text-[#8EA0B8]'>by {book.author}</p>
-                                <p className='mt-3 text-sm leading-relaxed text-[#CDCECF]'>{book.description}</p>
+                                <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5]'>{book.description}</p>
 
                                 <div className='mt-4 flex items-center gap-4 text-xs text-[#8EA0B8]'>
                                     <span className='inline-flex items-center gap-1'>
@@ -152,7 +152,7 @@ return (
 
             {filtered.length === 0 && (
                 <div className='mt-12 rounded-2xl border border-white/10 bg-white/2 p-12 text-center'>
-                    <p className='text-sm text-[#CDCECF]'>No e-books in this category yet — check back soon.</p>
+                    <p className='text-sm text-[#ADB0B5]'>No e-books in this category yet — check back soon.</p>
                 </div>
             )}
         </div>

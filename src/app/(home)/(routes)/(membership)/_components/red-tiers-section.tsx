@@ -71,7 +71,7 @@ const RedTiersSection = () => {
                         SLR <span className='text-red-600'>RED</span> Reward Tiers
                     </SectionHeading>
 
-                    <p className='mt-2 text-center text-sm leading-relaxed text-[#CDCECF] xl:text-base'>
+                    <p className='mt-2 text-center text-sm leading-relaxed text-[#ADB0B5] xl:text-base'>
                         Member prize tickets are base on your tier level.
                     </p>
                 </div>
@@ -101,7 +101,7 @@ const RedTiersSection = () => {
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>
-                                        <p className='text-xs leading-relaxed text-[#CDCECF] sm:text-sm'>
+                                        <p className='text-xs leading-relaxed text-[#ADB0B5] sm:text-sm'>
                                             4 to 7 prize chances per draw
                                         </p>
                                     </div>

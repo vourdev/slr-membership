@@ -39,7 +39,7 @@ const PricingSection = () => {
                 </div>
             </div>
 
-            <p className='mx-auto mt-24 max-w-xl px-4 text-center text-sm text-[#CDCECF] sm:text-base md:text-lg'>
+            <p className='mx-auto mt-24 max-w-xl px-4 text-center text-sm text-[#ADB0B5] sm:text-base md:text-lg'>
                 Smart Life Rewards is a membership platform designed to help Australians access value through rewards,
                 promotional prizes, partner discounts, and digital offers.
             </p>

@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-import { ArrowLeft, Check } from 'lucide-react';
 import { BENY_PRICE, SignUpFormData, TierKey } from './types';
+import { ArrowLeft, Check } from 'lucide-react';
 
 const goldButtonStyle: React.CSSProperties = {
     color: '#0C1132',
@@ -33,8 +33,7 @@ const tiers: TierOption[] = [
         note: 'No card needed',
         tagline: 'Try SLR with the weekly Visitor draw.',
         perks: ['Weekly $50 Visitor draw', 'Browse partner discounts', 'Browse e-book listings'],
-        cardClass:
-            'border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)]'
+        cardClass: 'border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)]'
     },
     {
         key: 'red',
@@ -74,8 +73,8 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
     const handleContinue = () => {
         if (!canContinue) {
             setTouched(true);
-            
-return;
+
+            return;
         }
         onNext({ tier: selected, beny: isPaid ? beny : false });
     };
@@ -86,16 +85,14 @@ return;
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Choose your tier
                 </h2>
-                <p className='mt-1 text-sm text-[#CDCECF]'>
-                    You can change or cancel any time from your account.
-                </p>
+                <p className='mt-1 text-sm text-[#ADB0B5]'>You can change or cancel any time from your account.</p>
             </div>
 
             <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 {tiers.map((tier) => {
                     const isSelected = selected === tier.key;
-                    
-return (
+
+                    return (
                         <button
                             key={tier.key}
                             type='button'
@@ -129,12 +126,10 @@ return (
                                 )}
                             </div>
                             <div className='mt-2 flex items-baseline gap-1'>
-                                <span className='font-bebas-neue text-3xl font-extrabold text-white'>
-                                    {tier.price}
-                                </span>
+                                <span className='font-bebas-neue text-3xl font-extrabold text-white'>{tier.price}</span>
                                 <span className='text-xs text-white/60'>{tier.note}</span>
                             </div>
-                            <p className='mt-2 text-xs text-[#CDCECF]'>{tier.tagline}</p>
+                            <p className='mt-2 text-xs text-[#ADB0B5]'>{tier.tagline}</p>
                             <ul className='mt-3 space-y-1.5'>
                                 {tier.perks.map((p) => (
                                     <li key={p} className='flex items-start gap-1.5 text-xs text-white/80'>
@@ -148,17 +143,13 @@ return (
                 })}
             </div>
 
-            {touched && !canContinue && (
-                <p className='text-xs text-red-400'>Choose a tier to continue.</p>
-            )}
+            {touched && !canContinue && <p className='text-xs text-red-400'>Choose a tier to continue.</p>}
 
             {isPaid && (
                 <label
                     className={cn(
                         'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors',
-                        beny
-                            ? 'border-[#D4AF3759] bg-[#D4AF370D]'
-                            : 'border-white/10 bg-white/2 hover:border-white/20'
+                        beny ? 'border-[#D4AF3759] bg-[#D4AF370D]' : 'border-white/10 bg-white/2 hover:border-white/20'
                     )}>
                     <input
                         type='checkbox'
@@ -173,7 +164,7 @@ return (
                             </span>
                             <span className='text-sm font-semibold text-[#FFDC75]'>+${BENY_PRICE}/month</span>
                         </div>
-                        <p className='mt-0.5 text-xs text-[#CDCECF]'>
+                        <p className='mt-0.5 text-xs text-[#ADB0B5]'>
                             Premium third-party discount platform. Optional. Requires phone for activation.
                         </p>
                     </div>

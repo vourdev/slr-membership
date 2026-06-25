@@ -40,9 +40,9 @@ const TierUpgradeCard: FC<TierUpgradeCardProps> = ({
     period = '/month',
     badgeLabel,
     badgeLabelColor = '#F5D78E',
-    badgeSubColor = '#CDCECF',
+    badgeSubColor = '#ADB0B5',
     badgeSub = 'MEMBER ENTRIES',
-    titleColor = '#CDCECF',
+    titleColor = '#ADB0B5',
     cardStyle,
     entryChanges,
     badgeStyle

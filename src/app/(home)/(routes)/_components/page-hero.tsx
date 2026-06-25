@@ -51,7 +51,9 @@ const PageHero = ({ eyebrow, title, description, accent = 'gold' }: PageHeroProp
                 </h1>
 
                 {description && (
-                    <p className='mt-5 text-center text-sm leading-relaxed text-[#CDCECF] md:text-base'>{description}</p>
+                    <p className='mt-5 text-center text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
+                        {description}
+                    </p>
                 )}
             </div>
         </section>

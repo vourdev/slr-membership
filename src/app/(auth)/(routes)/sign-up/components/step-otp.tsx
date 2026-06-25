@@ -27,8 +27,8 @@ const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
     const handleVerify = async () => {
         if (code.length !== 6) {
             setError('Enter the 6-digit code from your email.');
-            
-return;
+
+            return;
         }
         setError(null);
         setVerifying(true);
@@ -57,7 +57,7 @@ return;
                 <h2 className='font-bebas-neue mt-4 text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Verify your email
                 </h2>
-                <p className='mt-2 text-sm text-[#CDCECF]'>
+                <p className='mt-2 text-sm text-[#ADB0B5]'>
                     We sent a 6-digit code to <span className='font-semibold text-white'>{email}</span>.
                 </p>
             </div>
@@ -87,7 +87,7 @@ return;
 
                 {error && <p className='mt-3 text-center text-xs text-red-400'>{error}</p>}
 
-                <p className='mt-5 text-center text-xs text-[#CDCECF]'>
+                <p className='mt-5 text-center text-xs text-[#ADB0B5]'>
                     Didn&apos;t get it?{' '}
                     <button
                         type='button'

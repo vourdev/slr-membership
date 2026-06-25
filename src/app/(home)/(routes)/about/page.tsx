@@ -138,7 +138,7 @@ const AboutPage = () => {
                                     SLR
                                 </span>
                             </h2>
-                            <div className='mt-5 space-y-4 text-sm leading-relaxed text-[#CDCECF] md:text-base'>
+                            <div className='mt-5 space-y-4 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
                                 <p>
                                     Rewards programs in Australia were either tied to a single retailer or buried inside
                                     loyalty schemes nobody could actually use. Meanwhile the cost of living kept rising
@@ -229,7 +229,7 @@ const AboutPage = () => {
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             How SLR works
                         </h2>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#CDCECF] md:text-base'>
+                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
                             Four steps from signing up to winning. No paperwork, no claim forms — the platform handles
                             it for you.
                         </p>
@@ -255,7 +255,7 @@ const AboutPage = () => {
                                 <h3 className='font-bebas-neue mt-5 text-xl tracking-wider text-white uppercase md:text-2xl'>
                                     {title}
                                 </h3>
-                                <p className='mt-2 text-sm leading-relaxed text-[#CDCECF]'>{body}</p>
+                                <p className='mt-2 text-sm leading-relaxed text-[#ADB0B5]'>{body}</p>
                             </div>
                         ))}
                     </div>
@@ -280,7 +280,7 @@ const AboutPage = () => {
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             What we stand for
                         </h2>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#CDCECF] md:text-base'>
+                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
                             Four principles guide every decision we make about features, pricing, and partnerships.
                         </p>
                     </div>
@@ -301,7 +301,7 @@ const AboutPage = () => {
                                         <h3 className='font-bebas-neue text-xl tracking-wider text-white uppercase md:text-2xl'>
                                             {title}
                                         </h3>
-                                        <p className='mt-1 text-sm leading-relaxed text-[#CDCECF]'>{body}</p>
+                                        <p className='mt-1 text-sm leading-relaxed text-[#ADB0B5]'>{body}</p>
                                     </div>
                                 </div>
                             );
@@ -320,7 +320,7 @@ const AboutPage = () => {
                             </p>
                             <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
                         </div>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#CDCECF] md:text-base'>
+                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
                             Australian brands that work with SLR to bring members real, everyday value.
                         </p>
                     </div>
@@ -361,7 +361,7 @@ const AboutPage = () => {
                             <h2 className='font-bebas-neue mt-6 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                                 Ready to start saving?
                             </h2>
-                            <p className='mx-auto mt-3 max-w-md text-sm text-[#CDCECF] md:text-base'>
+                            <p className='mx-auto mt-3 max-w-md text-sm text-[#ADB0B5] md:text-base'>
                                 Join free as a Visitor, or unlock the full rewards club from $10/month.
                             </p>
                             <div className='mt-6 flex flex-wrap justify-center gap-3'>

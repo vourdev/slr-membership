@@ -34,15 +34,13 @@ const FaqPage = () => {
                         <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                             Still have questions?
                         </h2>
-                        <p className='mt-3 text-sm leading-relaxed text-[#CDCECF] md:text-base'>
+                        <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
                             Our support team is here to help. Reach out any time and we&apos;ll get back to you within
                             one business day.
                         </p>
                         <div className='mt-6 flex flex-wrap justify-center gap-3'>
                             <Link href='/contact'>
-                                <Button
-                                    style={goldButtonStyle}
-                                    className='h-11 rounded-xl px-8 font-bold uppercase'>
+                                <Button style={goldButtonStyle} className='h-11 rounded-xl px-8 font-bold uppercase'>
                                     Contact Support
                                 </Button>
                             </Link>

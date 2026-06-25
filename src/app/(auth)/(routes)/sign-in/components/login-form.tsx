@@ -42,7 +42,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     <CardTitle className='font-bebas-neue text-3xl tracking-wider text-white md:text-4xl'>
                         Sign In
                     </CardTitle>
-                    <CardDescription className='text-[#CDCECF]'>
+                    <CardDescription className='text-[#ADB0B5]'>
                         Enter your email below to login to your account
                     </CardDescription>
                     {state?.message && (

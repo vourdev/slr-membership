@@ -1,73 +1,115 @@
 import Image from 'next/image';
 
-import GoldCtaButton from '@/components/common/gold-cta-button';
 import SectionEyebrow from '@/components/common/section-eyebrow';
 import SectionHeading from '@/components/common/section-heading';
-import { StarsBackground } from '@/components/ui/stars-background';
 
-const trustedFeatures = [
+type Feature = {
+    number: string;
+    icon: string;
+    title: string;
+    description: string;
+    /** Single stat pill (cards 1–2). */
+    stat?: { value: string; label: string };
+    /** Render the Red/Blue tier pills instead of a stat (card 3). */
+    tiers?: boolean;
+};
+
+const features: Feature[] = [
     {
-        icon: '/icons/ic-list-trusted-1.webp',
-        title: 'Built for Australians',
-        description: 'Up to 7 prize draws every week — cash, gift cards, and exclusive member giveaways for Aussies.'
+        number: '01',
+        icon: '/icons/ic-calendar-gold.png',
+        title: 'Weekly Draws Every Cycle',
+        description:
+            "We run draws weekly, not monthly — so you don't wait weeks to see results. More cycles means more winning opportunities across the same time period.",
+        stat: { value: 'Weekly', label: 'Draw Cadence' }
     },
     {
-        icon: '/icons/ic-list-trusted-2.webp',
-        title: 'Transparent Prize System',
-        description: 'Know exactly when prizes are drawn and how every entry counts. No hidden fees, no surprises.'
+        number: '02',
+        icon: '/icons/ic-shield-gold.png',
+        title: 'Real Entries, Not Inflated',
+        description:
+            'No bundled or inflated entry counts that make the numbers look bigger than they are. We sell genuine entries with multiple options so you can pick what fits your budget.',
+        stat: { value: '100%', label: 'Genuine Entries' }
     },
     {
-        icon: '/icons/ic-list-trusted-3.webp',
-        title: 'Partner Discounts',
-        description: 'Meaningful savings with trusted brands on groceries, fuel, food & dining, and more.'
-    },
-    {
-        icon: '/icons/ic-list-trusted-4.webp',
-        title: 'Low Monthly Cost',
-        description: 'Our community delivers value from just $10/month and includes major benefits.'
+        number: '03',
+        icon: '/icons/ic-scales-gold.png',
+        title: 'Better Odds · Red & Blue',
+        description:
+            'Separate Red and Blue tiers keep competition balanced within each tier, so the odds improve compared to one single crowded monthly draw.',
+        tiers: true
     }
 ];
 
 const TrustedSection = () => {
     return (
-        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
-            <StarsBackground starDensity={0.0003} />
+        <section className='relative bg-[#040404] py-16 md:py-24'>
+            <div className='mx-auto max-w-7xl px-4'>
+                <SectionEyebrow label='Platform Advantages' color='#E2B42B' lineColor='#B08A20' />
 
-            <div className='relative mx-auto max-w-7xl px-4'>
-                <div className='text-center'>
-                    <SectionEyebrow label='TRUSTED BY THOUSANDS' color='#E2B42B' className='mt-4' />
+                <SectionHeading className='mt-4'>
+                    <span className='text-gradient-silver'>Why </span>
+                    <span className='text-gradient-gold'>Members Choose SLR</span>
+                </SectionHeading>
 
-                    <SectionHeading className='mt-2 text-[42px] leading-none md:text-[50px] lg:text-[60px]'>
-                        SEE WHY THOUSANDS OF AUSTRALIANS
-                        <br />
-                        LOVE <span className='text-gradient-gold font-extrabold'>SMART LIFE REWARDS</span>
-                    </SectionHeading>
-                </div>
+                <p className='mx-auto mt-4 max-w-2xl text-center text-sm text-[#ADB0B5] md:text-base'>
+                    Our platform is built to give members{' '}
+                    <span className='font-semibold text-[#FFD959]'>more chances to win</span>,{' '}
+                    <span className='font-semibold text-[#FFD959]'>more transparent value</span>, and{' '}
+                    <span className='font-semibold text-[#FFD959]'>better odds</span> through a tiered weekly-draw
+                    structure.
+                </p>
 
-                <div className='mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4'>
-                    {trustedFeatures.map((feature) => (
+                <div className='mt-12 grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-3'>
+                    {features.map((feature) => (
                         <div
-                            key={feature.title}
-                            className='relative h-70.5 overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26] backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40'>
-                            <div className='relative z-10 flex flex-col gap-2'>
-                                <h3 className='text-base font-semibold text-[#FFDC75]'>{feature.title}</h3>
-
-                                <p className='text-base leading-relaxed text-[#CDCECF]'>{feature.description}</p>
+                            key={feature.number}
+                            className='bg-card-dark-navy shadow-card-soft flex h-full flex-col rounded-2xl border border-[#A0B4D259] p-6'>
+                            <div className='flex items-start justify-between'>
+                                <span className='font-bebas-neue text-gradient-gold text-[44px] leading-none font-extrabold'>
+                                    {feature.number}
+                                </span>
+                                <Image
+                                    src={feature.icon}
+                                    alt=''
+                                    width={56}
+                                    height={56}
+                                    className='h-12 w-12 sm:h-14 sm:w-14'
+                                />
                             </div>
 
-                            <Image
-                                src={feature.icon}
-                                alt={feature.title}
-                                width={300}
-                                height={300}
-                                className='absolute right-0 -bottom-4 h-45 w-45 object-contain opacity-80'
-                            />
+                            <h3 className='mt-6 text-lg font-bold tracking-wide text-white uppercase'>
+                                {feature.title}
+                            </h3>
+
+                            <p className='mt-3 text-sm leading-relaxed text-[#8EA0B8]'>{feature.description}</p>
+
+                            <div className='mt-auto pt-8'>
+                                {feature.stat ? (
+                                    <div className='inline-flex items-center gap-3 rounded-lg border border-[#403314] bg-[#14171A] px-4 py-2.5'>
+                                        <span className='font-bebas-neue text-gradient-gold text-xl leading-none font-bold'>
+                                            {feature.stat.value}
+                                        </span>
+                                        <span className='h-4 w-px bg-[#403314]' />
+                                        <span className='text-[10px] font-semibold tracking-widest text-[#ADB0B5] uppercase'>
+                                            {feature.stat.label}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className='flex flex-wrap gap-2'>
+                                        <span className='inline-flex items-center gap-1.5 rounded-full border border-[#F0212159] bg-[#240505] px-3 py-1.5 text-[10px] font-semibold tracking-wider text-[#F02121] uppercase'>
+                                            <span className='h-1.5 w-1.5 rounded-full bg-[#F02121]' />
+                                            Red Tier
+                                        </span>
+                                        <span className='inline-flex items-center gap-1.5 rounded-full border border-[#3873F759] bg-[#081125] px-3 py-1.5 text-[10px] font-semibold tracking-wider text-[#3873F7] uppercase'>
+                                            <span className='h-1.5 w-1.5 rounded-full bg-[#3873F7]' />
+                                            Blue Tier
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
-                </div>
-
-                <div className='mt-10 flex justify-center'>
-                    <GoldCtaButton href='/sign-up'>JOIN NOW - IT`S FREE TO START</GoldCtaButton>
                 </div>
             </div>
         </section>

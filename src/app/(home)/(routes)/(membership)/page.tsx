@@ -1,12 +1,12 @@
 import Image from 'next/image';
 
-import BlueTiersSection from './_components/blue-tiers-section';
-import DiscountPartnerSection from './_components/discount-partner-section';
+import FreeVisitorsSection from './_components/free-visitors-section';
 import HeroSection from './_components/hero-section';
-import MembershipCtaSection from './_components/membership-cta-section';
+import MerchandiseSection from './_components/merchandise-section';
 import PartnersSection from './_components/partners-section';
-import PricingSection from './_components/pricing-section';
-import RedTiersSection from './_components/red-tiers-section';
+import SavingTiersSection from './_components/saving-tiers-section';
+import SlrRedBlueTiersSpinWheelSection from './_components/slr-red-blue-tiers-spin-wheel-section';
+import SlrRewardCarsSection from './_components/slr-reward-cars-section';
 import TrustedSection from './_components/trusted-section';
 import WelcomeSection from './_components/welcome-section';
 import WhyJoinSection from './_components/why-join-section';
@@ -28,14 +28,13 @@ const MembershipPage = () => {
                 </div>
                 <WhyJoinSection />
             </div>
-            <div id='tiers'>
-                <RedTiersSection />
-                <BlueTiersSection />
-            </div>
-            <DiscountPartnerSection />
+            <SlrRewardCarsSection />
+            <FreeVisitorsSection />
+            <SlrRedBlueTiersSpinWheelSection />
             <TrustedSection />
+            <SavingTiersSection />
             <PartnersSection />
-            <MembershipCtaSection />
+            <MerchandiseSection />
         </main>
     );
 };

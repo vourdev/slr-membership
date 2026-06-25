@@ -199,6 +199,17 @@
             opacity: 1;
         }
     }
+
+    --animate-marquee: marquee 60s linear infinite;
+
+    @keyframes marquee {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
 }
 
 @layer base {
@@ -254,6 +265,14 @@
     /* Gold gradient as solid background — used for CTAs, badges, accents */
     .bg-gradient-gold {
         background: linear-gradient(89.12deg, #f5d78e 3.07%, #d4af37 41.36%, #ffe066 60.5%, #a07018 98.79%);
+    }
+
+    /* Brushed-silver gradient applied as text fill — used for display headings */
+    .text-gradient-silver {
+        background: linear-gradient(180deg, #c2c2c2 4.17%, #d7d5d2 40.47%, #b1b1b1 58.61%, #a9a9a9 94.9%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
     }
 
     /* Dark navy card gradient — used for tier/pricing cards */

@@ -1,125 +1,145 @@
-'use client';
-
-import React from 'react';
+import type { FC } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ChevronUp, Mail } from 'lucide-react';
+type FooterLink = { name: string; href: string };
 
-const Footer: React.FC = () => {
-    const membershipLinks = [
-        { name: 'Join Now', href: '/sign-up' },
-        { name: 'Compare Plans', href: '/membership' },
-        { name: 'E-Books', href: '/ebooks' },
-        { name: 'Discount Partners', href: '/#partners' }
-    ];
+const navigationLinks: FooterLink[] = [
+    { name: 'Home', href: '/' },
+    { name: 'Membership', href: '/membership' },
+    { name: 'Rewards', href: '/#tiers' },
+    { name: 'Offers', href: '/#partners' },
+    { name: 'E-Books', href: '/ebooks' },
+    { name: 'Win', href: '/#tiers' },
+    { name: 'About Us', href: '/about' }
+];
 
-    const informationLinks = [
-        { name: 'About SLR', href: '/about' },
-        { name: 'FAQ', href: '/faq' },
-        { name: 'Contact', href: '/contact' },
-        { name: 'Giveaway Rules', href: '/giveaway-rules' }
-    ];
+const membershipLinks: FooterLink[] = [
+    { name: 'Join Free', href: '/sign-up' },
+    { name: 'SLR Red — $10/mo', href: '/membership' },
+    { name: 'SLR Blue — from $26/mo', href: '/membership' },
+    { name: 'Membership 4 Life', href: '/membership' },
+    { name: 'Compare Tiers', href: '/#tiers' }
+];
 
-    const legalLinks = [
-        { name: 'Terms & Conditions', href: '/terms' },
-        { name: 'Privacy Policy', href: '/privacy' },
-        { name: 'Disclaimer', href: '/disclaimer' }
-    ];
+const supportLinks: FooterLink[] = [
+    { name: 'Terms & Conditions', href: '/terms' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'FAQ', href: '/faq' },
+    { name: 'Contact Us', href: '/contact' }
+];
 
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+const socials = [
+    { icon: '/icons/ic-facebook.png', label: 'Facebook', href: '#' },
+    { icon: '/icons/ic-instagram.png', label: 'Instagram', href: '#' },
+    { icon: '/icons/ic-tiktok.png', label: 'TikTok', href: '#' }
+];
 
+const apps = [
+    { icon: '/icons/ic-apple.png', tagline: 'Download on the', name: 'App Store', href: '#' },
+    { icon: '/icons/ic-play-store.png', tagline: 'Get it on', name: 'Google Play', href: '#' }
+];
+
+const LinkColumn: FC<{ heading: string; links: FooterLink[] }> = ({ heading, links }) => (
+    <div>
+        <h3 className='text-xs font-bold tracking-widest text-[#E2B42B] uppercase'>{heading}</h3>
+        <ul className='mt-5 space-y-3.5'>
+            {links.map((link) => (
+                <li key={link.name}>
+                    <Link href={link.href} className='hover:text-slr-gold text-sm text-[#ADB0B5] transition-colors'>
+                        {link.name}
+                    </Link>
+                </li>
+            ))}
+        </ul>
+    </div>
+);
+
+const Footer: FC = () => {
     return (
-        <footer className='bg-slr-navy-deep text-slr-navy-foreground border-slr-navy-border/40 border-t'>
-            {/* Links */}
-            <div className='mx-auto max-w-7xl px-6 py-12'>
-                <div className='grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4'>
-                    <div>
-                        <div className='mb-4 flex items-center gap-3'>
-                            <Image
-                                src='/images/slr-rewards-logo.webp'
-                                alt='SLR Rewards'
-                                width={56}
-                                height={56}
-                                className='h-12 w-auto'
-                            />
-                        </div>
-                        <p className='text-sm leading-relaxed text-[#757575]'>
-                            Australia&apos;s Best Value Rewards Club. Helping Australians beat the cost of living with
-                            weekly rewards, partner discounts, and digital offers.
+        <footer className='relative bg-[#040404]'>
+            {/* Gold top hairline */}
+            <div className='h-px w-full bg-[linear-gradient(90deg,rgba(176,138,32,0)_0%,#B08A20_50%,rgba(176,138,32,0)_100%)]' />
+
+            <div className='mx-auto max-w-7xl px-6 py-14'>
+                <div className='grid grid-cols-1 gap-10 lg:grid-cols-12'>
+                    {/* Brand + socials */}
+                    <div className='lg:col-span-2'>
+                        <Image
+                            src='/images/slr-rewards-logo-color.webp'
+                            alt='SLR Smart Life Rewards'
+                            width={140}
+                            height={56}
+                            className='h-12 w-auto'
+                        />
+                        <p className='mt-5 max-w-xs text-sm leading-relaxed text-[#ADB0B5]'>
+                            Australia&apos;s Best Value Rewards Club — helping Australians beat the cost of living.
                         </p>
+
+                        <h3 className='mt-8 text-xs font-bold tracking-widest text-[#E2B42B] uppercase'>Follow Us</h3>
+                        <div className='mt-4 flex items-center gap-3'>
+                            {socials.map((social) => (
+                                <Link key={social.label} href={social.href} aria-label={social.label}>
+                                    <Image
+                                        src={social.icon}
+                                        alt=''
+                                        width={44}
+                                        height={44}
+                                        className='h-11 w-11 transition-opacity hover:opacity-80'
+                                    />
+                                </Link>
+                            ))}
+                        </div>
                     </div>
 
-                    <div>
-                        <h3 className='mb-4 text-sm font-bold tracking-widest text-[#FFDC75] uppercase'>Membership</h3>
-                        <ul className='space-y-3'>
-                            {membershipLinks.map((link) => (
-                                <li key={link.name}>
-                                    <Link
-                                        href={link.href}
-                                        className='hover:text-slr-gold text-sm text-[#757575] transition-colors'>
-                                        {link.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {/* Navigation → Get the App: 2 columns on mobile, single row on desktop */}
+                    <div className='grid grid-cols-2 gap-x-6 gap-y-10 lg:col-span-10 lg:grid-cols-10 lg:gap-10'>
+                        <div className='lg:col-span-2'>
+                            <LinkColumn heading='Navigation' links={navigationLinks} />
+                        </div>
+                        <div className='lg:col-span-3'>
+                            <LinkColumn heading='Membership' links={membershipLinks} />
+                        </div>
+                        <div className='lg:col-span-2'>
+                            <LinkColumn heading='Support' links={supportLinks} />
+                        </div>
 
-                    <div>
-                        <h3 className='mb-4 text-sm font-bold tracking-widest text-[#FFDC75] uppercase'>Information</h3>
-                        <ul className='space-y-3'>
-                            {informationLinks.map((link) => (
-                                <li key={link.name}>
+                        <div className='lg:col-span-3'>
+                            <h3 className='text-xs font-bold tracking-widest text-[#E2B42B] uppercase'>Get the App</h3>
+                            <div className='mt-5 flex flex-col gap-3'>
+                                {apps.map((app) => (
                                     <Link
-                                        href={link.href}
-                                        className='hover:text-slr-gold text-sm text-[#757575] transition-colors'>
-                                        {link.name}
+                                        key={app.name}
+                                        href={app.href}
+                                        className='flex w-47 max-w-full items-center gap-3 rounded-xl border border-[#2A2D31] bg-[#16191D] px-4 py-2.5 transition-colors hover:border-[#403314]'>
+                                        <Image
+                                            src={app.icon}
+                                            alt=''
+                                            width={24}
+                                            height={24}
+                                            className='h-6 w-6 shrink-0'
+                                        />
+                                        <span className='leading-tight'>
+                                            <span className='block text-[10px] tracking-wider text-[#ADB0B5] uppercase'>
+                                                {app.tagline}
+                                            </span>
+                                            <span className='block text-sm font-bold text-white'>{app.name}</span>
+                                        </span>
                                     </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 className='mb-4 text-sm font-bold tracking-widest text-[#FFDC75] uppercase'>Legal</h3>
-                        <ul className='space-y-3'>
-                            {legalLinks.map((link) => (
-                                <li key={link.name}>
-                                    <Link
-                                        href={link.href}
-                                        className='hover:text-slr-gold text-sm text-[#757575] transition-colors'>
-                                        {link.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                        <div className='mt-4 flex items-center gap-2 text-sm text-[#757575]'>
-                            <Mail className='h-4 w-4' />
-                            <span>support@slrrewards.com.au</span>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div className='h-px w-full bg-[linear-gradient(90deg,rgba(176,138,32,0)_0%,#B08A20_50%,rgba(176,138,32,0)_100%)]' />
 
             {/* Copyright */}
-            <div className='border-slr-navy-border/40 border-t'>
-                <div className='mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-5 md:flex-row'>
-                    <p className='text-slr-navy-foreground/60 text-center text-xs md:text-start'>
-                        © {new Date().getFullYear()} Smart Life Rewards Pty Ltd. All rights reserved. Australia&apos;s
-                        Best Value Rewards Club.
-                    </p>
-                    <button
-                        type='button'
-                        onClick={scrollToTop}
-                        className='hover:text-slr-gold flex cursor-pointer items-center gap-2 text-xs text-[#757575] transition-colors'>
-                        <span>Back to top</span>
-                        <ChevronUp className='h-4 w-4' />
-                    </button>
-                </div>
-            </div>
+            <p className='mx-auto max-w-7xl px-6 py-6 text-center text-xs text-[#8A8A8F]'>
+                © {new Date().getFullYear()} Smart Life Rewards Pty Ltd. All rights reserved. Australian Owned &amp;
+                Operated.
+            </p>
         </footer>
     );
 };

@@ -21,7 +21,7 @@ const LegalDoc = ({ lastUpdated, intro, sections, contactEmail = 'support@slrrew
                         Last updated: {lastUpdated}
                     </p>
 
-                    {intro && <div className='mt-4 text-sm leading-relaxed text-[#CDCECF] md:text-base'>{intro}</div>}
+                    {intro && <div className='mt-4 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>{intro}</div>}
 
                     <div className='mt-8 space-y-8'>
                         {sections.map((section, idx) => (
@@ -29,14 +29,14 @@ const LegalDoc = ({ lastUpdated, intro, sections, contactEmail = 'support@slrrew
                                 <h2 className='font-bebas-neue text-xl tracking-wider text-white uppercase md:text-2xl'>
                                     {idx + 1}. {section.heading}
                                 </h2>
-                                <div className='mt-3 space-y-3 text-sm leading-relaxed text-[#CDCECF] md:text-base'>
+                                <div className='mt-3 space-y-3 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
                                     {section.body}
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className='mt-10 border-t border-white/10 pt-6 text-sm text-[#CDCECF]'>
+                    <div className='mt-10 border-t border-white/10 pt-6 text-sm text-[#ADB0B5]'>
                         Questions about this document? Email us at{' '}
                         <a href={`mailto:${contactEmail}`} className='text-[#FFDC75] hover:underline'>
                             {contactEmail}

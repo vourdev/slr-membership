@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
 
-import { Clock, HelpCircle, Mail, MapPin } from 'lucide-react';
-
 import PageHero from '../_components/page-hero';
 import ContactForm from './_components/contact-form';
+import { Clock, HelpCircle, Mail, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Contact · SLR Rewards',
@@ -79,7 +78,7 @@ const ContactPage = () => {
                                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                                     Send us a message
                                 </h2>
-                                <p className='mt-2 mb-6 text-sm text-[#CDCECF]'>
+                                <p className='mt-2 mb-6 text-sm text-[#ADB0B5]'>
                                     Fill in the form below and our support team will get back to you.
                                 </p>
                                 <ContactForm />

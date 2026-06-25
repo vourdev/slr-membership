@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AU_STATES } from '@/constant/au-states';
 
-import { ArrowLeft, CreditCard, Loader2Icon, ShieldCheck } from 'lucide-react';
 import { BENY_PRICE, SignUpFormData, SpinPrize, TIER_LABEL, TIER_PRICE } from './types';
+import { ArrowLeft, CreditCard, Loader2Icon, ShieldCheck } from 'lucide-react';
 
 const goldButtonStyle: React.CSSProperties = {
     color: '#0C1132',
@@ -50,14 +50,18 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Review your order
                 </h2>
-                <p className='mt-1 text-sm text-[#CDCECF]'>
+                <p className='mt-1 text-sm text-[#ADB0B5]'>
                     You&apos;ll be redirected to Stripe to enter your card details. No charge until you confirm there.
                 </p>
             </div>
 
             <div className='rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-8'>
                 <div className='space-y-4'>
-                    <SummaryRow label={TIER_LABEL[tier]} sub='Monthly subscription' value={`$${tierPrice.toFixed(2)}`} />
+                    <SummaryRow
+                        label={TIER_LABEL[tier]}
+                        sub='Monthly subscription'
+                        value={`$${tierPrice.toFixed(2)}`}
+                    />
                     {data.beny && (
                         <SummaryRow
                             label='BENY add-on'
@@ -82,16 +86,12 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
 
                     <div className='flex items-baseline justify-between'>
                         <div>
-                            <p className='font-bebas-neue text-xl tracking-wider text-white uppercase'>
-                                Due today
-                            </p>
-                            <p className='text-xs text-[#CDCECF]'>
+                            <p className='font-bebas-neue text-xl tracking-wider text-white uppercase'>Due today</p>
+                            <p className='text-xs text-[#ADB0B5]'>
                                 Then ${subtotal.toFixed(2)}/month from your next billing date.
                             </p>
                         </div>
-                        <p className='font-bebas-neue text-3xl font-extrabold text-[#FFDC75]'>
-                            ${total.toFixed(2)}
-                        </p>
+                        <p className='font-bebas-neue text-3xl font-extrabold text-[#FFDC75]'>${total.toFixed(2)}</p>
                     </div>
                 </div>
             </div>
@@ -103,7 +103,7 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
                 <p className='mt-1 text-sm text-white'>
                     SLR {tier === 'red' ? 'Red' : 'Blue'} {data.state} — {stateLabel}
                 </p>
-                <p className='mt-1 text-xs text-[#CDCECF]'>
+                <p className='mt-1 text-xs text-[#ADB0B5]'>
                     Your entries will be allocated to this pool after your first successful payment.
                 </p>
             </div>
@@ -156,7 +156,7 @@ type SummaryRowProps = {
 const SummaryRow = ({ label, sub, value, muted, highlight }: SummaryRowProps) => (
     <div className='flex items-baseline justify-between gap-3'>
         <div>
-            <p className={muted ? 'text-sm text-[#CDCECF]' : 'text-sm font-medium text-white'}>{label}</p>
+            <p className={muted ? 'text-sm text-[#ADB0B5]' : 'text-sm font-medium text-white'}>{label}</p>
             {sub && <p className='text-xs text-[#8EA0B8]'>{sub}</p>}
         </div>
         <p
@@ -164,7 +164,7 @@ const SummaryRow = ({ label, sub, value, muted, highlight }: SummaryRowProps) =>
                 highlight
                     ? 'text-sm font-bold text-[#FFDC75]'
                     : muted
-                      ? 'text-sm text-[#CDCECF]'
+                      ? 'text-sm text-[#ADB0B5]'
                       : 'text-sm font-semibold text-white'
             }>
             {value}

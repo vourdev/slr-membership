@@ -100,7 +100,7 @@ const MembershipPage = () => {
     return (
         <>
             <PageHero
-                eyebrow="Choose Your Plan"
+                eyebrow='Choose Your Plan'
                 title={
                     <>
                         Pick The Right{' '}
@@ -118,8 +118,8 @@ const MembershipPage = () => {
                         {tiers.map((tier) => {
                             const s = tierCardStyles[tier.key];
                             const isFeatured = tier.key === 'red';
-                            
-return (
+
+                            return (
                                 <div
                                     key={tier.key}
                                     className={`relative flex flex-col rounded-2xl border p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-8 ${s.wrapper} ${isFeatured ? 'lg:-mt-4 lg:mb-4 lg:scale-[1.02]' : ''}`}>
@@ -135,8 +135,7 @@ return (
                                         </div>
                                     )}
 
-                                    <p
-                                        className={`text-xs font-semibold tracking-widest uppercase ${s.eyebrow}`}>
+                                    <p className={`text-xs font-semibold tracking-widest uppercase ${s.eyebrow}`}>
                                         {tier.eyebrow}
                                     </p>
                                     <h2 className='font-bebas-neue mt-2 text-3xl tracking-wider text-white uppercase md:text-4xl'>
@@ -151,7 +150,7 @@ return (
                                     </div>
                                     <p className='mt-1 text-xs text-[#8EA0B8]'>{tier.priceNote}</p>
 
-                                    <p className='mt-5 text-sm leading-relaxed text-[#CDCECF]'>{tier.tagline}</p>
+                                    <p className='mt-5 text-sm leading-relaxed text-[#ADB0B5]'>{tier.tagline}</p>
 
                                     <div className='mt-6 rounded-lg border border-white/5 bg-white/2 p-3'>
                                         <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase'>
@@ -199,15 +198,13 @@ return (
                     <div className='mb-10 text-center'>
                         <div className='mt-4 flex w-full items-center justify-center gap-2'>
                             <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
-                            <p className='text-xs font-semibold text-[#E2B42B] uppercase md:text-sm'>
-                                Side-by-side
-                            </p>
+                            <p className='text-xs font-semibold text-[#E2B42B] uppercase md:text-sm'>Side-by-side</p>
                             <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
                         </div>
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             Compare every feature
                         </h2>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#CDCECF] md:text-base'>
+                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
                             What you get at each tier — draws, discounts, content, and account perks.
                         </p>
                     </div>
@@ -231,11 +228,9 @@ return (
                             </div>
                             <h3 className='font-bebas-neue mt-4 text-2xl tracking-wider text-white uppercase md:text-3xl'>
                                 BENY Add-on
-                                <span className='ml-2 align-middle text-base font-normal text-[#FFDC75]'>
-                                    +$5/mo
-                                </span>
+                                <span className='ml-2 align-middle text-base font-normal text-[#FFDC75]'>+$5/mo</span>
                             </h3>
-                            <p className='mt-3 text-sm leading-relaxed text-[#CDCECF]'>
+                            <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5]'>
                                 Unlock the BENY premium discount platform — thousands of additional offers from
                                 Australian brands across travel, dining, retail, and more. Available to Red and Premium
                                 members. Activation requires a phone number.
@@ -258,7 +253,7 @@ return (
                             <h3 className='font-bebas-neue mt-4 text-2xl tracking-wider text-white uppercase md:text-3xl'>
                                 Spin Wheel
                             </h3>
-                            <p className='mt-3 text-sm leading-relaxed text-[#CDCECF]'>
+                            <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5]'>
                                 Every paid member gets one spin during registration checkout each cycle. Outcomes
                                 include bonus entries, discount credit, a percentage discount on your next invoice, or
                                 no prize. The wheel resets every cycle.
@@ -279,7 +274,7 @@ return (
                 <div className='mx-auto max-w-4xl px-4'>
                     <div className='relative isolate rounded-2xl p-1.25 shadow-[0px_0px_20px_0px_#776D6D26]'>
                         <div
-                            className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#FFE066_10%,#D4AF37_25%,#A07018_75%,#D4AF37_87%,#FFE066_100%)] [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] mask-exclude p-1.25'
+                            className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#FFE066_10%,#D4AF37_25%,#A07018_75%,#D4AF37_87%,#FFE066_100%)] mask-exclude p-1.25 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]'
                             aria-hidden='true'
                         />
                         <div className='rounded-[calc(1rem-5px)] bg-[linear-gradient(180deg,#1A1408_0%,#0C0A04_50%,#1A1408_100%)] p-8 text-center md:p-12'>
@@ -293,7 +288,7 @@ return (
                             <h2 className='font-bebas-neue mt-6 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                                 Start saving today
                             </h2>
-                            <p className='mx-auto mt-3 max-w-md text-sm text-[#CDCECF] md:text-base'>
+                            <p className='mx-auto mt-3 max-w-md text-sm text-[#ADB0B5] md:text-base'>
                                 Join free or unlock the full club — your first cycle of entries starts as soon as your
                                 first payment clears.
                             </p>

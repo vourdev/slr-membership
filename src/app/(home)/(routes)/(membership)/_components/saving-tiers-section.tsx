@@ -1,0 +1,101 @@
+import type { FC } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import SectionHeading from '@/components/common/section-heading';
+import { cn } from '@/lib/utils';
+
+type TierCardProps = {
+    image: string;
+    width: number;
+    height: number;
+    alt: string;
+    href: string;
+    /** Accessible label for the transparent button link. */
+    cta: string;
+    /** Width / elevation classes for the card wrapper. */
+    className?: string;
+    /** Absolute-position classes placing the transparent link over the card's button. */
+    buttonClassName: string;
+};
+
+const TierCard: FC<TierCardProps> = ({ image, width, height, alt, href, cta, className, buttonClassName }) => (
+    <div className={cn('relative w-full max-w-[18rem]', className)}>
+        <Image src={image} alt={alt} width={width} height={height} className='h-auto w-full select-none' priority />
+        <Link
+            href={href}
+            aria-label={cta}
+            className={cn(
+                'absolute rounded-md focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none',
+                buttonClassName
+            )}
+        />
+    </div>
+);
+
+const SavingTiersSection = () => {
+    return (
+        <section id='saving-tiers' className='relative bg-[#040404] py-16 md:py-24'>
+            <div className='mx-auto max-w-7xl px-4'>
+                <SectionHeading>
+                    <span className='text-gradient-silver'>Start Your Saving Now With The Best Value Tiers</span>
+                </SectionHeading>
+
+                <p
+                    className='mt-4 bg-clip-text text-center text-xs font-semibold tracking-[0.2em] text-transparent uppercase sm:text-sm'
+                    style={{
+                        backgroundImage:
+                            'linear-gradient(89.12deg, #F5D68C 3.07%, #D4AD36 41.36%, #FFDE66 60.5%, #9E6E17 98.79%)'
+                    }}>
+                    Rewards <span className='mx-2'>•</span> Discounts <span className='mx-2'>•</span> Bonus Giveaways
+                </p>
+
+                <div className='mt-4 flex justify-center'>
+                    <Image
+                        src='/images/knotted-rope.png'
+                        alt=''
+                        width={960}
+                        height={90}
+                        className='h-auto w-56 sm:w-72'
+                    />
+                </div>
+
+                <div className='mt-12 flex flex-col items-center justify-center gap-8 sm:flex-row sm:gap-4 lg:gap-8'>
+                    <TierCard
+                        image='/images/card-slr-red.webp'
+                        width={795}
+                        height={1164}
+                        alt='SLR Red tier — $10 per month, Red Standard'
+                        href='/sign-up'
+                        cta='Join SLR Red'
+                        className='sm:w-44 md:w-52 lg:w-60'
+                        buttonClassName='inset-x-[10%] bottom-[4.9%] h-[10%]'
+                    />
+                    <TierCard
+                        image='/images/card-free-visitor.webp'
+                        width={846}
+                        height={1617}
+                        alt='Free Visitors — bonus giveaways, upgrade anytime'
+                        href='/sign-up'
+                        cta='Enter as a Free Visitor'
+                        className='sm:w-52 md:w-60 lg:w-72'
+                        buttonClassName='inset-x-[11%] bottom-[6%] h-[10%]'
+                    />
+                    <TierCard
+                        image='/images/card-slr-blue.webp'
+                        width={795}
+                        height={1164}
+                        alt='SLR Blue tier — $26 per month, Blue Standard'
+                        href='/sign-up'
+                        cta='Join SLR Blue'
+                        className='sm:w-44 md:w-52 lg:w-60'
+                        buttonClassName='inset-x-[10%] bottom-[4.9%] h-[10%]'
+                    />
+                </div>
+            </div>
+        </section>
+    );
+};
+
+export default SavingTiersSection;

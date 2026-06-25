@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { AU_STATES } from '@/constant/au-states';
 
-import { Check, Mail, PartyPopper } from 'lucide-react';
 import { SignUpFormData, SpinPrize, TIER_LABEL, TIER_PRICE } from './types';
+import { Check, Mail, PartyPopper } from 'lucide-react';
 
 const goldButtonStyle: React.CSSProperties = {
     color: '#0C1132',
@@ -29,9 +29,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
               `Welcome email sent to ${data.email}`,
               `Payment confirmation + invoice on the way`,
               `Entries allocated to SLR ${tier === 'red' ? 'Red' : 'Blue'} ${data.state}`,
-              spinPrize && spinPrize.discountPercent > 0
-                  ? `${spinPrize.label} applied to your first month`
-                  : null
+              spinPrize && spinPrize.discountPercent > 0 ? `${spinPrize.label} applied to your first month` : null
           ].filter(Boolean)
         : [
               `Welcome email sent to ${data.email}`,
@@ -54,7 +52,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     {isPaid ? "You're in." : 'Welcome to SLR.'}
                 </h2>
-                <p className='mt-2 text-sm text-[#CDCECF] md:text-base'>
+                <p className='mt-2 text-sm text-[#ADB0B5] md:text-base'>
                     {isPaid
                         ? `Your ${TIER_LABEL[tier]} membership is active. Your first cycle starts now.`
                         : `Your free Visitor account is ready. Browse the platform and get entered into the weekly draw.`}

@@ -88,9 +88,33 @@ const PartnersSection = () => {
     return (
         <section id='partners' className='bg-slr-navy-deep relative overflow-hidden pt-16 md:pt-24'>
             <div className='px-4 pb-12 text-center'>
-                <SectionHeading className='mt-2 text-[42px] leading-none md:text-[50px] lg:text-[60px]'>
-                    OUR PARTNERS AND <span className='text-gradient-gold font-extrabold'>DISCOUNTS</span>
+                <div className='flex justify-center'>
+                    <Image
+                        src='/images/knotted-rope.png'
+                        alt=''
+                        width={960}
+                        height={90}
+                        className='h-auto w-56 sm:w-72'
+                    />
+                </div>
+
+                <SectionHeading className='mt-6 text-[42px] leading-none sm:text-[56px] md:text-[72px] xl:text-[90px] xl:leading-22.5'>
+                    <span className='text-gradient-silver'>Community Givebacks</span>
                 </SectionHeading>
+
+                <p className='mt-4 text-sm text-[#ADB0B5] md:text-base'>
+                    Draw prizes and discounts to support community
+                </p>
+
+                <div className='mt-6 flex justify-center'>
+                    <Image
+                        src='/images/knotted-rope.png'
+                        alt=''
+                        width={960}
+                        height={90}
+                        className='h-auto w-56 sm:w-72'
+                    />
+                </div>
             </div>
 
             <motion.div

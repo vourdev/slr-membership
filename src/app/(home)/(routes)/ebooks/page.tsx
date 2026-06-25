@@ -79,7 +79,7 @@ const EbooksPage = () => {
                                             {title}
                                         </p>
                                     </div>
-                                    <p className='mt-1 text-xs text-[#CDCECF]'>{body}</p>
+                                    <p className='mt-1 text-xs text-[#ADB0B5]'>{body}</p>
                                 </div>
                             </div>
                         ))}
@@ -99,7 +99,7 @@ const EbooksPage = () => {
                         <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             Unlock the full library
                         </h2>
-                        <p className='mx-auto mt-3 max-w-md text-sm text-[#CDCECF] md:text-base'>
+                        <p className='mx-auto mt-3 max-w-md text-sm text-[#ADB0B5] md:text-base'>
                             Every e-book reads in your browser — no downloads, no DRM tools. Included with SLR Red and
                             Premium from $10/month.
                         </p>

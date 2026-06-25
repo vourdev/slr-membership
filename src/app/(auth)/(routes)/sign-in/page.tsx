@@ -31,14 +31,14 @@ const SignIn = () => {
                             className='h-16 w-auto md:h-20'
                         />
                     </Link>
-                    <p className='text-xs font-medium tracking-[0.3em] text-[#CDCECF] uppercase'>
+                    <p className='text-xs font-medium tracking-[0.3em] text-[#ADB0B5] uppercase'>
                         Australia&apos;s Best Value Rewards Club
                     </p>
                 </div>
 
                 <LoginForm />
 
-                <p className='mt-6 text-center text-sm text-[#CDCECF]'>
+                <p className='mt-6 text-center text-sm text-[#ADB0B5]'>
                     Don&apos;t have an account?{' '}
                     <Link href='/sign-up' className='font-semibold text-white transition-colors hover:underline'>
                         Sign up

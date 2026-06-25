@@ -52,7 +52,7 @@ const ForgotPasswordForm = () => {
                     <h3 className='font-bebas-neue mt-4 text-2xl tracking-wider text-white uppercase'>
                         Check your inbox
                     </h3>
-                    <p className='mt-2 text-sm text-[#CDCECF]'>
+                    <p className='mt-2 text-sm text-[#ADB0B5]'>
                         If an account exists for <span className='font-semibold text-white'>{email}</span>, we&apos;ve
                         sent a reset link. The link is valid for 30 minutes.
                     </p>
@@ -72,7 +72,7 @@ const ForgotPasswordForm = () => {
                         <CardTitle className='font-bebas-neue text-3xl tracking-wider text-white md:text-4xl'>
                             Forgot password?
                         </CardTitle>
-                        <CardDescription className='text-[#CDCECF]'>
+                        <CardDescription className='text-[#ADB0B5]'>
                             Enter the email on your account and we&apos;ll send a reset link.
                         </CardDescription>
                     </CardHeader>

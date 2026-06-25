@@ -27,12 +27,12 @@ const ForgotPasswordPage = () => {
                             className='h-16 w-auto md:h-20'
                         />
                     </Link>
-                    <p className='text-xs font-medium tracking-[0.3em] text-[#CDCECF] uppercase'>Reset your password</p>
+                    <p className='text-xs font-medium tracking-[0.3em] text-[#ADB0B5] uppercase'>Reset your password</p>
                 </div>
 
                 <ForgotPasswordForm />
 
-                <p className='mt-6 text-center text-sm text-[#CDCECF]'>
+                <p className='mt-6 text-center text-sm text-[#ADB0B5]'>
                     Remembered it?{' '}
                     <Link href='/sign-in' className='font-semibold text-white transition-colors hover:underline'>
                         Back to sign in

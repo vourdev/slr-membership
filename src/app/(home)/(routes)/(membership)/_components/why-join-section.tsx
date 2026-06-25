@@ -1,162 +1,138 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
+import GoldPillButton from '@/components/common/gold-pill-button';
 import SectionEyebrow from '@/components/common/section-eyebrow';
 import SectionHeading from '@/components/common/section-heading';
+import { cn } from '@/lib/utils';
 
-const benefits = [
-    {
-        icon: '/icons/ic-list-member-benefit-1.webp',
-        title: 'Weekly Prize Draws',
-        description: 'Up to 7 prize draws every week — cash, gift cards, and exclusive member giveaways.'
-    },
-    {
-        icon: '/icons/ic-list-member-benefit-2.webp',
-        title: 'Affiliated Discounts',
-        description: 'Save with hundreds of trusted Australian partner brands — fuel, groceries, dining & more.'
-    },
-    {
-        icon: '/icons/ic-list-member-benefit-3.webp',
-        title: 'Digital Offers',
-        description: 'Instant digital deals, different every Monday. Track wins, check rewards, redeem instantly.'
-    },
-    {
-        icon: '/icons/ic-list-member-benefit-4.webp',
-        title: 'Exclusive Giveaways',
-        description: 'Member-only access to giveaways and seasonal events — only for active SLR members.'
-    }
-];
+import { ArrowRight } from 'lucide-react';
 
-const stats = [
+const cards = [
     {
-        icon: '/icons/ic-member-benefit-1.webp',
-        title: 'Visitors $50 Weekly Draws',
-        description: 'Sign up to get a chance to win prizes.'
+        icon: '/icons/ic-person-circle.png',
+        iconHasCircle: false,
+        title: 'Membership Details',
+        description: 'Explore plans, pricing tiers, and what each membership unlocks.',
+        href: '#pricing'
     },
     {
-        icon: '/icons/ic-member-benefit-2.webp',
-        title: 'Car monthly draw',
-        description: 'Win a Car or major prize giveaways.'
+        icon: '/icons/ic-prize-circle.png',
+        iconHasCircle: true,
+        title: 'Prizes, Bonus & Promotions',
+        description: 'See live giveaways, weekly prize draws and exclusive promotions.',
+        href: '#promotions',
+        highlight: true
+    },
+    {
+        icon: '/icons/ic-star-circle.png',
+        iconHasCircle: false,
+        title: 'Smart Life Content',
+        description: 'Access guides, tips and member-only content to live smarter.',
+        href: '#content'
     }
 ];
 
 const WhyJoinSection = () => {
     return (
-        <section className='bg-slr-navy-deep relative py-16 md:py-24'>
+        <section className='relative bg-[#040404] py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
-                <div className='flex flex-col items-center justify-center xl:flex-row xl:justify-between'>
+                <div className='flex flex-row items-center justify-center'>
                     <div className='flex flex-col'>
-                        <SectionEyebrow
-                            label='Member Benefits'
-                            color='#E2B42B'
-                            lineColor='#B08A20'
-                            className='mt-4 xl:justify-start'
-                        />
-                        <SectionHeading className='mt-3'>
-                            Why Members
-                            <span className='text-gradient-gold block md:ml-3 md:inline'>Join SLR?</span>
+                        <SectionEyebrow label='Discover more' color='#E2B42B' lineColor='#B08A20' className='mt-4' />
+                        <SectionHeading className='mt-3 text-6xl md:text-7xl lg:text-[80px] xl:text-[90px]'>
+                            <span className='text-gradient-gold block md:ml-3 md:inline'>What we offer</span>
                         </SectionHeading>
                     </div>
-                    <p className='mt-3 max-w-sm text-center text-sm leading-relaxed text-[#CDCECF] xl:max-w-xs xl:text-right xl:text-base'>
-                        More than just a rewards club — a smarter way to live and save in Australia.
-                    </p>
                 </div>
 
-                <div className='mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2'>
-                    {/* Benefits list */}
-                    <ul className='space-y-4'>
-                        {benefits.map((benefit) => (
-                            <li
-                                key={benefit.title}
-                                className='bg-card-dark-navy shadow-card-warm-lg relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#A0B4D259] p-5 backdrop-blur-sm transition-all duration-300 hover:border-[#F5D78E]/40 hover:shadow-[0px_0px_25px_0px_#776D6D36]'>
-                                {/* Background Grid Decoration */}
-                                <div className='pointer-events-none absolute top-0 -right-15 xl:right-5'>
-                                    <Image
-                                        src='/images/grid-background-list-card.webp'
-                                        alt='Grid Decoration'
-                                        width={300}
-                                        height={300}
-                                        sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
-                                        className='object-contain'
-                                    />
-                                </div>
+                <div className='mt-8 flex justify-center'>
+                    <Image
+                        src='/icons/ic-three-arrow-gold.png'
+                        alt=''
+                        width={96}
+                        height={42}
+                        className='h-30 w-auto object-contain sm:h-34 md:h-38 lg:h-40 xl:h-48'
+                    />
+                </div>
 
-                                {/* Icon Section */}
-                                <div className='relative z-10 shrink-0'>
-                                    <div className='relative h-20 w-20 sm:h-24 sm:w-24 lg:h-30 lg:w-30'>
-                                        <Image
-                                            src={benefit.icon}
-                                            alt={benefit.title}
-                                            fill
-                                            sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
-                                            className='object-contain'
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Content Section */}
-                                <div className='relative z-10 space-y-2'>
-                                    <h3 className='text-slr-navy-foreground font-bebas-neue text-xl font-bold uppercase md:text-2xl'>
-                                        {benefit.title}
-                                    </h3>
-                                    <p className='text-slr-navy-foreground/60 text-xs font-normal uppercase sm:text-sm md:text-base'>
-                                        {benefit.description}
-                                    </p>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-
-                    {/* Pie chart and stats */}
-                    <div className='space-y-18'>
-                        <h3 className='text-slr-navy-foreground font-bebas-neue text-center text-4xl font-bold tracking-wide uppercase md:text-5xl'>
-                            Transparent System & Chart
-                        </h3>
-                        <div className='mt-4 flex justify-center'>
-                            <Image
-                                src='/images/transparent-system-pie-chart.webp'
-                                alt='Transparent System Pie Chart'
-                                width={540}
-                                height={361}
-                                className='h-auto w-full max-w-sm object-contain'
-                            />
-                        </div>
-
-                        <div className='space-y-3'>
-                            {stats.map((stat) => (
+                <div className='mx-auto mt-4 grid max-w-4xl grid-cols-1 items-end gap-6 md:grid-cols-3 md:gap-3 lg:gap-4'>
+                    {cards.map((card) => (
+                        <div
+                            key={card.title}
+                            className='bg-gradient-gold rounded-3xl p-0.75 shadow-[0_0_28px_rgba(212,175,55,0.25)]'>
+                            <div className='bg-slr-navy-deep rounded-[21px] p-1.5'>
                                 <div
-                                    key={stat.title}
-                                    className='relative flex items-center gap-4 overflow-hidden rounded-xl p-4'>
-                                    <div className='pointer-events-none absolute -right-15 xl:right-5'>
+                                    style={
+                                        card.highlight
+                                            ? {
+                                                  background:
+                                                      'linear-gradient(180deg, #FFE066 0%, #F5C22E 50%, #C78C14 100%)'
+                                              }
+                                            : undefined
+                                    }
+                                    className={cn(
+                                        'flex h-full flex-col items-center rounded-2xl px-7 pt-10 pb-8 text-center',
+                                        card.highlight
+                                            ? 'min-h-90 border border-[#8C660D] sm:min-h-100 md:min-h-101.5'
+                                            : 'min-h-80 bg-[linear-gradient(180deg,#FFFFFF_0%,#E5E5E5_100%)] sm:min-h-90 md:min-h-95'
+                                    )}>
+                                    <div className='mb-5 flex items-center justify-center'>
                                         <Image
-                                            src='/images/grid-background-card.webp'
-                                            alt='Grid Decoration'
-                                            width={400}
-                                            height={300}
-                                            sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
-                                            className='object-contain'
+                                            src={card.icon}
+                                            alt=''
+                                            width={120}
+                                            height={120}
+                                            className='h-20 w-20 object-contain sm:h-24 sm:w-24'
                                         />
                                     </div>
-                                    <div className='relative h-20 w-20 shrink-0 sm:h-24 sm:w-24 lg:h-30 lg:w-30'>
-                                        <Image
-                                            src={stat.icon}
-                                            alt={stat.title}
-                                            fill
-                                            className='object-contain'
-                                            sizes='(max-width: 640px) 80px, (max-width: 1024px) 96px, 120px'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <p className='text-slr-navy-foreground font-bebas-neue text-xl font-bold uppercase md:text-2xl'>
-                                            {stat.title}
-                                        </p>
-                                        <p className='text-slr-navy-foreground/60 text-xs uppercase sm:text-sm md:text-base'>
-                                            {stat.description}
-                                        </p>
-                                    </div>
+
+                                    <h3 className='text-lg leading-tight font-extrabold tracking-wide text-[#0A0A0A] uppercase sm:text-xl lg:text-2xl'>
+                                        {card.title}
+                                    </h3>
+
+                                    <p
+                                        className={cn(
+                                            'mt-3 max-w-65 text-sm leading-relaxed sm:text-[15px]',
+                                            card.highlight ? 'text-[#1A1308]' : 'text-[#2F2F2F]'
+                                        )}>
+                                        {card.description}
+                                    </p>
+
+                                    <Link
+                                        href={card.href}
+                                        className={cn(
+                                            'mt-auto flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-opacity hover:opacity-90 sm:text-sm',
+                                            card.highlight
+                                                ? 'bg-[#0A0A0A] text-[#FFDC75]'
+                                                : 'border border-[#C78C14] bg-transparent text-[#1A1308]'
+                                        )}>
+                                        Learn More
+                                        <ArrowRight className='h-4 w-4' />
+                                    </Link>
                                 </div>
-                            ))}
+                            </div>
                         </div>
+                    ))}
+                </div>
+                <div className='mt-8 flex flex-col items-center justify-center gap-2'>
+                    <div className='flex flex-col'>
+                        <SectionEyebrow
+                            label='Membership'
+                            color='#E2B42B'
+                            lineColor='#B08A20'
+                            gradient='linear-gradient(90deg, #F2F2F2 0%, #B3B3B8 45%, #FFFFFF 60%, #8C8C94 100%)'
+                            labelClassName='text-base md:text-lg lg:text-xl tracking-[0.20em] text-[#E2B42B] xl:text-2xl'
+                            className='mt-4'
+                        />
+
+                        <SectionHeading className='mt-2 text-8xl md:text-[90px] lg:text-[120px] xl:text-[150px]'>
+                            <span className='text-gradient-gold block md:ml-3 md:inline'>Club</span>
+                        </SectionHeading>
                     </div>
+                    <GoldPillButton href='/sign-up' withArrow={false}>
+                        JOIN NOW
+                    </GoldPillButton>
                 </div>
             </div>
         </section>

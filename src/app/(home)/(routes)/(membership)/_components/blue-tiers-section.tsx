@@ -89,7 +89,7 @@ const BlueTiersSection = () => {
                         SLR <span className='text-[#4D62E5]'>BLUE</span> Reward Tiers
                     </SectionHeading>
 
-                    <p className='mt-2 text-center text-sm leading-relaxed text-[#CDCECF] xl:text-base'>
+                    <p className='mt-2 text-center text-sm leading-relaxed text-[#ADB0B5] xl:text-base'>
                         Higher tiers — more chances to win every month.
                     </p>
                 </div>
@@ -120,7 +120,7 @@ const BlueTiersSection = () => {
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>
-                                        <p className='text-xs leading-relaxed text-[#CDCECF] sm:text-sm'>
+                                        <p className='text-xs leading-relaxed text-[#ADB0B5] sm:text-sm'>
                                             Premium tier — priority access & perks
                                         </p>
                                     </div>
@@ -236,7 +236,7 @@ const BlueTiersSection = () => {
                             badgeLabel='7 Tokens'
                             cardStyle={blackCardStyle}
                             badgeLabelColor='#E8E9E9'
-                            badgeSubColor='#CDCECF'
+                            badgeSubColor='#ADB0B5'
                             badgeSub='ALL ACCESS'
                             entryChanges='7 Entry Changes'
                             badgeStyle={blackBadgeStyle}

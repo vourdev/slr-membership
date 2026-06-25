@@ -65,7 +65,7 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Create your account
                 </h2>
-                <p className='mt-1 text-sm text-[#CDCECF]'>
+                <p className='mt-1 text-sm text-[#ADB0B5]'>
                     Tell us a bit about you. We use your state to assign you to the correct draw pool.
                 </p>
             </div>
