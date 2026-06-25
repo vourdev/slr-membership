@@ -30,8 +30,8 @@ export const authConfig = {
                 token.user_id = (user as any).user_id;
                 token.region_id = (user as any).region_id;
             }
-            
-return token;
+
+            return token;
         },
 
         async session({ session, token }) {
@@ -41,8 +41,8 @@ return token;
                 (session.user as any).user_id = token.user_id;
                 (session.user as any).region_id = token.region_id;
             }
-            
-return session;
+
+            return session;
         }
     },
     providers: []

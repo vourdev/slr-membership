@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Button as ButtonShadcn } from '@/components/ui/button';
 import { menuItems } from '@/constant/menu-items';
 import { logoutAction } from '@/lib/logout-action';
+import { goldBgStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import { Button, Transition } from '@headlessui/react';
 
@@ -76,11 +77,6 @@ export function Navbar({ user }: NavbarProps) {
 
     const navStyle: React.CSSProperties = scrolled || isOpen ? glassStyle : transparentStyle;
 
-    // Gold gradient CTA style per spec
-    const goldButtonStyle: React.CSSProperties = {
-        background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)'
-    };
-
     const isActive = (url: string) => {
         if (!url) return false;
         // hash-based item (e.g. "#pricing")
@@ -130,7 +126,7 @@ export function Navbar({ user }: NavbarProps) {
                                         href={item.url}
                                         className={cn(
                                             'rounded-xl px-4 py-2 text-sm font-medium transition-colors',
-                                            active ? 'text-white' : 'text-[#ADB0B5] hover:text-white'
+                                            active ? 'text-white' : 'text-slr-muted hover:text-white'
                                         )}>
                                         {item.text}
                                     </Link>
@@ -168,7 +164,7 @@ export function Navbar({ user }: NavbarProps) {
                                 </Link>
                                 <Link
                                     href='/sign-up'
-                                    style={goldButtonStyle}
+                                    style={goldBgStyle}
                                     className='rounded-xl px-4 py-2 font-bold text-[#1a1408] shadow-md transition-opacity hover:opacity-90'>
                                     Join Now
                                 </Link>
@@ -215,7 +211,7 @@ export function Navbar({ user }: NavbarProps) {
                                             'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
                                             active
                                                 ? 'bg-white/5 text-white'
-                                                : 'text-[#ADB0B5] hover:bg-white/5 hover:text-white'
+                                                : 'text-slr-muted hover:bg-white/5 hover:text-white'
                                         )}>
                                         {item.text}
                                     </Link>
@@ -225,7 +221,7 @@ export function Navbar({ user }: NavbarProps) {
                         <li className='pt-2'>
                             <Link
                                 href='/sign-up'
-                                style={goldButtonStyle}
+                                style={goldBgStyle}
                                 className='block w-full rounded-xl px-5 py-2 text-center font-bold text-[#1a1408] shadow-md'
                                 onClick={toggleMenu}>
                                 Join Now

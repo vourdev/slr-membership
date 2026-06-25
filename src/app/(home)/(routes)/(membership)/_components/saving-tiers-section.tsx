@@ -36,7 +36,7 @@ const TierCard: FC<TierCardProps> = ({ image, width, height, alt, href, cta, cla
 
 const SavingTiersSection = () => {
     return (
-        <section id='saving-tiers' className='relative bg-[#040404] py-16 md:py-24'>
+        <section id='saving-tiers' className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <SectionHeading>
                     <span className='text-gradient-silver'>Start Your Saving Now With The Best Value Tiers</span>

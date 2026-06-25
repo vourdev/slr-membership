@@ -24,6 +24,12 @@
     --slr-smart-foreground: oklch(98% 0 0);
     --slr-smart-light: oklch(94% 0.04 155);
 
+    /* Neutral text + surface tokens (promoted from repeated arbitrary hex values) */
+    --slr-muted: #adb0b5; /* body muted text */
+    --slr-dim: #8ea0b8; /* ultra-muted text */
+    --slr-gold-label: #e2b42b; /* eyebrow / accent label gold */
+    --slr-ink: #040404; /* deep section background */
+
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
@@ -157,6 +163,10 @@
     --color-slr-smart: var(--slr-smart);
     --color-slr-smart-foreground: var(--slr-smart-foreground);
     --color-slr-smart-light: var(--slr-smart-light);
+    --color-slr-muted: var(--slr-muted);
+    --color-slr-dim: var(--slr-dim);
+    --color-slr-gold-label: var(--slr-gold-label);
+    --color-slr-ink: var(--slr-ink);
 
     @keyframes accordion-down {
         from {

@@ -151,8 +151,8 @@ const renderCell = (value: Cell) => {
             </span>
         );
     }
-    
-return <span className='text-xs font-semibold text-white md:text-sm'>{value}</span>;
+
+    return <span className='text-xs font-semibold text-white md:text-sm'>{value}</span>;
 };
 
 const ComparisonMatrix = () => {
@@ -162,10 +162,10 @@ const ComparisonMatrix = () => {
                 <table className='w-full min-w-160 border-collapse'>
                     <thead>
                         <tr className='border-b border-white/10'>
-                            <th className='p-4 text-left text-xs font-semibold tracking-widest text-[#8EA0B8] uppercase md:p-5'>
+                            <th className='text-slr-dim p-4 text-left text-xs font-semibold tracking-widest uppercase md:p-5'>
                                 Feature
                             </th>
-                            <th className='p-4 text-center text-xs font-semibold tracking-widest text-[#8EA0B8] uppercase md:p-5'>
+                            <th className='text-slr-dim p-4 text-center text-xs font-semibold tracking-widest uppercase md:p-5'>
                                 <div className='flex flex-col items-center gap-0.5'>
                                     <span>Visitor</span>
                                     <span className='text-[10px] text-white/40 normal-case'>Free</span>
@@ -204,12 +204,8 @@ const ComparisonMatrix = () => {
                                                 : 'border-b border-white/5'
                                         }>
                                         <td className='p-4 md:p-5'>
-                                            <p className='text-sm font-medium text-white md:text-base'>
-                                                {row.feature}
-                                            </p>
-                                            {row.hint && (
-                                                <p className='mt-0.5 text-xs text-[#8EA0B8]'>{row.hint}</p>
-                                            )}
+                                            <p className='text-sm font-medium text-white md:text-base'>{row.feature}</p>
+                                            {row.hint && <p className='text-slr-dim mt-0.5 text-xs'>{row.hint}</p>}
                                         </td>
                                         <td className='p-4 text-center md:p-5'>{renderCell(row.visitor)}</td>
                                         <td className='p-4 text-center md:p-5'>{renderCell(row.red)}</td>

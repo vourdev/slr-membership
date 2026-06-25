@@ -4,15 +4,10 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { AU_STATES } from '@/constant/au-states';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { SignUpFormData, SpinPrize, TIER_LABEL, TIER_PRICE } from './types';
 import { Check, Mail, PartyPopper } from 'lucide-react';
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 type StepSuccessProps = {
     data: SignUpFormData;
@@ -52,7 +47,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     {isPaid ? "You're in." : 'Welcome to SLR.'}
                 </h2>
-                <p className='mt-2 text-sm text-[#ADB0B5] md:text-base'>
+                <p className='text-slr-muted mt-2 text-sm md:text-base'>
                     {isPaid
                         ? `Your ${TIER_LABEL[tier]} membership is active. Your first cycle starts now.`
                         : `Your free Visitor account is ready. Browse the platform and get entered into the weekly draw.`}
@@ -76,7 +71,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
                 </ul>
 
                 <div className='mt-6 rounded-xl border border-white/10 bg-white/2 p-4'>
-                    <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase'>Your details</p>
+                    <p className='text-slr-dim text-[10px] font-semibold tracking-widest uppercase'>Your details</p>
                     <dl className='mt-2 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2'>
                         <Detail label='Name' value={data.name} />
                         <Detail label='Email' value={data.email} />
@@ -103,7 +98,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
 
 const Detail = ({ label, value }: { label: string; value: string }) => (
     <div>
-        <dt className='text-[10px] tracking-widest text-[#8EA0B8] uppercase'>{label}</dt>
+        <dt className='text-slr-dim text-[10px] tracking-widest uppercase'>{label}</dt>
         <dd className='mt-0.5 text-sm text-white'>{value}</dd>
     </div>
 );

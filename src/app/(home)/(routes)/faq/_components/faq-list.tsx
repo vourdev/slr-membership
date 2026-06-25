@@ -138,7 +138,7 @@ const FaqList = () => {
                                     <AccordionTrigger className='py-5 text-left text-sm font-semibold text-white hover:no-underline md:text-base'>
                                         {item.question}
                                     </AccordionTrigger>
-                                    <AccordionContent className='pb-5 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
+                                    <AccordionContent className='text-slr-muted pb-5 text-sm leading-relaxed md:text-base'>
                                         {item.answer}
                                     </AccordionContent>
                                 </AccordionItem>

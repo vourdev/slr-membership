@@ -43,11 +43,11 @@ const apps = [
 
 const LinkColumn: FC<{ heading: string; links: FooterLink[] }> = ({ heading, links }) => (
     <div>
-        <h3 className='text-xs font-bold tracking-widest text-[#E2B42B] uppercase'>{heading}</h3>
+        <h3 className='text-slr-gold-label text-xs font-bold tracking-widest uppercase'>{heading}</h3>
         <ul className='mt-5 space-y-3.5'>
             {links.map((link) => (
                 <li key={link.name}>
-                    <Link href={link.href} className='hover:text-slr-gold text-sm text-[#ADB0B5] transition-colors'>
+                    <Link href={link.href} className='hover:text-slr-gold text-slr-muted text-sm transition-colors'>
                         {link.name}
                     </Link>
                 </li>
@@ -58,7 +58,7 @@ const LinkColumn: FC<{ heading: string; links: FooterLink[] }> = ({ heading, lin
 
 const Footer: FC = () => {
     return (
-        <footer className='relative bg-[#040404]'>
+        <footer className='bg-slr-ink relative'>
             {/* Gold top hairline */}
             <div className='h-px w-full bg-[linear-gradient(90deg,rgba(176,138,32,0)_0%,#B08A20_50%,rgba(176,138,32,0)_100%)]' />
 
@@ -73,11 +73,13 @@ const Footer: FC = () => {
                             height={56}
                             className='h-12 w-auto'
                         />
-                        <p className='mt-5 max-w-xs text-sm leading-relaxed text-[#ADB0B5]'>
+                        <p className='text-slr-muted mt-5 max-w-xs text-sm leading-relaxed'>
                             Australia&apos;s Best Value Rewards Club — helping Australians beat the cost of living.
                         </p>
 
-                        <h3 className='mt-8 text-xs font-bold tracking-widest text-[#E2B42B] uppercase'>Follow Us</h3>
+                        <h3 className='text-slr-gold-label mt-8 text-xs font-bold tracking-widest uppercase'>
+                            Follow Us
+                        </h3>
                         <div className='mt-4 flex items-center gap-3'>
                             {socials.map((social) => (
                                 <Link key={social.label} href={social.href} aria-label={social.label}>
@@ -106,7 +108,9 @@ const Footer: FC = () => {
                         </div>
 
                         <div className='lg:col-span-3'>
-                            <h3 className='text-xs font-bold tracking-widest text-[#E2B42B] uppercase'>Get the App</h3>
+                            <h3 className='text-slr-gold-label text-xs font-bold tracking-widest uppercase'>
+                                Get the App
+                            </h3>
                             <div className='mt-5 flex flex-col gap-3'>
                                 {apps.map((app) => (
                                     <Link
@@ -121,7 +125,7 @@ const Footer: FC = () => {
                                             className='h-6 w-6 shrink-0'
                                         />
                                         <span className='leading-tight'>
-                                            <span className='block text-[10px] tracking-wider text-[#ADB0B5] uppercase'>
+                                            <span className='text-slr-muted block text-[10px] tracking-wider uppercase'>
                                                 {app.tagline}
                                             </span>
                                             <span className='block text-sm font-bold text-white'>{app.name}</span>

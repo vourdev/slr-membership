@@ -1,6 +1,6 @@
-import { CreditCard, FileText, Layers, Tag } from 'lucide-react';
-
 import type { ReactNode } from 'react';
+
+import { CreditCard, FileText, Layers, Tag } from 'lucide-react';
 
 export type MenuItem = {
     text: string;

@@ -4,14 +4,9 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { ArrowLeft, Loader2Icon, MailCheck } from 'lucide-react';
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 type StepOtpProps = {
     email: string;
@@ -57,7 +52,7 @@ const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
                 <h2 className='font-bebas-neue mt-4 text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Verify your email
                 </h2>
-                <p className='mt-2 text-sm text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-2 text-sm'>
                     We sent a 6-digit code to <span className='font-semibold text-white'>{email}</span>.
                 </p>
             </div>
@@ -87,7 +82,7 @@ const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
 
                 {error && <p className='mt-3 text-center text-xs text-red-400'>{error}</p>}
 
-                <p className='mt-5 text-center text-xs text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-5 text-center text-xs'>
                     Didn&apos;t get it?{' '}
                     <button
                         type='button'

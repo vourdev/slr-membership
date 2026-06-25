@@ -35,7 +35,7 @@ const cards = [
 
 const WhyJoinSection = () => {
     return (
-        <section className='relative bg-[#040404] py-16 md:py-24'>
+        <section className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='flex flex-row items-center justify-center'>
                     <div className='flex flex-col'>
@@ -122,7 +122,7 @@ const WhyJoinSection = () => {
                             color='#E2B42B'
                             lineColor='#B08A20'
                             gradient='linear-gradient(90deg, #F2F2F2 0%, #B3B3B8 45%, #FFFFFF 60%, #8C8C94 100%)'
-                            labelClassName='text-base md:text-lg lg:text-xl tracking-[0.20em] text-[#E2B42B] xl:text-2xl'
+                            labelClassName='text-base md:text-lg lg:text-xl tracking-[0.20em] text-slr-gold-label xl:text-2xl'
                             className='mt-4'
                         />
 

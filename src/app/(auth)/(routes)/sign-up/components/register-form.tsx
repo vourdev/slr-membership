@@ -86,13 +86,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
             case 'spin':
                 return <StepSpinWheel onNext={goSpinDone} onBack={() => setStep('tier')} />;
             case 'otp':
-                return (
-                    <StepOtp
-                        email={data.email}
-                        onNext={() => setStep('success')}
-                        onBack={() => setStep('tier')}
-                    />
-                );
+                return <StepOtp email={data.email} onNext={() => setStep('success')} onBack={() => setStep('tier')} />;
             case 'checkout':
                 return (
                     <StepCheckout

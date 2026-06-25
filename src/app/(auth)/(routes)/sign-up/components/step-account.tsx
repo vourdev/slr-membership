@@ -7,16 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AU_STATES, AuStateCode } from '@/constant/au-states';
+import { goldButtonStyle } from '@/lib/styles';
 import { SignUpSchema } from '@/lib/zod';
 
 import { SignUpFormData } from './types';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 type StepAccountProps = {
     data: SignUpFormData;
@@ -65,7 +60,7 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Create your account
                 </h2>
-                <p className='mt-1 text-sm text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-1 text-sm'>
                     Tell us a bit about you. We use your state to assign you to the correct draw pool.
                 </p>
             </div>

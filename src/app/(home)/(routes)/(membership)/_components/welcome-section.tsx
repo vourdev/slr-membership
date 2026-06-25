@@ -21,7 +21,7 @@ const highlights = [
 
 const WelcomeSection = () => {
     return (
-        <section className='relative bg-[#040404] py-16 md:py-24'>
+        <section className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='text-center'>
                     <SectionEyebrow
@@ -33,7 +33,7 @@ const WelcomeSection = () => {
                     <h2 className='font-bebas-neue mt-3 text-center text-[40px] leading-none font-medium tracking-wider text-white uppercase sm:text-[56px] md:text-[72px] xl:text-[90px] xl:leading-22.5'>
                         Members <span className='text-gradient-gold inline-block'>PARTICIPATION LEVELS</span>
                     </h2>
-                    <p className='mt-3 text-center text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
+                    <p className='text-slr-muted mt-3 text-center text-sm leading-relaxed md:text-base'>
                         Join thousands of Australians saving more, winning more, and living smarter — every week.
                     </p>
                 </div>
@@ -49,7 +49,7 @@ const WelcomeSection = () => {
                             <h3 className='text-gradient-gold font-bebas-neue text-lg leading-none tracking-wider uppercase sm:text-xl md:text-3xl lg:text-4xl xl:text-[44px]'>
                                 {item.title}
                             </h3>
-                            <p className='mt-2 text-[9px] font-semibold tracking-[0.18em] text-[#ADB0B5] uppercase sm:text-[11px] md:mt-3 md:text-xs lg:text-sm'>
+                            <p className='text-slr-muted mt-2 text-[9px] font-semibold tracking-[0.18em] uppercase sm:text-[11px] md:mt-3 md:text-xs lg:text-sm'>
                                 {item.subtitle}
                             </p>
                         </div>

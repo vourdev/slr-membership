@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signInCredentials } from '@/lib/action';
+import { goldBgStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 
 import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
@@ -19,11 +20,6 @@ const glassStyle: React.CSSProperties = {
     border: '1px solid rgba(255, 255, 255, 0.08)',
     backdropFilter: 'blur(50px)',
     WebkitBackdropFilter: 'blur(50px)'
-};
-
-// Gold gradient button style per design system
-const goldButtonStyle: React.CSSProperties = {
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)'
 };
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
@@ -42,7 +38,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     <CardTitle className='font-bebas-neue text-3xl tracking-wider text-white md:text-4xl'>
                         Sign In
                     </CardTitle>
-                    <CardDescription className='text-[#ADB0B5]'>
+                    <CardDescription className='text-slr-muted'>
                         Enter your email below to login to your account
                     </CardDescription>
                     {state?.message && (
@@ -112,7 +108,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                 {isPending ? (
                                     <Button
                                         disabled
-                                        style={goldButtonStyle}
+                                        style={goldBgStyle}
                                         className='h-11 w-full rounded-full font-bold text-[#1a1408] opacity-80 shadow-md'>
                                         <Loader2Icon className='animate-spin' />
                                         Loading
@@ -120,7 +116,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                 ) : (
                                     <Button
                                         type='submit'
-                                        style={goldButtonStyle}
+                                        style={goldBgStyle}
                                         className='h-11 w-full rounded-xl font-bold text-[#1a1408] shadow-md transition-opacity hover:opacity-90'>
                                         Login
                                     </Button>

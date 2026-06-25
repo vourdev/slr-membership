@@ -102,7 +102,7 @@ const PartnersSection = () => {
                     <span className='text-gradient-silver'>Community Givebacks</span>
                 </SectionHeading>
 
-                <p className='mt-4 text-sm text-[#ADB0B5] md:text-base'>
+                <p className='text-slr-muted mt-4 text-sm md:text-base'>
                     Draw prizes and discounts to support community
                 </p>
 

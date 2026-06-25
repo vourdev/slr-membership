@@ -3,16 +3,11 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { SpinPrize } from './types';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { motion, useAnimationControls } from 'motion/react';
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 type Segment = { label: string; discountPercent: number; fill: string; textColor: string };
 
@@ -107,7 +102,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     One free spin
                 </h2>
-                <p className='mt-1 text-sm text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-1 text-sm'>
                     Every new paid member gets one spin. You might win a discount on your first month.
                 </p>
             </div>
@@ -195,7 +190,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                                 <p className='font-bebas-neue mt-2 text-2xl tracking-wider text-white uppercase'>
                                     You won {result.segment.label}!
                                 </p>
-                                <p className='mt-1 text-xs text-[#ADB0B5]'>
+                                <p className='text-slr-muted mt-1 text-xs'>
                                     Your discount will be applied at checkout.
                                 </p>
                             </>
@@ -204,7 +199,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                                 <p className='font-bebas-neue text-xl tracking-wider text-white uppercase'>
                                     Better luck next cycle
                                 </p>
-                                <p className='mt-1 text-xs text-[#ADB0B5]'>
+                                <p className='text-slr-muted mt-1 text-xs'>
                                     You can spin again at the start of your next billing cycle.
                                 </p>
                             </>

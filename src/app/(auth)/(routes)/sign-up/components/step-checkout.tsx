@@ -4,15 +4,10 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { AU_STATES } from '@/constant/au-states';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { BENY_PRICE, SignUpFormData, SpinPrize, TIER_LABEL, TIER_PRICE } from './types';
 import { ArrowLeft, CreditCard, Loader2Icon, ShieldCheck } from 'lucide-react';
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 type StepCheckoutProps = {
     data: SignUpFormData;
@@ -50,7 +45,7 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Review your order
                 </h2>
-                <p className='mt-1 text-sm text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-1 text-sm'>
                     You&apos;ll be redirected to Stripe to enter your card details. No charge until you confirm there.
                 </p>
             </div>
@@ -87,7 +82,7 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
                     <div className='flex items-baseline justify-between'>
                         <div>
                             <p className='font-bebas-neue text-xl tracking-wider text-white uppercase'>Due today</p>
-                            <p className='text-xs text-[#ADB0B5]'>
+                            <p className='text-slr-muted text-xs'>
                                 Then ${subtotal.toFixed(2)}/month from your next billing date.
                             </p>
                         </div>
@@ -97,13 +92,11 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
             </div>
 
             <div className='rounded-xl border border-white/10 bg-white/2 p-4'>
-                <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase'>
-                    Draw pool assignment
-                </p>
+                <p className='text-slr-dim text-[10px] font-semibold tracking-widest uppercase'>Draw pool assignment</p>
                 <p className='mt-1 text-sm text-white'>
                     SLR {tier === 'red' ? 'Red' : 'Blue'} {data.state} — {stateLabel}
                 </p>
-                <p className='mt-1 text-xs text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-1 text-xs'>
                     Your entries will be allocated to this pool after your first successful payment.
                 </p>
             </div>
@@ -137,7 +130,7 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
                 </Button>
             </div>
 
-            <p className='flex items-center justify-center gap-1.5 text-center text-xs text-[#8EA0B8]'>
+            <p className='text-slr-dim flex items-center justify-center gap-1.5 text-center text-xs'>
                 <ShieldCheck className='h-3.5 w-3.5' />
                 Payment processed securely by Stripe. We never store your card details.
             </p>
@@ -156,15 +149,15 @@ type SummaryRowProps = {
 const SummaryRow = ({ label, sub, value, muted, highlight }: SummaryRowProps) => (
     <div className='flex items-baseline justify-between gap-3'>
         <div>
-            <p className={muted ? 'text-sm text-[#ADB0B5]' : 'text-sm font-medium text-white'}>{label}</p>
-            {sub && <p className='text-xs text-[#8EA0B8]'>{sub}</p>}
+            <p className={muted ? 'text-slr-muted text-sm' : 'text-sm font-medium text-white'}>{label}</p>
+            {sub && <p className='text-slr-dim text-xs'>{sub}</p>}
         </div>
         <p
             className={
                 highlight
                     ? 'text-sm font-bold text-[#FFDC75]'
                     : muted
-                      ? 'text-sm text-[#ADB0B5]'
+                      ? 'text-slr-muted text-sm'
                       : 'text-sm font-semibold text-white'
             }>
             {value}

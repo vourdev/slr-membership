@@ -89,7 +89,7 @@ const BlueTiersSection = () => {
                         SLR <span className='text-[#4D62E5]'>BLUE</span> Reward Tiers
                     </SectionHeading>
 
-                    <p className='mt-2 text-center text-sm leading-relaxed text-[#ADB0B5] xl:text-base'>
+                    <p className='text-slr-muted mt-2 text-center text-sm leading-relaxed xl:text-base'>
                         Higher tiers — more chances to win every month.
                     </p>
                 </div>
@@ -120,7 +120,7 @@ const BlueTiersSection = () => {
                                             </p>
                                             <span className='text-xs font-normal text-white/60 sm:text-sm'>/month</span>
                                         </div>
-                                        <p className='text-xs leading-relaxed text-[#ADB0B5] sm:text-sm'>
+                                        <p className='text-slr-muted text-xs leading-relaxed sm:text-sm'>
                                             Premium tier — priority access & perks
                                         </p>
                                     </div>
@@ -256,7 +256,7 @@ const BlueTiersSection = () => {
                         />
                     </div>
                 </div>
-                <div className='mt-12 w-full rounded-xl border border-[#1A62C033] bg-[#1A62C014] p-4 text-center text-sm text-[#8EA0B8] md:text-base'>
+                <div className='text-slr-dim mt-12 w-full rounded-xl border border-[#1A62C033] bg-[#1A62C014] p-4 text-center text-sm md:text-base'>
                     Each token gives you <span className='font-bold text-[#6AB0F0]'>one entry</span> into the weekly
                     member prize draws. Higher tiers = more chances to win every week.
                 </div>

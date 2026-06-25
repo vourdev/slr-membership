@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { Loader2Icon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -17,12 +18,6 @@ const subjects = [
     'Technical issue',
     'Partnership opportunity'
 ];
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 const ContactForm = () => {
     const [isPending, setIsPending] = useState(false);

@@ -14,8 +14,8 @@ const sections: LegalSection[] = [
         body: (
             <p>
                 By creating an account or using the Smart Life Rewards (SLR) website, mobile app, or related services
-                (the &ldquo;Services&rdquo;), you agree to be bound by these Terms &amp; Conditions. If you do not agree,
-                please do not use the Services.
+                (the &ldquo;Services&rdquo;), you agree to be bound by these Terms &amp; Conditions. If you do not
+                agree, please do not use the Services.
             </p>
         )
     },
@@ -34,8 +34,8 @@ const sections: LegalSection[] = [
         body: (
             <>
                 <p>
-                    SLR offers a free Visitor tier and paid tiers (SLR Red and SLR Premium / Blue) billed monthly through
-                    Stripe. Pricing for each tier is shown during registration and on the pricing section of our
+                    SLR offers a free Visitor tier and paid tiers (SLR Red and SLR Premium / Blue) billed monthly
+                    through Stripe. Pricing for each tier is shown during registration and on the pricing section of our
                     website.
                 </p>
                 <p>

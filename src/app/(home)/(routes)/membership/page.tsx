@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { goldButtonStyle } from '@/lib/styles';
 
 import PageHero from '../_components/page-hero';
 import ComparisonMatrix from './_components/comparison-matrix';
@@ -14,16 +15,10 @@ export const metadata: Metadata = {
         "Compare Smart Life Rewards membership tiers — Visitor (free), SLR Red ($10/mo), and SLR Premium ($26/mo). Choose the plan that's right for you."
 };
 
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
-
 const tierCardStyles = {
     visitor: {
         wrapper: 'border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)]',
-        eyebrow: 'text-[#8EA0B8]',
+        eyebrow: 'text-slr-dim',
         price: 'text-white'
     },
     red: {
@@ -148,12 +143,12 @@ const MembershipPage = () => {
                                             {tier.price}
                                         </span>
                                     </div>
-                                    <p className='mt-1 text-xs text-[#8EA0B8]'>{tier.priceNote}</p>
+                                    <p className='text-slr-dim mt-1 text-xs'>{tier.priceNote}</p>
 
-                                    <p className='mt-5 text-sm leading-relaxed text-[#ADB0B5]'>{tier.tagline}</p>
+                                    <p className='text-slr-muted mt-5 text-sm leading-relaxed'>{tier.tagline}</p>
 
                                     <div className='mt-6 rounded-lg border border-white/5 bg-white/2 p-3'>
-                                        <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase'>
+                                        <p className='text-slr-dim text-[10px] font-semibold tracking-widest uppercase'>
                                             Best for
                                         </p>
                                         <p className='mt-0.5 text-sm font-semibold text-white'>{tier.bestFor}</p>
@@ -187,7 +182,7 @@ const MembershipPage = () => {
                         })}
                     </div>
 
-                    <p className='mt-6 text-center text-xs text-[#8EA0B8]'>
+                    <p className='text-slr-dim mt-6 text-center text-xs'>
                         All prices in AUD. Billed monthly through Stripe. Cancel any time from your account.
                     </p>
                 </div>
@@ -198,13 +193,15 @@ const MembershipPage = () => {
                     <div className='mb-10 text-center'>
                         <div className='mt-4 flex w-full items-center justify-center gap-2'>
                             <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
-                            <p className='text-xs font-semibold text-[#E2B42B] uppercase md:text-sm'>Side-by-side</p>
+                            <p className='text-slr-gold-label text-xs font-semibold uppercase md:text-sm'>
+                                Side-by-side
+                            </p>
                             <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'></div>
                         </div>
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             Compare every feature
                         </h2>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
+                        <p className='text-slr-muted mx-auto mt-3 max-w-xl text-sm md:text-base'>
                             What you get at each tier — draws, discounts, content, and account perks.
                         </p>
                     </div>
@@ -230,12 +227,12 @@ const MembershipPage = () => {
                                 BENY Add-on
                                 <span className='ml-2 align-middle text-base font-normal text-[#FFDC75]'>+$5/mo</span>
                             </h3>
-                            <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5]'>
+                            <p className='text-slr-muted mt-3 text-sm leading-relaxed'>
                                 Unlock the BENY premium discount platform — thousands of additional offers from
                                 Australian brands across travel, dining, retail, and more. Available to Red and Premium
                                 members. Activation requires a phone number.
                             </p>
-                            <p className='mt-3 text-xs text-[#8EA0B8]'>
+                            <p className='text-slr-dim mt-3 text-xs'>
                                 Optional. Add during checkout or any time from your account. Cancel any time.
                             </p>
                         </div>
@@ -253,12 +250,12 @@ const MembershipPage = () => {
                             <h3 className='font-bebas-neue mt-4 text-2xl tracking-wider text-white uppercase md:text-3xl'>
                                 Spin Wheel
                             </h3>
-                            <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5]'>
+                            <p className='text-slr-muted mt-3 text-sm leading-relaxed'>
                                 Every paid member gets one spin during registration checkout each cycle. Outcomes
                                 include bonus entries, discount credit, a percentage discount on your next invoice, or
                                 no prize. The wheel resets every cycle.
                             </p>
-                            <p className='mt-3 text-xs text-[#8EA0B8]'>
+                            <p className='text-slr-dim mt-3 text-xs'>
                                 Included with Red and Premium. See{' '}
                                 <Link href='/giveaway-rules' className='text-[#FFDC75] hover:underline'>
                                     Giveaway Rules
@@ -288,7 +285,7 @@ const MembershipPage = () => {
                             <h2 className='font-bebas-neue mt-6 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                                 Start saving today
                             </h2>
-                            <p className='mx-auto mt-3 max-w-md text-sm text-[#ADB0B5] md:text-base'>
+                            <p className='text-slr-muted mx-auto mt-3 max-w-md text-sm md:text-base'>
                                 Join free or unlock the full club — your first cycle of entries starts as soon as your
                                 first payment clears.
                             </p>

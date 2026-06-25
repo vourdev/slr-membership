@@ -73,8 +73,8 @@ export const normalizeRegionKey = (value: string) => {
 
 export const toNumber = (v?: string) => {
     const n = Number(v);
-    
-return Number.isFinite(n) ? n : 0;
+
+    return Number.isFinite(n) ? n : 0;
 };
 
 export function formatNumericColumn(ws: XLSX.WorkSheet, columnIndex: number) {
@@ -133,8 +133,8 @@ export function formatPriceComparison(
                 return current > 0 ? `+ Rp ${formatNumber(current)}` : '± Rp 0';
             case 'both':
                 const amount = current > 0 ? `+ Rp ${formatNumber(current)}` : '± Rp 0';
-                
-return `${amount} (+∞%)`;
+
+                return `${amount} (+∞%)`;
         }
     }
 

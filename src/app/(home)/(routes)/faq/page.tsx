@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { goldButtonStyle } from '@/lib/styles';
 
 import PageHero from '../_components/page-hero';
 import FaqList from './_components/faq-list';
@@ -9,12 +10,6 @@ import FaqList from './_components/faq-list';
 export const metadata: Metadata = {
     title: 'FAQ · SLR Rewards',
     description: 'Answers to common questions about Smart Life Rewards membership, draws, billing, and discounts.'
-};
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
 };
 
 const FaqPage = () => {
@@ -34,7 +29,7 @@ const FaqPage = () => {
                         <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                             Still have questions?
                         </h2>
-                        <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
+                        <p className='text-slr-muted mt-3 text-sm leading-relaxed md:text-base'>
                             Our support team is here to help. Reach out any time and we&apos;ll get back to you within
                             one business day.
                         </p>

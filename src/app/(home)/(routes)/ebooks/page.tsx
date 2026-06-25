@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { goldButtonStyle } from '@/lib/styles';
 
 import PageHero from '../_components/page-hero';
 import EbookGrid from './_components/ebook-grid';
@@ -11,12 +12,6 @@ export const metadata: Metadata = {
     title: 'E-Books · SLR Rewards',
     description:
         'Browse the SLR e-book library — practical guides on cost of living, finance, family, health, and lifestyle. Read full content with SLR Red or Premium membership.'
-};
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
 };
 
 const accessLegend = [
@@ -79,7 +74,7 @@ const EbooksPage = () => {
                                             {title}
                                         </p>
                                     </div>
-                                    <p className='mt-1 text-xs text-[#ADB0B5]'>{body}</p>
+                                    <p className='text-slr-muted mt-1 text-xs'>{body}</p>
                                 </div>
                             </div>
                         ))}
@@ -99,7 +94,7 @@ const EbooksPage = () => {
                         <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             Unlock the full library
                         </h2>
-                        <p className='mx-auto mt-3 max-w-md text-sm text-[#ADB0B5] md:text-base'>
+                        <p className='text-slr-muted mx-auto mt-3 max-w-md text-sm md:text-base'>
                             Every e-book reads in your browser — no downloads, no DRM tools. Included with SLR Red and
                             Premium from $10/month.
                         </p>

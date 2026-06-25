@@ -26,7 +26,7 @@ const cards = [
 
 const FreeVisitorsSection = () => {
     return (
-        <section className='relative bg-[#040404] py-16 md:py-24'>
+        <section className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <SectionEyebrow label='No cost to start' color='#E2B42B' lineColor='#B08A20' />
 
@@ -34,7 +34,7 @@ const FreeVisitorsSection = () => {
                     <span className='text-gradient-gold'>Free Visitors</span>
                 </SectionHeading>
 
-                <p className='mx-auto mt-4 max-w-xl text-center text-sm text-[#ADB0B5] md:text-base'>
+                <p className='text-slr-muted mx-auto mt-4 max-w-xl text-center text-sm md:text-base'>
                     Explore everything SLR has to offer — free, no signup required.
                 </p>
 
@@ -47,13 +47,13 @@ const FreeVisitorsSection = () => {
 
                             <h3 className='mt-6 text-lg font-bold tracking-wide text-white uppercase'>{card.title}</h3>
 
-                            <p className='mt-3 text-sm leading-relaxed text-[#8EA0B8]'>{card.description}</p>
+                            <p className='text-slr-dim mt-3 text-sm leading-relaxed'>{card.description}</p>
 
                             <div className='mt-6 h-0.5 w-10 bg-[#997314]' />
 
                             <div className='mt-4 flex items-center gap-2'>
                                 <Image src='/icons/ic-check.png' alt='' width={20} height={20} className='h-3 w-3' />
-                                <span className='text-xs font-semibold tracking-widest text-[#E2B42B] uppercase'>
+                                <span className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase'>
                                     Included Free
                                 </span>
                             </div>

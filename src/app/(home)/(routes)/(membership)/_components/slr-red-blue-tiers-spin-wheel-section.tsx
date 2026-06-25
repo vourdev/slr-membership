@@ -134,7 +134,7 @@ const TierCard: FC<{ name: string; tiers: Tier[]; theme: TierTheme }> = ({ name,
 
 const SlrRedBlueTiersSpinWheelSection = () => {
     return (
-        <section id='tiers' className='relative bg-[#040404] py-16 md:py-24'>
+        <section id='tiers' className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <SectionHeading>
                     <span className='text-gradient-silver'>SLR Red - Blue Tiers &amp; Spin Wheel</span>
@@ -156,7 +156,7 @@ const SlrRedBlueTiersSpinWheelSection = () => {
                 <div className='mt-8 flex flex-col gap-4 sm:mt-10 sm:flex-row sm:items-end sm:justify-between'>
                     <div className='flex items-center gap-3'>
                         <Image src='/icons/ic-trophy.png' alt='' width={40} height={40} className='h-9 w-9 shrink-0' />
-                        <p className='max-w-xl text-xs font-semibold tracking-wider text-[#E2B42B] uppercase sm:text-base'>
+                        <p className='text-slr-gold-label max-w-xl text-xs font-semibold tracking-wider uppercase sm:text-base'>
                             Tokens are used for member draws &amp; promotions only. Spins provide bonus savings
                             discounts.
                         </p>
@@ -172,7 +172,7 @@ const SlrRedBlueTiersSpinWheelSection = () => {
                         href='/membership'
                         className='flex items-center justify-center rounded-xl px-8 py-2.5 transition-opacity hover:opacity-90 sm:rounded-2xl lg:px-12 lg:py-3'
                         style={{ background: '#212429', border: '1.5px solid #D1A62E' }}>
-                        <span className='text-base font-bold tracking-[2px] text-[#E2B42B] uppercase sm:tracking-[2.5px] lg:text-xl lg:tracking-[3px]'>
+                        <span className='text-slr-gold-label text-base font-bold tracking-[2px] uppercase sm:tracking-[2.5px] lg:text-xl lg:tracking-[3px]'>
                             Learn More
                         </span>
                     </Link>

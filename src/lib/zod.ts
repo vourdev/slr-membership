@@ -1,6 +1,6 @@
-import { email, enum as zEnum, object, string } from 'zod';
-
 import { AU_STATE_CODES } from '@/constant/au-states';
+
+import { email, object, string, enum as zEnum } from 'zod';
 
 export const SignInSchema = object({
     email: email('Invalid Email'),

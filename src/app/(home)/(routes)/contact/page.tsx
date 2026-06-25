@@ -67,7 +67,7 @@ const ContactPage = () => {
                                             {title}
                                         </p>
                                         <p className='mt-0.5 text-sm font-medium text-white'>{body}</p>
-                                        <p className='mt-1 text-xs text-[#8EA0B8]'>{hint}</p>
+                                        <p className='text-slr-dim mt-1 text-xs'>{hint}</p>
                                     </div>
                                 </div>
                             ))}
@@ -78,7 +78,7 @@ const ContactPage = () => {
                                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                                     Send us a message
                                 </h2>
-                                <p className='mt-2 mb-6 text-sm text-[#ADB0B5]'>
+                                <p className='text-slr-muted mt-2 mb-6 text-sm'>
                                     Fill in the form below and our support team will get back to you.
                                 </p>
                                 <ContactForm />

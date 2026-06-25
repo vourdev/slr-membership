@@ -3,16 +3,11 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { goldButtonStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 
 import { BENY_PRICE, SignUpFormData, TierKey } from './types';
 import { ArrowLeft, Check } from 'lucide-react';
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
-};
 
 type TierOption = {
     key: TierKey;
@@ -85,7 +80,7 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                     Choose your tier
                 </h2>
-                <p className='mt-1 text-sm text-[#ADB0B5]'>You can change or cancel any time from your account.</p>
+                <p className='text-slr-muted mt-1 text-sm'>You can change or cancel any time from your account.</p>
             </div>
 
             <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
@@ -129,7 +124,7 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                                 <span className='font-bebas-neue text-3xl font-extrabold text-white'>{tier.price}</span>
                                 <span className='text-xs text-white/60'>{tier.note}</span>
                             </div>
-                            <p className='mt-2 text-xs text-[#ADB0B5]'>{tier.tagline}</p>
+                            <p className='text-slr-muted mt-2 text-xs'>{tier.tagline}</p>
                             <ul className='mt-3 space-y-1.5'>
                                 {tier.perks.map((p) => (
                                     <li key={p} className='flex items-start gap-1.5 text-xs text-white/80'>
@@ -164,7 +159,7 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                             </span>
                             <span className='text-sm font-semibold text-[#FFDC75]'>+${BENY_PRICE}/month</span>
                         </div>
-                        <p className='mt-0.5 text-xs text-[#ADB0B5]'>
+                        <p className='text-slr-muted mt-0.5 text-xs'>
                             Premium third-party discount platform. Optional. Requires phone for activation.
                         </p>
                     </div>

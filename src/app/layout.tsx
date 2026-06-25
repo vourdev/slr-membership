@@ -30,7 +30,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <html suppressHydrationWarning lang='en'>
             <body
                 suppressHydrationWarning
-                className={`${montserrat.variable} ${bebasNeue.variable} text-foreground overscroll-none bg-[#040404] antialiased`}>
+                className={`${montserrat.variable} ${bebasNeue.variable} text-foreground bg-slr-ink overscroll-none antialiased`}>
                 {children}
                 <Toaster />
             </body>

@@ -66,7 +66,7 @@ const EbookGrid = () => {
                                 'rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors md:text-sm',
                                 isActive
                                     ? 'border-[#D4AF3759] bg-[#D4AF370D] text-[#FFDC75]'
-                                    : 'border-white/10 bg-white/2 text-[#8EA0B8] hover:border-white/20 hover:text-white'
+                                    : 'text-slr-dim border-white/10 bg-white/2 hover:border-white/20 hover:text-white'
                             )}>
                             {f === 'all' ? 'All categories' : f}
                         </button>
@@ -74,7 +74,7 @@ const EbookGrid = () => {
                 })}
             </div>
 
-            <p className='mt-4 text-xs text-[#8EA0B8]'>
+            <p className='text-slr-dim mt-4 text-xs'>
                 Showing {filtered.length} of {ebooks.length} titles
             </p>
 
@@ -122,10 +122,10 @@ const EbookGrid = () => {
                             </div>
 
                             <div className='flex flex-1 flex-col p-5'>
-                                <p className='text-xs font-medium text-[#8EA0B8]'>by {book.author}</p>
-                                <p className='mt-3 text-sm leading-relaxed text-[#ADB0B5]'>{book.description}</p>
+                                <p className='text-slr-dim text-xs font-medium'>by {book.author}</p>
+                                <p className='text-slr-muted mt-3 text-sm leading-relaxed'>{book.description}</p>
 
-                                <div className='mt-4 flex items-center gap-4 text-xs text-[#8EA0B8]'>
+                                <div className='text-slr-dim mt-4 flex items-center gap-4 text-xs'>
                                     <span className='inline-flex items-center gap-1'>
                                         <BookOpen className='h-3.5 w-3.5' /> {book.pages} pages
                                     </span>
@@ -142,7 +142,7 @@ const EbookGrid = () => {
                                             {cfg.cta}
                                         </Button>
                                     </Link>
-                                    <p className='mt-2 text-center text-[10px] text-[#8EA0B8]'>{cfg.helper}</p>
+                                    <p className='text-slr-dim mt-2 text-center text-[10px]'>{cfg.helper}</p>
                                 </div>
                             </div>
                         </article>
@@ -152,7 +152,7 @@ const EbookGrid = () => {
 
             {filtered.length === 0 && (
                 <div className='mt-12 rounded-2xl border border-white/10 bg-white/2 p-12 text-center'>
-                    <p className='text-sm text-[#ADB0B5]'>No e-books in this category yet — check back soon.</p>
+                    <p className='text-slr-muted text-sm'>No e-books in this category yet — check back soon.</p>
                 </div>
             )}
         </div>

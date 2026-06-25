@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { goldButtonStyle } from '@/lib/styles';
 
 import PageHero from '../_components/page-hero';
 import {
@@ -24,12 +25,6 @@ export const metadata: Metadata = {
     title: 'About · SLR Rewards',
     description:
         'Smart Life Rewards is an Australian membership club built to help everyday Australians beat the cost of living through weekly draws, partner discounts, and digital offers.'
-};
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
 };
 
 const stats = [
@@ -128,7 +123,7 @@ const AboutPage = () => {
                         <div className='order-2 lg:order-1'>
                             <div className='flex items-center gap-2'>
                                 <div className='h-px w-12 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                                <p className='text-xs font-semibold tracking-widest text-[#E2B42B] uppercase md:text-sm'>
+                                <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
                                     Our mission
                                 </p>
                             </div>
@@ -138,7 +133,7 @@ const AboutPage = () => {
                                     SLR
                                 </span>
                             </h2>
-                            <div className='mt-5 space-y-4 text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
+                            <div className='text-slr-muted mt-5 space-y-4 text-sm leading-relaxed md:text-base'>
                                 <p>
                                     Rewards programs in Australia were either tied to a single retailer or buried inside
                                     loyalty schemes nobody could actually use. Meanwhile the cost of living kept rising
@@ -206,7 +201,7 @@ const AboutPage = () => {
                                     <p className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-3xl font-extrabold text-transparent md:text-4xl'>
                                         {value}
                                     </p>
-                                    <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase md:text-xs'>
+                                    <p className='text-slr-dim text-[10px] font-semibold tracking-widest uppercase md:text-xs'>
                                         {label}
                                     </p>
                                 </div>
@@ -221,7 +216,7 @@ const AboutPage = () => {
                     <div className='text-center'>
                         <div className='flex w-full items-center justify-center gap-2'>
                             <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                            <p className='text-xs font-semibold tracking-widest text-[#E2B42B] uppercase md:text-sm'>
+                            <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
                                 Member journey
                             </p>
                             <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
@@ -229,7 +224,7 @@ const AboutPage = () => {
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             How SLR works
                         </h2>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
+                        <p className='text-slr-muted mx-auto mt-3 max-w-xl text-sm md:text-base'>
                             Four steps from signing up to winning. No paperwork, no claim forms — the platform handles
                             it for you.
                         </p>
@@ -255,12 +250,12 @@ const AboutPage = () => {
                                 <h3 className='font-bebas-neue mt-5 text-xl tracking-wider text-white uppercase md:text-2xl'>
                                     {title}
                                 </h3>
-                                <p className='mt-2 text-sm leading-relaxed text-[#ADB0B5]'>{body}</p>
+                                <p className='text-slr-muted mt-2 text-sm leading-relaxed'>{body}</p>
                             </div>
                         ))}
                     </div>
 
-                    <div className='mt-8 flex items-center justify-center gap-2 text-xs text-[#8EA0B8]'>
+                    <div className='text-slr-dim mt-8 flex items-center justify-center gap-2 text-xs'>
                         <CreditCard className='h-3.5 w-3.5' />
                         <span>Payments processed securely by Stripe. Draws conducted under permit by TPAL.</span>
                     </div>
@@ -272,7 +267,7 @@ const AboutPage = () => {
                     <div className='text-center'>
                         <div className='flex w-full items-center justify-center gap-2'>
                             <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                            <p className='text-xs font-semibold tracking-widest text-[#E2B42B] uppercase md:text-sm'>
+                            <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
                                 Our principles
                             </p>
                             <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
@@ -280,7 +275,7 @@ const AboutPage = () => {
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             What we stand for
                         </h2>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
+                        <p className='text-slr-muted mx-auto mt-3 max-w-xl text-sm md:text-base'>
                             Four principles guide every decision we make about features, pricing, and partnerships.
                         </p>
                     </div>
@@ -301,7 +296,7 @@ const AboutPage = () => {
                                         <h3 className='font-bebas-neue text-xl tracking-wider text-white uppercase md:text-2xl'>
                                             {title}
                                         </h3>
-                                        <p className='mt-1 text-sm leading-relaxed text-[#ADB0B5]'>{body}</p>
+                                        <p className='text-slr-muted mt-1 text-sm leading-relaxed'>{body}</p>
                                     </div>
                                 </div>
                             );
@@ -315,12 +310,12 @@ const AboutPage = () => {
                     <div className='text-center'>
                         <div className='flex w-full items-center justify-center gap-2'>
                             <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                            <p className='text-xs font-semibold tracking-widest text-[#E2B42B] uppercase md:text-sm'>
+                            <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
                                 Trusted by
                             </p>
                             <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
                         </div>
-                        <p className='mx-auto mt-3 max-w-xl text-sm text-[#ADB0B5] md:text-base'>
+                        <p className='text-slr-muted mx-auto mt-3 max-w-xl text-sm md:text-base'>
                             Australian brands that work with SLR to bring members real, everyday value.
                         </p>
                     </div>
@@ -361,7 +356,7 @@ const AboutPage = () => {
                             <h2 className='font-bebas-neue mt-6 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                                 Ready to start saving?
                             </h2>
-                            <p className='mx-auto mt-3 max-w-md text-sm text-[#ADB0B5] md:text-base'>
+                            <p className='text-slr-muted mx-auto mt-3 max-w-md text-sm md:text-base'>
                                 Join free as a Visitor, or unlock the full rewards club from $10/month.
                             </p>
                             <div className='mt-6 flex flex-wrap justify-center gap-3'>

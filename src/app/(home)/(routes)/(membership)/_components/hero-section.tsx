@@ -4,7 +4,7 @@ import GoldPillButton from '@/components/common/gold-pill-button';
 
 const HeroSection = () => {
     return (
-        <section className='relative overflow-hidden bg-[#040404] pt-28 pb-16 md:pt-32 md:pb-20'>
+        <section className='bg-slr-ink relative overflow-hidden pt-28 pb-16 md:pt-32 md:pb-20'>
             <div className='relative z-20 mx-auto max-w-7xl px-4'>
                 {/* Logo */}
                 <div className='mb-8 flex justify-center'>

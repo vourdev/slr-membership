@@ -4,7 +4,7 @@ import GoldPillButton from '@/components/common/gold-pill-button';
 
 const SlrRewardCarsSection = () => {
     return (
-        <section className='relative bg-[#040404] py-16 md:py-24'>
+        <section className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='grid grid-cols-1 items-center gap-10 lg:grid-cols-[2fr_3fr]'>
                     {/* Left — logo, headline, meta, CTA */}
@@ -24,8 +24,8 @@ const SlrRewardCarsSection = () => {
                         </h2>
 
                         <p className='mt-5 text-[10px] font-semibold tracking-[3px] text-white/70 uppercase sm:text-xs'>
-                            Weekly <span className='mx-1 text-[#E2B42B]'>•</span> Monthly{' '}
-                            <span className='mx-1 text-[#E2B42B]'>•</span> Member Benefits
+                            Weekly <span className='text-slr-gold-label mx-1'>•</span> Monthly{' '}
+                            <span className='text-slr-gold-label mx-1'>•</span> Member Benefits
                         </p>
 
                         <GoldPillButton href='/sign-up' className='mt-8'>

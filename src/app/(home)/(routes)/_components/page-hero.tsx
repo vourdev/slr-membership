@@ -9,7 +9,7 @@ type PageHeroProps = {
 
 const accentStyles = {
     gold: {
-        text: 'text-[#E2B42B]',
+        text: 'text-slr-gold-label',
         lineLeft: 'bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]',
         lineRight: 'bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]'
     },
@@ -51,7 +51,7 @@ const PageHero = ({ eyebrow, title, description, accent = 'gold' }: PageHeroProp
                 </h1>
 
                 {description && (
-                    <p className='mt-5 text-center text-sm leading-relaxed text-[#ADB0B5] md:text-base'>
+                    <p className='text-slr-muted mt-5 text-center text-sm leading-relaxed md:text-base'>
                         {description}
                     </p>
                 )}

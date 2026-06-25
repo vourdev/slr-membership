@@ -29,14 +29,14 @@ const SignUp = () => {
                             className='h-16 w-auto md:h-20'
                         />
                     </Link>
-                    <p className='text-xs font-medium tracking-[0.3em] text-[#ADB0B5] uppercase'>
+                    <p className='text-slr-muted text-xs font-medium tracking-[0.3em] uppercase'>
                         Join the Rewards Club
                     </p>
                 </div>
 
                 <RegisterForm />
 
-                <p className='mt-6 text-center text-sm text-[#ADB0B5]'>
+                <p className='text-slr-muted mt-6 text-center text-sm'>
                     Already have an account?{' '}
                     <Link href='/sign-in' className='font-semibold text-white transition-colors hover:underline'>
                         Sign in

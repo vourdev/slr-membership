@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { Loader2Icon, MailCheck } from 'lucide-react';
 
@@ -14,12 +15,6 @@ const glassStyle: React.CSSProperties = {
     border: '1px solid rgba(255, 255, 255, 0.08)',
     backdropFilter: 'blur(50px)',
     WebkitBackdropFilter: 'blur(50px)'
-};
-
-const goldButtonStyle: React.CSSProperties = {
-    color: '#0C1132',
-    background: 'linear-gradient(89.12deg, #F5D78E 3.07%, #D4AF37 41.36%, #FFE066 60.5%, #A07018 98.79%)',
-    borderTop: '2px solid #FFDC75'
 };
 
 const ForgotPasswordForm = () => {
@@ -52,7 +47,7 @@ const ForgotPasswordForm = () => {
                     <h3 className='font-bebas-neue mt-4 text-2xl tracking-wider text-white uppercase'>
                         Check your inbox
                     </h3>
-                    <p className='mt-2 text-sm text-[#ADB0B5]'>
+                    <p className='text-slr-muted mt-2 text-sm'>
                         If an account exists for <span className='font-semibold text-white'>{email}</span>, we&apos;ve
                         sent a reset link. The link is valid for 30 minutes.
                     </p>
@@ -72,7 +67,7 @@ const ForgotPasswordForm = () => {
                         <CardTitle className='font-bebas-neue text-3xl tracking-wider text-white md:text-4xl'>
                             Forgot password?
                         </CardTitle>
-                        <CardDescription className='text-[#ADB0B5]'>
+                        <CardDescription className='text-slr-muted'>
                             Enter the email on your account and we&apos;ll send a reset link.
                         </CardDescription>
                     </CardHeader>

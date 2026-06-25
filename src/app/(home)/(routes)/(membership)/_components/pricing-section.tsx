@@ -8,7 +8,7 @@ const PricingSection = () => {
             <div className='relative grid grid-cols-3 gap-2 sm:gap-3'>
                 {/* Visitor */}
                 <div className='bg-card-dark-navy shadow-card-soft flex h-auto flex-col items-center justify-center rounded-xl border border-[#A0B4D259] p-3 text-center sm:p-4 md:h-55.5'>
-                    <p className='text-[10px] font-semibold tracking-widest text-[#8EA0B8] uppercase sm:text-xs md:text-sm'>
+                    <p className='text-slr-dim text-[10px] font-semibold tracking-widest uppercase sm:text-xs md:text-sm'>
                         Visitor
                     </p>
                     <p className='font-bebas-neue mt-2 text-[52px] font-extrabold text-white sm:text-[60px] lg:text-[60px] xl:text-[70px]'>
@@ -24,7 +24,7 @@ const PricingSection = () => {
                     <p className='font-bebas-neue text-gradient-gold mt-2 text-[52px] font-extrabold md:text-[60px] lg:text-[60px] xl:text-[70px]'>
                         $10
                     </p>
-                    <p className='mt-1 text-[10px] text-[#8EA0B8] sm:text-sm'>/month</p>
+                    <p className='text-slr-dim mt-1 text-[10px] sm:text-sm'>/month</p>
                 </div>
 
                 {/* SLR Premium */}
@@ -35,11 +35,11 @@ const PricingSection = () => {
                     <p className='font-bebas-neue text-gradient-gold mt-2 text-[52px] font-extrabold md:text-[60px] lg:text-[60px] xl:text-[70px]'>
                         $26
                     </p>
-                    <p className='mt-1 text-[10px] text-[#8EA0B8] sm:text-sm'>/month</p>
+                    <p className='text-slr-dim mt-1 text-[10px] sm:text-sm'>/month</p>
                 </div>
             </div>
 
-            <p className='mx-auto mt-24 max-w-xl px-4 text-center text-sm text-[#ADB0B5] sm:text-base md:text-lg'>
+            <p className='text-slr-muted mx-auto mt-24 max-w-xl px-4 text-center text-sm sm:text-base md:text-lg'>
                 Smart Life Rewards is a membership platform designed to help Australians access value through rewards,
                 promotional prizes, partner discounts, and digital offers.
             </p>

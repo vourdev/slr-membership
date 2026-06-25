@@ -46,8 +46,7 @@ const SectionEyebrow: FC<SectionEyebrowProps> = ({ label, color, lineColor, grad
                               color: 'transparent'
                           }
                         : { color }
-                }
-            >
+                }>
                 {label}
             </p>
             <div

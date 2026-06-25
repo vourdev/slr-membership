@@ -43,7 +43,7 @@ const features: Feature[] = [
 
 const TrustedSection = () => {
     return (
-        <section className='relative bg-[#040404] py-16 md:py-24'>
+        <section className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <SectionEyebrow label='Platform Advantages' color='#E2B42B' lineColor='#B08A20' />
 
@@ -52,7 +52,7 @@ const TrustedSection = () => {
                     <span className='text-gradient-gold'>Members Choose SLR</span>
                 </SectionHeading>
 
-                <p className='mx-auto mt-4 max-w-2xl text-center text-sm text-[#ADB0B5] md:text-base'>
+                <p className='text-slr-muted mx-auto mt-4 max-w-2xl text-center text-sm md:text-base'>
                     Our platform is built to give members{' '}
                     <span className='font-semibold text-[#FFD959]'>more chances to win</span>,{' '}
                     <span className='font-semibold text-[#FFD959]'>more transparent value</span>, and{' '}
@@ -82,7 +82,7 @@ const TrustedSection = () => {
                                 {feature.title}
                             </h3>
 
-                            <p className='mt-3 text-sm leading-relaxed text-[#8EA0B8]'>{feature.description}</p>
+                            <p className='text-slr-dim mt-3 text-sm leading-relaxed'>{feature.description}</p>
 
                             <div className='mt-auto pt-8'>
                                 {feature.stat ? (
@@ -91,7 +91,7 @@ const TrustedSection = () => {
                                             {feature.stat.value}
                                         </span>
                                         <span className='h-4 w-px bg-[#403314]' />
-                                        <span className='text-[10px] font-semibold tracking-widest text-[#ADB0B5] uppercase'>
+                                        <span className='text-slr-muted text-[10px] font-semibold tracking-widest uppercase'>
                                             {feature.stat.label}
                                         </span>
                                     </div>

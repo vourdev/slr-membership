@@ -14,7 +14,7 @@ const cardStyle = {
 
 const MerchandiseSection = () => {
     return (
-        <section className='relative bg-[#040404] py-16 md:py-24'>
+        <section className='bg-slr-ink relative py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
                 <div className='flex items-center gap-3 sm:gap-4'>
                     <span className='h-px flex-1 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />

@@ -96,8 +96,8 @@ function getPaginationRange(currentPage: number, totalPages: number) {
     // Jika total halaman 5 atau kurang, tampilkan semua
     if (totalPages <= 5) {
         for (let i = 1; i <= totalPages; i++) range.push(i);
-        
-return range;
+
+        return range;
     }
 
     // Logika menampilkan 5 angka di sekitar current page
@@ -493,8 +493,8 @@ export function DataTable({
 
     const YEARS = Array.from({ length: 2050 - 2020 + 1 }, (_, i) => {
         const y = 2020 + i;
-        
-return { value: String(y), label: String(y) };
+
+        return { value: String(y), label: String(y) };
     });
 
     return (

@@ -91,8 +91,8 @@ export const ShootingStars: React.FC<ShootingStarsProps> = ({
                     if (newX < -20 || newX > window.innerWidth + 20 || newY < -20 || newY > window.innerHeight + 20) {
                         return null;
                     }
-                    
-return {
+
+                    return {
                         ...prevStar,
                         x: newX,
                         y: newY,
@@ -104,8 +104,8 @@ return {
         };
 
         const animationFrame = requestAnimationFrame(moveStar);
-        
-return () => cancelAnimationFrame(animationFrame);
+
+        return () => cancelAnimationFrame(animationFrame);
     }, [star]);
 
     return (
