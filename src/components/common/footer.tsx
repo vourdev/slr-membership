@@ -122,7 +122,7 @@ const Footer: FC = () => {
                                             alt=''
                                             width={24}
                                             height={24}
-                                            className='h-6 w-6 shrink-0'
+                                            className='h-7 w-6 shrink-0'
                                         />
                                         <span className='leading-tight'>
                                             <span className='text-slr-muted block text-[10px] tracking-wider uppercase'>
