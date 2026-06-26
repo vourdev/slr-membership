@@ -10,6 +10,10 @@ export const menuItems: IMenuItem[] = [
         url: '/membership'
     },
     {
+        text: 'Prizes',
+        url: '/prizes'
+    },
+    {
         text: 'E-Books',
         url: '/ebooks'
     },
@@ -17,10 +21,7 @@ export const menuItems: IMenuItem[] = [
         text: 'About',
         url: '/about'
     },
-    {
-        text: 'FAQ',
-        url: '/faq'
-    },
+
     {
         text: 'Contact',
         url: '/contact'
