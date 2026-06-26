@@ -13,7 +13,7 @@ import WhyJoinSection from './_components/why-join-section';
 
 const MembershipPage = () => {
     return (
-        <main className='bg-slr-navy-deep min-h-screen'>
+        <main className='bg-slr-ink min-h-screen'>
             <HeroSection />
             <div className='relative'>
                 <WelcomeSection />
