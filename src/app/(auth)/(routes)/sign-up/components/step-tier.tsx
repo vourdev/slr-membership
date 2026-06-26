@@ -166,12 +166,12 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                 </label>
             )}
 
-            <div className='flex flex-col gap-3 sm:flex-row'>
+            <div className='flex flex-wrap gap-3'>
                 <Button
                     type='button'
                     variant='outline'
                     onClick={onBack}
-                    className='h-11 rounded-xl border border-white/10 bg-white/5 px-6 font-semibold text-white hover:bg-white/10 hover:text-white sm:w-auto'>
+                    className='h-11 min-w-max flex-1 rounded-xl border border-white/10 bg-white/5 px-6 font-semibold text-white hover:bg-white/10 hover:text-white sm:flex-none'>
                     <ArrowLeft className='h-4 w-4' />
                     Back
                 </Button>
@@ -179,7 +179,7 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                     type='button'
                     onClick={handleContinue}
                     style={goldButtonStyle}
-                    className='h-11 flex-1 rounded-xl font-bold uppercase shadow-md transition-opacity hover:opacity-90'>
+                    className='h-11 min-w-max flex-1 rounded-xl font-bold uppercase shadow-md transition-opacity hover:opacity-90'>
                     Continue
                 </Button>
             </div>

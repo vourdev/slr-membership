@@ -154,7 +154,7 @@ export function Navbar({ user }: NavbarProps) {
                             </div>
                         ) : (
                             <div className='hidden items-center gap-2 xl:flex'>
-                                <Link href='#partners' className='flex-1'>
+                                <Link href='/sign-in' className='flex-1'>
                                     <ButtonShadcn
                                         type='button'
                                         variant='outline'

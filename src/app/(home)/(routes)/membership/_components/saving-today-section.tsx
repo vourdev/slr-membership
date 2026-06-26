@@ -20,12 +20,14 @@ const SavingTodaySection = () => {
                     very first day.
                 </p>
 
-                <div className='mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row'>
-                    <GoldPillButton href='/sign-up'>Join Now</GoldPillButton>
+                <div className='mt-8 flex w-full flex-wrap justify-center gap-4'>
+                    <GoldPillButton href='/sign-up' className='min-w-max flex-1 sm:flex-none'>
+                        Join Now
+                    </GoldPillButton>
 
                     <Link
                         href='/faq'
-                        className='flex items-center justify-center rounded-xl px-8 py-2.5 transition-opacity hover:opacity-90 sm:rounded-2xl lg:px-12 lg:py-3'
+                        className='flex min-w-max flex-1 items-center justify-center rounded-xl px-8 py-2.5 transition-opacity hover:opacity-90 sm:flex-none sm:rounded-2xl lg:px-12 lg:py-3'
                         style={{ background: '#212429', border: '1.5px solid #D1A62E' }}>
                         <span className='text-base font-bold tracking-[2px] text-[#E2B42B] uppercase sm:tracking-[2.5px] lg:text-xl lg:tracking-[3px]'>
                             Read FAQ
