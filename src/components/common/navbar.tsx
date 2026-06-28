@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Button as ButtonShadcn } from '@/components/ui/button';
 import { menuItems } from '@/constant/menu-items';
 import { logoutAction } from '@/lib/logout-action';
-import { goldBgStyle } from '@/lib/styles';
+import { goldButtonStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import { Button, Transition } from '@headlessui/react';
 
@@ -85,6 +85,7 @@ export function Navbar({ user }: NavbarProps) {
 
             return activeHash === url;
         }
+
         // pathname-based item
         return pathname === url;
     };
@@ -164,8 +165,8 @@ export function Navbar({ user }: NavbarProps) {
                                 </Link>
                                 <Link
                                     href='/sign-up'
-                                    style={goldBgStyle}
-                                    className='rounded-xl px-4 py-2 font-bold text-[#1a1408] shadow-md transition-opacity hover:opacity-90'>
+                                    style={goldButtonStyle}
+                                    className='rounded-xl px-4 py-2 font-bold uppercase shadow-md transition-opacity hover:opacity-90'>
                                     Join Now
                                 </Link>
                             </div>
@@ -221,8 +222,8 @@ export function Navbar({ user }: NavbarProps) {
                         <li className='pt-2'>
                             <Link
                                 href='/sign-up'
-                                style={goldBgStyle}
-                                className='block w-full rounded-xl px-5 py-2 text-center font-bold text-[#1a1408] shadow-md'
+                                style={goldButtonStyle}
+                                className='block w-full rounded-xl px-5 py-2 text-center font-bold uppercase shadow-md transition-opacity hover:opacity-90'
                                 onClick={toggleMenu}>
                                 Join Now
                             </Link>
