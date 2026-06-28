@@ -2,10 +2,12 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import SectionEyebrow from '@/components/common/section-eyebrow';
 import { Button } from '@/components/ui/button';
 import { goldButtonStyle } from '@/lib/styles';
 
 import PageHero from '../_components/page-hero';
+import SavingTodaySection from '../membership/_components/saving-today-section';
 import {
     Award,
     CalendarCheck,
@@ -103,21 +105,20 @@ const partnerLogos = Array.from({ length: 10 }, (_, i) => `/images/list-partner-
 
 const AboutPage = () => {
     return (
-        <>
+        <main className='bg-slr-ink'>
             <PageHero
+                surface='#040404'
                 eyebrow='Our Story'
                 title={
                     <>
                         About <span className='text-red-600'>Smart Life</span>{' '}
-                        <span className='bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-transparent'>
-                            Rewards
-                        </span>
+                        <span className='text-gradient-gold'>Rewards</span>
                     </>
                 }
                 description='A homegrown rewards club, built to help everyday Australians beat the rising cost of living — one cycle at a time.'
             />
 
-            <section className='bg-slr-navy-deep relative py-12 md:py-20'>
+            <section className='bg-slr-ink relative py-12 md:py-20'>
                 <div className='mx-auto max-w-7xl px-4'>
                     <div className='grid grid-cols-1 items-center gap-10 lg:grid-cols-2'>
                         <div className='order-2 lg:order-1'>
@@ -128,10 +129,7 @@ const AboutPage = () => {
                                 </p>
                             </div>
                             <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl xl:text-6xl'>
-                                Why we built{' '}
-                                <span className='bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-transparent'>
-                                    SLR
-                                </span>
+                                Why we built <span className='text-gradient-gold'>SLR</span>
                             </h2>
                             <div className='text-slr-muted mt-5 space-y-4 text-sm leading-relaxed md:text-base'>
                                 <p>
@@ -183,9 +181,9 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            <section className='bg-slr-navy-deep relative py-8 md:py-12'>
+            <section className='bg-slr-ink relative py-8 md:py-12'>
                 <div className='mx-auto max-w-7xl px-4'>
-                    <div className='overflow-hidden rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] shadow-[0px_0px_20px_0px_#776D6D26]'>
+                    <div className='bg-card-dark-navy overflow-hidden rounded-2xl border border-[#A0B4D259] shadow-[0px_0px_20px_0px_#776D6D26]'>
                         <div className='grid grid-cols-2 divide-x divide-y divide-white/5 sm:grid-cols-4 sm:divide-y-0'>
                             {stats.map(({ icon: Icon, label, value }) => (
                                 <div key={label} className='flex flex-col items-center gap-2 p-6 text-center md:p-8'>
@@ -211,16 +209,10 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            <section className='bg-slr-navy-deep relative py-12 md:py-20'>
+            <section className='bg-slr-ink relative py-12 md:py-20'>
                 <div className='mx-auto max-w-7xl px-4'>
                     <div className='text-center'>
-                        <div className='flex w-full items-center justify-center gap-2'>
-                            <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                            <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
-                                Member journey
-                            </p>
-                            <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                        </div>
+                        <SectionEyebrow label='Member journey' color='#E2B42B' lineColor='#B08A20' />
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             How SLR works
                         </h2>
@@ -234,7 +226,7 @@ const AboutPage = () => {
                         {howItWorks.map(({ icon: Icon, title, body }, idx) => (
                             <div
                                 key={title}
-                                className='relative flex flex-col rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26]'>
+                                className='bg-card-dark-navy relative flex flex-col rounded-2xl border border-[#A0B4D259] p-6 shadow-[0px_0px_20px_0px_#776D6D26]'>
                                 <span className='font-bebas-neue absolute top-4 right-5 bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-5xl font-extrabold text-transparent opacity-30'>
                                     0{idx + 1}
                                 </span>
@@ -262,16 +254,10 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            <section className='bg-slr-navy-deep relative py-12 md:py-20'>
+            <section className='bg-slr-ink relative py-12 md:py-20'>
                 <div className='mx-auto max-w-7xl px-4'>
                     <div className='text-center'>
-                        <div className='flex w-full items-center justify-center gap-2'>
-                            <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                            <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
-                                Our principles
-                            </p>
-                            <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                        </div>
+                        <SectionEyebrow label='Our principles' color='#E2B42B' lineColor='#B08A20' />
                         <h2 className='font-bebas-neue mt-3 text-3xl tracking-wider text-white uppercase md:text-5xl'>
                             What we stand for
                         </h2>
@@ -287,7 +273,7 @@ const AboutPage = () => {
                             return (
                                 <div
                                     key={title}
-                                    className='flex items-start gap-4 rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-7'>
+                                    className='bg-card-dark-navy flex items-start gap-4 rounded-2xl border border-[#A0B4D259] p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-7'>
                                     <div
                                         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border ${s.wrap} ${s.bg}`}>
                                         <Icon className={`h-6 w-6 ${s.text}`} />
@@ -305,16 +291,10 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            <section className='bg-slr-navy-deep relative py-12 md:py-16'>
+            <section className='bg-slr-ink relative py-12 md:py-16'>
                 <div className='mx-auto max-w-7xl px-4'>
                     <div className='text-center'>
-                        <div className='flex w-full items-center justify-center gap-2'>
-                            <div className='h-px w-16 bg-[linear-gradient(270deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                            <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase md:text-sm'>
-                                Trusted by
-                            </p>
-                            <div className='h-px w-16 bg-[linear-gradient(90deg,#B08A20_0%,rgba(255,255,255,0)_100%)]' />
-                        </div>
+                        <SectionEyebrow label='Trusted by' color='#E2B42B' lineColor='#B08A20' />
                         <p className='text-slr-muted mx-auto mt-3 max-w-xl text-sm md:text-base'>
                             Australian brands that work with SLR to bring members real, everyday value.
                         </p>
@@ -338,48 +318,8 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            <section className='bg-slr-navy-deep relative py-12 md:py-20'>
-                <div className='mx-auto max-w-4xl px-4'>
-                    <div className='relative isolate rounded-2xl p-1.25 shadow-[0px_0px_20px_0px_#776D6D26]'>
-                        <div
-                            className='absolute inset-0 -z-10 rounded-2xl bg-[linear-gradient(180deg,#FFE066_10%,#D4AF37_25%,#A07018_75%,#D4AF37_87%,#FFE066_100%)] mask-exclude p-1.25 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]'
-                            aria-hidden='true'
-                        />
-                        <div className='rounded-[calc(1rem-5px)] bg-[linear-gradient(180deg,#1A1408_0%,#0C0A04_50%,#1A1408_100%)] p-8 text-center md:p-12'>
-                            <Image
-                                src='/images/slr-rewards-logo-color.webp'
-                                alt='SLR Rewards'
-                                width={100}
-                                height={100}
-                                className='mx-auto h-16 w-auto'
-                            />
-                            <h2 className='font-bebas-neue mt-6 text-3xl tracking-wider text-white uppercase md:text-5xl'>
-                                Ready to start saving?
-                            </h2>
-                            <p className='text-slr-muted mx-auto mt-3 max-w-md text-sm md:text-base'>
-                                Join free as a Visitor, or unlock the full rewards club from $10/month.
-                            </p>
-                            <div className='mt-6 flex flex-wrap justify-center gap-3'>
-                                <Link href='/sign-up'>
-                                    <Button
-                                        style={goldButtonStyle}
-                                        className='h-11 rounded-xl px-8 font-bold uppercase'>
-                                        Join Now
-                                    </Button>
-                                </Link>
-                                <Link href='/faq'>
-                                    <Button
-                                        variant='outline'
-                                        className='h-11 rounded-xl border border-[#FFD147] bg-[#FFD1471A] px-8 font-semibold text-[#FFDC75] hover:bg-[#FFD14726] hover:text-[#FFDC75]'>
-                                        Read FAQ
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </>
+            <SavingTodaySection />
+        </main>
     );
 };
 

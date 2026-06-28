@@ -38,21 +38,22 @@ const infoCards = [
 
 const ContactPage = () => {
     return (
-        <>
+        <main className='bg-slr-ink'>
             <PageHero
+                surface='#040404'
                 eyebrow='Get In Touch'
                 title='Contact Us'
                 description="Questions about your membership, billing, or a draw? Send us a message and we'll respond within one business day."
             />
 
-            <section className='bg-slr-navy-deep relative py-12 md:py-16'>
+            <section className='bg-slr-ink relative py-12 md:py-16'>
                 <div className='mx-auto max-w-6xl px-4'>
                     <div className='grid grid-cols-1 gap-8 lg:grid-cols-5'>
                         <aside className='space-y-4 lg:col-span-2'>
                             {infoCards.map(({ icon: Icon, title, body, hint }) => (
                                 <div
                                     key={title}
-                                    className='flex items-start gap-4 rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-5 shadow-[0px_0px_20px_0px_#776D6D26]'>
+                                    className='bg-card-dark-navy flex items-start gap-4 rounded-2xl border border-[#A0B4D259] p-5 shadow-[0px_0px_20px_0px_#776D6D26]'>
                                     <div
                                         className='flex h-11 w-11 shrink-0 items-center justify-center rounded-xl'
                                         style={{
@@ -74,7 +75,7 @@ const ContactPage = () => {
                         </aside>
 
                         <div className='lg:col-span-3'>
-                            <div className='rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-8'>
+                            <div className='bg-card-dark-navy rounded-2xl border border-[#A0B4D259] p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-8'>
                                 <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
                                     Send us a message
                                 </h2>
@@ -87,7 +88,7 @@ const ContactPage = () => {
                     </div>
                 </div>
             </section>
-        </>
+        </main>
     );
 };
 
