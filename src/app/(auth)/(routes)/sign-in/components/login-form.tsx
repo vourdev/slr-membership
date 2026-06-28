@@ -78,7 +78,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                         Forgot password?
                                     </Link>
                                 </div>
-                                <div className='relative'>
+                                <div className='relative isolate'>
                                     <Input
                                         id='password'
                                         type={showPassword ? 'text' : 'password'}

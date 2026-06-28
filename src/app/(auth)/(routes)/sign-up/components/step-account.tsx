@@ -101,7 +101,7 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                 <Label htmlFor='password' className='text-sm font-medium text-white'>
                     Password
                 </Label>
-                <div className='relative'>
+                <div className='relative isolate'>
                     <Input
                         id='password'
                         type={showPassword ? 'text' : 'password'}
