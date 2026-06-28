@@ -94,7 +94,7 @@ const values: {
 const accentStyles = {
     gold: {
         wrap: 'border-[#D4AF3759]',
-        bg: 'bg-[linear-gradient(89.12deg,rgba(245,215,142,0.15)_3.07%,rgba(212,175,55,0.15)_41.36%,rgba(255,224,102,0.15)_60.5%,rgba(160,112,24,0.15)_98.79%)]',
+        bg: 'bg-gold-tint',
         text: 'text-[#FFDC75]'
     },
     red: { wrap: 'border-[#C8152E66]', bg: 'bg-[#C8152E1A]', text: 'text-[#E88888]' },
@@ -187,16 +187,10 @@ const AboutPage = () => {
                         <div className='grid grid-cols-2 divide-x divide-y divide-white/5 sm:grid-cols-4 sm:divide-y-0'>
                             {stats.map(({ icon: Icon, label, value }) => (
                                 <div key={label} className='flex flex-col items-center gap-2 p-6 text-center md:p-8'>
-                                    <div
-                                        className='flex h-10 w-10 items-center justify-center rounded-xl'
-                                        style={{
-                                            background:
-                                                'linear-gradient(89.12deg, rgba(245,215,142,0.15) 3.07%, rgba(212,175,55,0.15) 41.36%, rgba(255,224,102,0.15) 60.5%, rgba(160,112,24,0.15) 98.79%)',
-                                            border: '1px solid #D4AF3759'
-                                        }}>
+                                    <div className='bg-gold-tint flex h-10 w-10 items-center justify-center rounded-xl border border-[#D4AF3759]'>
                                         <Icon className='h-5 w-5 text-[#FFDC75]' />
                                     </div>
-                                    <p className='font-bebas-neue bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-3xl font-extrabold text-transparent md:text-4xl'>
+                                    <p className='font-bebas-neue text-gradient-gold text-3xl font-extrabold md:text-4xl'>
                                         {value}
                                     </p>
                                     <p className='text-slr-dim text-[10px] font-semibold tracking-widest uppercase md:text-xs'>
@@ -227,16 +221,10 @@ const AboutPage = () => {
                             <div
                                 key={title}
                                 className='bg-card-dark-navy relative flex flex-col rounded-2xl border border-[#A0B4D259] p-6 shadow-[0px_0px_20px_0px_#776D6D26]'>
-                                <span className='font-bebas-neue absolute top-4 right-5 bg-[linear-gradient(89.12deg,#F5D78E_3.07%,#D4AF37_41.36%,#FFE066_60.5%,#A07018_98.79%)] bg-clip-text text-5xl font-extrabold text-transparent opacity-30'>
+                                <span className='font-bebas-neue text-gradient-gold absolute top-4 right-5 text-5xl font-extrabold opacity-30'>
                                     0{idx + 1}
                                 </span>
-                                <div
-                                    className='flex h-12 w-12 items-center justify-center rounded-xl'
-                                    style={{
-                                        background:
-                                            'linear-gradient(89.12deg, rgba(245,215,142,0.15) 3.07%, rgba(212,175,55,0.15) 41.36%, rgba(255,224,102,0.15) 60.5%, rgba(160,112,24,0.15) 98.79%)',
-                                        border: '1px solid #D4AF3759'
-                                    }}>
+                                <div className='bg-gold-tint flex h-12 w-12 items-center justify-center rounded-xl border border-[#D4AF3759]'>
                                     <Icon className='h-6 w-6 text-[#FFDC75]' />
                                 </div>
                                 <h3 className='font-bebas-neue mt-5 text-xl tracking-wider text-white uppercase md:text-2xl'>

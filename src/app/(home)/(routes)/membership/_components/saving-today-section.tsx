@@ -29,7 +29,7 @@ const SavingTodaySection = () => {
                         href='/faq'
                         className='flex min-w-max flex-1 items-center justify-center rounded-xl px-8 py-2.5 transition-opacity hover:opacity-90 sm:flex-none sm:rounded-2xl lg:px-12 lg:py-3'
                         style={{ background: '#212429', border: '1.5px solid #D1A62E' }}>
-                        <span className='text-base font-bold tracking-[2px] text-[#E2B42B] uppercase sm:tracking-[2.5px] lg:text-xl lg:tracking-[3px]'>
+                        <span className='text-slr-gold-label text-base font-bold tracking-[2px] uppercase sm:tracking-[2.5px] lg:text-xl lg:tracking-[3px]'>
                             Read FAQ
                         </span>
                     </Link>

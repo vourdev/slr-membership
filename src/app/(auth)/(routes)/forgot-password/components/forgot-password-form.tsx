@@ -26,7 +26,7 @@ const ForgotPasswordForm = () => {
         event.preventDefault();
         if (!email) return;
         setPending(true);
-        await new Promise((r) => setTimeout(r, 900));
+        await new Promise((resolve) => setTimeout(resolve, 900));
         setPending(false);
         setSent(true);
     };
@@ -35,13 +35,7 @@ const ForgotPasswordForm = () => {
         <Card style={glassStyle} className='gap-4 border-0 text-white shadow-2xl'>
             {sent ? (
                 <CardContent className='py-10 text-center'>
-                    <div
-                        className='mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl'
-                        style={{
-                            background:
-                                'linear-gradient(89.12deg, rgba(245,215,142,0.15) 3.07%, rgba(212,175,55,0.15) 41.36%, rgba(255,224,102,0.15) 60.5%, rgba(160,112,24,0.15) 98.79%)',
-                            border: '1px solid #D4AF3759'
-                        }}>
+                    <div className='bg-gold-tint mx-auto inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[#D4AF3759]'>
                         <MailCheck className='h-6 w-6 text-[#FFDC75]' />
                     </div>
                     <h3 className='font-bebas-neue mt-4 text-2xl tracking-wider text-white uppercase'>

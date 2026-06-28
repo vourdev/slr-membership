@@ -54,13 +54,7 @@ const ContactPage = () => {
                                 <div
                                     key={title}
                                     className='bg-card-dark-navy flex items-start gap-4 rounded-2xl border border-[#A0B4D259] p-5 shadow-[0px_0px_20px_0px_#776D6D26]'>
-                                    <div
-                                        className='flex h-11 w-11 shrink-0 items-center justify-center rounded-xl'
-                                        style={{
-                                            background:
-                                                'linear-gradient(89.12deg, rgba(245,215,142,0.15) 3.07%, rgba(212,175,55,0.15) 41.36%, rgba(255,224,102,0.15) 60.5%, rgba(160,112,24,0.15) 98.79%)',
-                                            border: '1px solid #D4AF3759'
-                                        }}>
+                                    <div className='bg-gold-tint flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#D4AF3759]'>
                                         <Icon className='h-5 w-5 text-[#FFDC75]' />
                                     </div>
                                     <div>

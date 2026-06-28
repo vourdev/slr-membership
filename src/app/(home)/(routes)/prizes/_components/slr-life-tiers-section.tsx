@@ -22,7 +22,7 @@ const SlrLifeTiersSection = () => {
 
                 <Link
                     href='/membership'
-                    className='mt-8 inline-flex items-center gap-2 rounded-xl border-[1.5px] border-[#D1A62E] bg-[#212429] px-8 py-3 text-sm font-bold tracking-[0.18em] text-[#E2B42B] uppercase transition-colors hover:bg-[#2A2E34] sm:px-10 sm:text-base md:mt-10'>
+                    className='text-slr-gold-label mt-8 inline-flex items-center gap-2 rounded-xl border-[1.5px] border-[#D1A62E] bg-[#212429] px-8 py-3 text-sm font-bold tracking-[0.18em] uppercase transition-colors hover:bg-[#2A2E34] sm:px-10 sm:text-base md:mt-10'>
                     Explore All Tiers
                     <ArrowRight className='h-4 w-4 sm:h-5 sm:w-5' />
                 </Link>

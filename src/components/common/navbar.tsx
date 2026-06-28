@@ -166,7 +166,7 @@ export function Navbar({ user }: NavbarProps) {
                                 <Link
                                     href='/sign-up'
                                     style={goldButtonStyle}
-                                    className='rounded-xl px-4 py-2 font-bold uppercase shadow-md transition-opacity hover:opacity-90'>
+                                    className='rounded-xl px-4 py-2 text-sm font-bold shadow-md transition-opacity hover:opacity-90'>
                                     Join Now
                                 </Link>
                             </div>
@@ -223,7 +223,7 @@ export function Navbar({ user }: NavbarProps) {
                             <Link
                                 href='/sign-up'
                                 style={goldButtonStyle}
-                                className='block w-full rounded-xl px-5 py-2 text-center font-bold uppercase shadow-md transition-opacity hover:opacity-90'
+                                className='block w-full rounded-xl px-5 py-2 text-center text-sm font-bold shadow-md transition-opacity hover:opacity-90'
                                 onClick={toggleMenu}>
                                 Join Now
                             </Link>
