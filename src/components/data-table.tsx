@@ -159,13 +159,13 @@ const TablePagination = ({
     return (
         <div className='mt-4 flex flex-wrap items-center justify-between gap-3'>
             <div className='text-muted-foreground text-sm'>
-                Total: <span className='text-foreground font-medium'>{totalItems}</span> data
+                Total: <span className='text-foreground font-medium'>{totalItems}</span> entries
             </div>
 
             <div className='flex items-center gap-4'>
                 {/* Jump to Page Input */}
                 <div className='flex items-center gap-2'>
-                    <span className='text-muted-foreground text-sm'>Lompat ke</span>
+                    <span className='text-muted-foreground text-sm'>Jump to</span>
                     <Input
                         type='number'
                         value={jumpPage}
@@ -174,7 +174,7 @@ const TablePagination = ({
                         onBlur={submitJump}
                         className='h-8 w-14 [appearance:textfield] px-2 text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
                     />
-                    <span className='text-muted-foreground text-sm'>dari {totalPages}</span>
+                    <span className='text-muted-foreground text-sm'>of {totalPages}</span>
                 </div>
 
                 <div className='flex items-center gap-1'>
@@ -333,15 +333,14 @@ const TableRowComponent = ({
 
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle>Hapus data ini?</AlertDialogTitle>
+                                        <AlertDialogTitle>Delete this record?</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            Tindakan ini tidak dapat dibatalkan. Data yang dihapus tidak bisa
-                                            dikembalikan.
+                                            This action cannot be undone. Deleted data cannot be recovered.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleConfirmDelete}>Ya, hapus</AlertDialogAction>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleConfirmDelete}>Yes, delete</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>

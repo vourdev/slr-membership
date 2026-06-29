@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
-import { Book, Box, ChartAreaIcon, ChevronDown, LayoutGrid, Tag, UsersIcon } from 'lucide-react';
+import { Box, ChevronDown, ClipboardList, LayoutGrid, UsersIcon } from 'lucide-react';
 
 export function NavMain({ user }) {
     const isSuperAdmin = user?.role?.includes('ROLE_SUPER_ADMIN');
@@ -27,14 +27,9 @@ export function NavMain({ user }) {
             icon: LayoutGrid
         },
         {
-            title: 'Neraca',
-            href: '/dashboard/neraca',
-            icon: Book
-        },
-        {
-            title: 'Harga',
-            href: '/dashboard/harga',
-            icon: ChartAreaIcon
+            title: 'Registrations',
+            href: '/dashboard/registrations',
+            icon: ClipboardList
         }
     ];
 

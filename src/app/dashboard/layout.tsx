@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 
 import AppSidebarLayout from './app/app-sidebar-layout';
-import { SessionProvider } from 'next-auth/react';
 import { Toaster } from 'react-hot-toast';
 
 interface AppLayoutProps {
@@ -10,8 +9,10 @@ interface AppLayoutProps {
 }
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
-    <AppSidebarLayout breadcrumbs={breadcrumbs} {...props}>
-        <Toaster />
-        {children}
-    </AppSidebarLayout>
+    <div className='slr-admin dark bg-background text-foreground min-h-screen'>
+        <AppSidebarLayout breadcrumbs={breadcrumbs} {...props}>
+            <Toaster />
+            {children}
+        </AppSidebarLayout>
+    </div>
 );

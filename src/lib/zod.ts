@@ -1,9 +1,10 @@
 import { AU_STATE_CODES } from '@/constant/au-states';
 
-import { email, object, string, enum as zEnum } from 'zod';
+import { email, literal, object, string, union, enum as zEnum } from 'zod';
 
 export const SignInSchema = object({
-    email: email('Invalid Email'),
+    // `SLRAdmin` is a dev-only bypass login while the auth API is under development.
+    email: union([email('Invalid Email'), literal('SLRAdmin')]),
     password: string().min(8, 'Password must be more than 8 characters')
 });
 

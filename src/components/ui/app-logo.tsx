@@ -2,11 +2,13 @@ import Image from 'next/image';
 
 export default function AppLogo() {
     return (
-        <>
-            <Image alt='Logo' src='/icons/kaltara.png' width={40} height={40} />
-            <div className='grid flex-1 text-left text-sm'>
-                <span className='mb-0.5 truncate leading-tight font-semibold'>SLR Membership</span>
-            </div>
-        </>
+        <Image
+            alt='SLR Rewards'
+            src='/images/slr-rewards-logo.webp'
+            width={250}
+            height={250}
+            priority
+            className='h-7 w-auto object-contain'
+        />
     );
 }

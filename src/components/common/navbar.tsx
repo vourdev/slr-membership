@@ -138,12 +138,12 @@ export function Navbar({ user }: NavbarProps) {
 
                     <div className='flex items-center gap-3 justify-self-end'>
                         {user ? (
-                            <div className='hidden xl:flex'>
+                            <div className='dark hidden text-white xl:flex'>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger>
                                         <UserInfo user={user?.user} showEmail={true} />
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
+                                    <DropdownMenuContent className='dark'>
                                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>

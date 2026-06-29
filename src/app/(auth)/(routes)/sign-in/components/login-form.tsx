@@ -56,7 +56,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                 </Label>
                                 <Input
                                     id='email'
-                                    type='email'
+                                    type='text'
                                     name='email'
                                     placeholder='email@example.com'
                                     required

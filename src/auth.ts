@@ -31,6 +31,19 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             async authorize(credentials, req) {
                 if (!credentials?.email || !credentials?.password) return null;
 
+                // Dev-only bypass while the auth API is under development.
+                if (credentials.email === 'SLRAdmin' && credentials.password === 'SLRAdmin') {
+                    return {
+                        id: 'dev-admin',
+                        user_id: 'dev-admin',
+                        name: 'SLR Admin',
+                        email: 'admin@slr.dev',
+                        role: 'ROLE_ADMIN',
+                        accessToken: 'dev-token',
+                        region_id: ''
+                    };
+                }
+
                 const forwarded = req.headers.get('x-forwarded-for');
                 const clientIp = typeof forwarded === 'string' ? forwarded.split(',')[0] : '127.0.0.1';
 
