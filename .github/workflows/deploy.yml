@@ -54,49 +54,39 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Set SSH Port
+      - name: Configure SSH Key
         run: |
-          if [ -n "${{ secrets.SSH_PORT }}" ]; then
-            echo "SSH_PORT=${{ secrets.SSH_PORT }}" >> $GITHUB_ENV
-          else
-            echo "SSH_PORT=22" >> $GITHUB_ENV
-          fi
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.SSH_PORT || 22 }} -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v1
-        env:
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
-          ENV_FILE_CONTENT: ${{ secrets.ENV_FILE }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ env.SSH_PORT }}
-          envs: REGISTRY,IMAGE_NAME,GHCR_PAT,GITHUB_ACTOR,ENV_FILE_CONTENT
-          script: |
-            # Write .env file for the container
-            mkdir -p /opt/slr-membership
-            printf '%s\n' "${ENV_FILE_CONTENT}" > /opt/slr-membership/.env
+      - name: Copy .env file to VPS
+        run: |
+          ssh -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/slr-membership"
+          scp -P ${{ secrets.SSH_PORT || 22 }} .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/slr-membership/.env
 
+      - name: Deploy container via SSH
+        run: |
+          ssh -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" <<EOF
             # Login to ghcr.io on VPS
-            echo "${GHCR_PAT}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
             # Pull latest image
-            docker pull ${REGISTRY}/${IMAGE_NAME}:latest
+            docker pull ${REGISTRY}/${{ env.IMAGE_NAME }}:latest
 
             # Stop and remove existing container (if any)
             docker stop slr-membership 2>/dev/null || true
             docker rm slr-membership 2>/dev/null || true
 
-            # Run new container with env vars from .env file
+            # Run new container with env vars
             docker run -d \
               --name slr-membership \
               --restart unless-stopped \
               --env-file /opt/slr-membership/.env \
               -p 3000:3000 \
-              ${REGISTRY}/${IMAGE_NAME}:latest
+              ${REGISTRY}/${{ env.IMAGE_NAME }}:latest
 
             # Verify container is running
             sleep 3
@@ -108,8 +98,9 @@ jobs:
               exit 1
             fi
 
-            # Clean up old images on VPS
+            # Clean up old images
             docker image prune -af
+          EOF
 
   cleanup-registry:
     needs: build-and-deploy
