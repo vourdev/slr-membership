@@ -47,7 +47,7 @@ const tiers: TierOption[] = [
         perks: ['Up to 7 weekly draws', '4–7 entries per cycle', 'Unlock all discount codes', 'Read all e-books'],
         badge: 'Most popular',
         isPaid: true,
-        icon: '/icons/ic-slr-red-reward.webp',
+        icon: null,
         borderGradient:
             'bg-[linear-gradient(180deg,#FF6B7A_10%,#C8152E_25%,#8B0010_75.24%,#C8152E_87.62%,#FF6B7A_100%)]',
         innerBg: 'bg-[linear-gradient(180deg,#530710_0%,#37040D_30%,#220408_60%,#470818_87.62%)]'
@@ -60,7 +60,7 @@ const tiers: TierOption[] = [
         tagline: 'Maximum draws, member-only deals.',
         perks: ['Everything in Red', '10+ entries per cycle', 'Premium prize pool', 'Member-only deals'],
         isPaid: true,
-        icon: '/icons/ic-slr-blue-reward.webp',
+        icon: null,
         borderGradient:
             'bg-[linear-gradient(180deg,#6AACFF_10%,#1A62C0_25%,#0A2E80_75.24%,#1A62C0_87.62%,#6AACFF_100%)]',
         innerBg: 'bg-[linear-gradient(180deg,#0F2F7A_0%,#0B205D_30%,#081640_60%,#0D2662_87.62%)]'
