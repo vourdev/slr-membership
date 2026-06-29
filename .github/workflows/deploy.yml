@@ -84,6 +84,7 @@ jobs:
             docker run -d \
               --name slr-membership \
               --restart unless-stopped \
+              --network shared-network \
               --env-file ~/frontend/slr-membership/.env \
               -p 3000:3000 \
               ${REGISTRY}/${{ env.IMAGE_NAME }}:latest
