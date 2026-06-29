@@ -76,15 +76,15 @@ jobs:
           port: ${{ env.SSH_PORT }}
           envs: REGISTRY,IMAGE_NAME,GHCR_PAT,GITHUB_ACTOR,ENV_FILE_CONTENT
           script: |
+            # Write .env file for the container
+            mkdir -p /opt/slr-membership
+            printf '%s\n' "${ENV_FILE_CONTENT}" > /opt/slr-membership/.env
+
             # Login to ghcr.io on VPS
             echo "${GHCR_PAT}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
 
             # Pull latest image
             docker pull ${REGISTRY}/${IMAGE_NAME}:latest
-
-            # Write .env file for the container
-            mkdir -p /opt/slr-membership
-            echo "${ENV_FILE_CONTENT}" > /opt/slr-membership/.env
 
             # Stop and remove existing container (if any)
             docker stop slr-membership 2>/dev/null || true
@@ -97,6 +97,16 @@ jobs:
               --env-file /opt/slr-membership/.env \
               -p 3000:3000 \
               ${REGISTRY}/${IMAGE_NAME}:latest
+
+            # Verify container is running
+            sleep 3
+            if docker ps --filter "name=slr-membership" --filter "status=running" -q | grep -q .; then
+              echo "✅ Container is running successfully"
+            else
+              echo "❌ Container failed to start. Logs:"
+              docker logs slr-membership 2>&1 || true
+              exit 1
+            fi
 
             # Clean up old images on VPS
             docker image prune -af
