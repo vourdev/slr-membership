@@ -64,8 +64,8 @@ jobs:
 
       - name: Copy .env file to VPS
         run: |
-          ssh -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /opt/slr-membership"
-          scp -P ${{ secrets.SSH_PORT || 22 }} .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/slr-membership/.env
+          ssh -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ~/frontend/slr-membership"
+          scp -P ${{ secrets.SSH_PORT || 22 }} .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/frontend/slr-membership/.env
 
       - name: Deploy container via SSH
         run: |
@@ -84,7 +84,7 @@ jobs:
             docker run -d \
               --name slr-membership \
               --restart unless-stopped \
-              --env-file /opt/slr-membership/.env \
+              --env-file ~/frontend/slr-membership/.env \
               -p 3000:3000 \
               ${REGISTRY}/${{ env.IMAGE_NAME }}:latest
 
