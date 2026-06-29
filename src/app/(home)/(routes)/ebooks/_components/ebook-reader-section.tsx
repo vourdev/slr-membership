@@ -191,13 +191,13 @@ const EbookReaderSection = () => {
                                     </h3>
 
                                     {chapter.image && (
-                                        <div className='relative mt-6 aspect-16/10 w-full overflow-hidden rounded-2xl ring-1 ring-white/10'>
+                                        <div className='relative mx-auto mt-6 aspect-square w-full max-w-180 overflow-hidden rounded-3xl ring-1 ring-white/10'>
                                             <Image
                                                 src={chapter.image}
                                                 alt=''
                                                 fill
-                                                sizes='(max-width: 1024px) 100vw, 680px'
-                                                className='object-cover'
+                                                sizes='(max-width: 768px) 100vw, 720px'
+                                                className='object-contain'
                                             />
                                         </div>
                                     )}
