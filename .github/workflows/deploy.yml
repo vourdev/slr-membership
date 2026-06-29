@@ -1,0 +1,113 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-slr-membership-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set image name (lowercase)
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Create .env file from GitHub Secret
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Set SSH Port
+        run: |
+          if [ -n "${{ secrets.SSH_PORT }}" ]; then
+            echo "SSH_PORT=${{ secrets.SSH_PORT }}" >> $GITHUB_ENV
+          else
+            echo "SSH_PORT=22" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ env.SSH_PORT }}
+          envs: REGISTRY,IMAGE_NAME,GHCR_PAT,GITHUB_ACTOR
+          script: |
+            # Login to ghcr.io on VPS
+            echo "${GHCR_PAT}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
+
+            # Pull latest image
+            docker pull ${REGISTRY}/${IMAGE_NAME}:latest
+
+            # Stop and remove existing container (if any)
+            docker stop slr-membership 2>/dev/null || true
+            docker rm slr-membership 2>/dev/null || true
+
+            # Run new container
+            docker run -d \
+              --name slr-membership \
+              --restart unless-stopped \
+              -p 3000:3000 \
+              ${REGISTRY}/${IMAGE_NAME}:latest
+
+            # Clean up old images on VPS
+            docker image prune -af
+
+  cleanup-registry:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Delete old images from ghcr.io
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ github.event.repository.name }}
+          package-type: container
+          min-versions-to-keep: 3
+          delete-only-untagged-versions: false

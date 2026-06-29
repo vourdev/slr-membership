@@ -19,6 +19,8 @@ ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# .env file will be created by CI from GitHub Variables
+# before building the image
 RUN npm run build
 
 # ===============================
@@ -28,20 +30,19 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# === setup ENV ===
-ENV AUTH_SECRET=98E3B2CC28F61492C6934531C828C
-ENV NEXT_PUBLIC_API_BASE=https://apiku.samabitech.com
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-RUN chown -R nextjs:nodejs /app
 USER nextjs
+
+EXPOSE 3000
 
 CMD ["node", "server.js"]
