@@ -57,7 +57,7 @@ const HeroSection = () => {
 
                 {/* TV / Giveaway image */}
                 <div className='relative mt-12 flex justify-center'>
-                    <div className='relative w-full max-w-3xl'>
+                    <div className='relative w-full max-w-7xl'>
                         <Image
                             src='/images/giveaway-win.webp'
                             alt='Giveaway and Win Cash Prizes'
@@ -83,7 +83,7 @@ const HeroSection = () => {
                                         {Array.from({ length: 6 }).map((_, i) => (
                                             <span
                                                 key={i}
-                                                className='text-gradient-gold flex items-center gap-3 px-6 font-bold tracking-[0.18em] uppercase sm:text-base md:text-xl lg:text-2xl'>
+                                                className='text-gradient-gold flex items-center gap-3 px-6 text-xl font-bold tracking-[0.18em] uppercase sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl'>
                                                 <span className='text-white/90'>Next Draw</span>
                                                 <span className='bg-gradient-gold inline-block h-1 w-1 rounded-full' />
                                                 <span>Weekly prize pool open now</span>
