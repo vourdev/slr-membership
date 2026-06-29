@@ -68,12 +68,13 @@ jobs:
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
           GITHUB_ACTOR: ${{ github.actor }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          ENV_FILE_CONTENT: ${{ secrets.ENV_FILE }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ env.SSH_PORT }}
-          envs: REGISTRY,IMAGE_NAME,GHCR_PAT,GITHUB_ACTOR
+          envs: REGISTRY,IMAGE_NAME,GHCR_PAT,GITHUB_ACTOR,ENV_FILE_CONTENT
           script: |
             # Login to ghcr.io on VPS
             echo "${GHCR_PAT}" | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
@@ -81,14 +82,19 @@ jobs:
             # Pull latest image
             docker pull ${REGISTRY}/${IMAGE_NAME}:latest
 
+            # Write .env file for the container
+            mkdir -p /opt/slr-membership
+            echo "${ENV_FILE_CONTENT}" > /opt/slr-membership/.env
+
             # Stop and remove existing container (if any)
             docker stop slr-membership 2>/dev/null || true
             docker rm slr-membership 2>/dev/null || true
 
-            # Run new container
+            # Run new container with env vars from .env file
             docker run -d \
               --name slr-membership \
               --restart unless-stopped \
+              --env-file /opt/slr-membership/.env \
               -p 3000:3000 \
               ${REGISTRY}/${IMAGE_NAME}:latest
 
