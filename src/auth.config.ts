@@ -10,15 +10,20 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
             const { pathname } = nextUrl;
 
-            const isDashboardRoute = pathname.startsWith('/dashboard');
+            // Both the admin dashboard and the member area require a session.
+            const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/member');
             const isAuthPage = pathname.startsWith('/sign-in');
 
-            if (!isLoggedIn && isDashboardRoute) {
+            if (!isLoggedIn && isProtectedRoute) {
                 return Response.redirect(new URL('/sign-in', nextUrl));
             }
 
             if (isLoggedIn && isAuthPage) {
-                return Response.redirect(new URL('/dashboard', nextUrl));
+                // Land staff on the admin dashboard, members on the member area.
+                const role = (auth!.user as { role?: string }).role ?? '';
+                const isStaff = /ADMIN|SPV/.test(role);
+
+                return Response.redirect(new URL(isStaff ? '/dashboard' : '/member', nextUrl));
             }
 
             return true;

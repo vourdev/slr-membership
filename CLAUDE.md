@@ -9,24 +9,42 @@ Guidance for Claude when working in this repo. Read this before making changes.
 **Smart Life Rewards (SLR)** — Australian membership / rewards-club web platform.
 Production domain: `smartliferewards.com.au`. This Next.js app is the **parent platform** for the SLR ecosystem; it owns registration, Stripe recurring billing, entry allocation, state-based draw pools, admin operations, and member-facing features. A separate mobile app consumes its data.
 
-Source-of-truth PRD: [SLR Web Platform — PRD v1.0 (EN) on Notion](https://www.notion.so/SLR-Web-Platform-PRD-v1-0-EN-356df1937d988113803bf97f2846a47f).
+### Source-of-truth docs (Notion — fetch via MCP for detail; don't copy here)
+
+- PRD v3.2 ID (MASTER): https://www.notion.so/35edf1937d9881d9abc4f9ebf19a308d
+- PRD v3.2 EN: https://www.notion.so/356df1937d988113803bf97f2846a47f
+- API Contract v1.0: https://www.notion.so/389df1937d98816ab84ff538176fa4bb
+- DB Schema / ERD v1.0: https://www.notion.so/389df1937d98817c8d0afe7fe7cf3321
+- Technical Spec v1.0: https://www.notion.so/389df1937d98817ab3f9fe8809d54a07
+- Task Board (use "FE — Next.js" view): https://www.notion.so/29fbd767616c414c830be4385edc2bdf
+- Sprint Schedule: https://www.notion.so/6a694bea0bdf4dfabc913b22a8b140b7
+
+Rule: when unsure about copy, pricing, business rules, an endpoint shape, or a data field — fetch the relevant Notion doc via MCP rather than guessing. PRD ID is master; EN mirrors it.
 
 ### Roles & tiers
 
-| Role               | Price           | Notes                                   |
-| ------------------ | --------------- | --------------------------------------- |
-| Visitor            | Free            | Visitor weekly draw only                |
-| RED                | $10/mo (Stripe) | Basic discounts, RED draws, e-books     |
-| BLUE (SLR Premium) | $26/mo (Stripe) | Full access. Optional BENY add-on (+$5) |
-| Admin              | —               | Full platform control                   |
+| Tier        | Sub-tiers (price/cycle · tokens)                        | Notes                                          |
+| ----------- | ------------------------------------------------------- | ---------------------------------------------- |
+| **Visitor** | Free · 1 token                                          | OTP signup, no payment. Visitor draw only.     |
+| **RED**     | R1 $10·1tok · R4 $20·4tok · R7 $30·7tok                 | Discounts, RED draws, e-books                  |
+| **BLUE**    | B1 $26·1tok · B4 $39·4tok · B7 $52·7tok · B10 $65·10tok | Full access. Optional **BENY** add-on (+$4/mo) |
+| **Admin**   | —                                                       | Full platform control                          |
+
+All paid sub-tiers get 4 draw_pass per cycle. Visitor draw_pass = infinite. Billing = 28-day exact-time cycle (not calendar month).
 
 ### Core domain concepts (don't paraphrase loosely — these have rules)
 
-- **Entries** — assigned only after a successful Stripe payment. Do **not** accumulate across cycles. Reset each cycle.
-- **Draw pool** — `state + tier` (e.g. `SLR Red VIC`, `SLR Blue NSW`). Member can't change state without admin approval.
-- **TPAL export** — separate CSV per tier (Visitor / RED / BLUE) for legally compliant draw processing.
-- **Spin Wheel** — one spin per cycle, paid tiers only. Outcomes: bonus entries, discount credit, billing discount (applied to next Stripe invoice), or no prize.
-- **BENY** — separate third-party discount platform. **Optional $5 add-on**, not bundled in any tier. Requires phone number for activation.
+- **Token vs draw_pass** — _token_ = rows/entries in the TPAL CSV per giveaway (chance of winning). _draw_pass_ = giveaways joinable per cycle (4 paid, infinite Visitor). **draw_pass is INTERNAL-ONLY** — frontend must NEVER display the number. API exposes it as `entry_status` (active/inactive). draw_pass = 0 → excluded from CSV.
+- **Cycle** — 28 days flat, anchored to the exact second of payment success. 4 giveaways/cycle. Reset token + draw_pass on successful renewal.
+- **Entries** — assigned only after a successful Stripe payment. Do not accumulate across cycles; reset each cycle.
+- **Draw pool** — `state + tier` (e.g. `SLR Red VIC`). Member can't change state without admin approval.
+- **TPAL export** — 3 separate CSVs per tier (Visitor/RED/BLUE), filtered to draw_pass > 0. Draw runs externally at randomdraws.com/au; admin uploads CSV + records winners back.
+- **Spin Wheel** — token-upgrade sub-tiers ONLY (R4/R7/B4/B7/B10 — NOT R1/B1/Visitor). Fires at 2 moments: at registration (before checkout) and 24h before auto-renewal. 1/4 odds. Prize = one-time billing discount on that invoice. No tier-lock after a win.
+- **BENY** — separate third-party platform. Optional **$4/month recurring** add-on (RED/BLUE only), not bundled. No system integration: web sells access via Stripe + collects name/email/phone → admin activates manually (batch) → member notified by **email** → downloads BENY app.
+- **Upgrade/downgrade** — Visitor→Paid immediate (new cycle now). Paid→Paid scheduled via `pending_upgrade`, applied at next renewal, cancelable, no proration.
+- **E-books** — listing visible to all; full content gated to RED & BLUE (Visitor locked + upgrade CTA). Reading page is a long-form HTML web page (hero → sticky "In This Guide" TOC → per-chapter image+body+pull-quote → "Next Ebook" → footer), NOT a PDF reader. Content is CMS-managed. No download/offline on web (mobile-only).
+- **Email/OTP** — OTP email verification is Visitor-only; paid tiers verify via Stripe (no OTP). Gateway = Mailjet, live from Sprint 1 (OTP + reset depend on it). SMS gateway TBD.
+- **CMS scope** — only 2 areas are CMS-managed: the Prizes page and E-book content. Everything else static.
 
 ### This is a revamp
 
@@ -45,7 +63,8 @@ Look here for patterns around dashboard layout, discount directory UX, and draw 
 
 ## 2. Engineering Context
 
-- **Role:** Frontend engineer. Backend is a separate **Express.js** service to be integrated later.
+- **Role:** Frontend engineer. Backend is a separate **Express.js** service (separate repo) integrated later — NOT Next.js API routes.
+- **API conventions:** REST, JWT Bearer, snake_case JSON. Money is always integer cents (AUD). API exposes `entry_status`, never raw draw_pass. Stripe Checkout is hosted.
 - **Stack:** Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · Tailwind v4 · shadcn/ui · NextAuth v5 (beta) · React Hook Form + Zod · Zustand · Axios · Sonner toasts · Motion (Framer Motion successor).
 - **No design files.** There is no Figma. The home page is the **canonical style reference** — derive design tokens and patterns from there (see §4).
 
@@ -99,7 +118,8 @@ src/
 - **Reuse existing tokens, sections, and shadcn components** before creating new ones. Check `src/components/ui/` and `src/app/(home)/.../_components/` first.
 - **Match the visual language of the home page** for any new public-facing page. The dashboard can deviate (lighter density, more data) but must keep the same brand palette and typography.
 - **Convert hex to CSS variables when reusable.** If a hex appears 3+ times, promote it to a token in [globals.css](src/app/globals.css).
-- When unsure about copy, pricing, or business rules — re-read the Notion PRD rather than guessing.
+- When unsure about copy, pricing, or business rules — re-read the Notion PRD (§1 links) rather than guessing.
+- Never render the draw_pass number in any UI — only `entry_status` (active/inactive).
 
 ---
 

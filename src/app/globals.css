@@ -132,6 +132,39 @@
     --sidebar-ring: var(--slr-gold);
 }
 
+/* Member area scoped theme — premium navy palette matching the home page
+   (navy-deep base, gold primary). Distinct from .slr-admin (near-black ink). */
+.slr-member {
+    color-scheme: dark;
+    --background: #131619;
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(22% 0.05 250);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(20% 0.06 250);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: var(--slr-gold);
+    --primary-foreground: #0c1132;
+    --secondary: oklch(0.27 0.03 250);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.24 0.02 250);
+    --muted-foreground: #adb0b5;
+    --accent: oklch(0.27 0.03 250);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.55 0.2 25);
+    --destructive-foreground: oklch(0.985 0 0);
+    --border: oklch(30% 0.04 250);
+    --input: oklch(30% 0.04 250);
+    --ring: var(--slr-gold);
+    --sidebar: #0f1316;
+    --sidebar-foreground: oklch(0.95 0 0);
+    --sidebar-primary: var(--slr-gold);
+    --sidebar-primary-foreground: #0c1132;
+    --sidebar-accent: oklch(0.26 0.04 250);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(28% 0.03 250);
+    --sidebar-ring: var(--slr-gold);
+}
+
 @theme inline {
     --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
     --font-montserrat: var(--font-montserrat);
