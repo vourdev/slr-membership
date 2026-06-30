@@ -20,7 +20,7 @@ export default async function MemberLayout({ children }: { children: ReactNode }
         <div className='slr-member dark bg-background text-foreground min-h-screen'>
             <AppShell variant='sidebar'>
                 <MemberSidebar user={user} member={member} />
-                <AppContent variant='sidebar' className='flex min-h-svh flex-col'>
+                <AppContent variant='sidebar' className='flex min-h-svh flex-col overflow-x-hidden'>
                     <MemberHeader user={user} member={member} notificationsCount={notifications_count} />
                     {children}
                 </AppContent>

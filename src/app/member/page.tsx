@@ -21,7 +21,7 @@ export default async function MemberDashboardPage() {
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
             <Greeting member={data.member} />
 
-            <div className='grid gap-4 lg:grid-cols-3'>
+            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                 <MembershipSummaryCard summary={data.summary} className='lg:col-span-1' />
                 <DrawStatusCard
                     draw={data.draw}

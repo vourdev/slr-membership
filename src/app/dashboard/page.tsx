@@ -62,7 +62,7 @@ export default function DashboardHome() {
             </div>
 
             {/* Summary cards */}
-            <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+            <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
                 {/* Tier & Token Summary */}
                 <Card>
                     <CardHeader>
@@ -116,7 +116,7 @@ export default function DashboardHome() {
                 </Card>
 
                 {/* Next Draw */}
-                <Card className='md:col-span-2 xl:col-span-1'>
+                <Card className='xl:col-span-1'>
                     <CardHeader>
                         <CardDescription>Next Draw</CardDescription>
                         <CardTitle className='flex items-center gap-2 text-2xl font-semibold'>
