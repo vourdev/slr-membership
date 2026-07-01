@@ -32,7 +32,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 if (!credentials?.email || !credentials?.password) return null;
 
                 // Dev-only bypass while the auth API is under development.
-                if (credentials.email === 'SLRAdmin' && credentials.password === 'SLRAdmin') {
+                if (credentials.email === 'SLRadmin' && credentials.password === 'SLRadmin') {
                     return {
                         id: 'dev-admin',
                         user_id: 'dev-admin',
