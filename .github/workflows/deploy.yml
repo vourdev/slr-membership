@@ -82,6 +82,7 @@ jobs:
 
             # Pull latest image and recreate container
             docker compose pull
+            docker rm -f slr-membership 2>/dev/null || true
             docker compose up -d
 
             # Verify container is running
