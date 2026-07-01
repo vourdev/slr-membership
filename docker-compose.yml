@@ -1,0 +1,17 @@
+services:
+  slr-membership:
+    image: ${REGISTRY}/${IMAGE_NAME}:latest
+    container_name: slr-membership
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - AUTH_TRUST_HOST=true
+    ports:
+      - "3000:3000"
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true
