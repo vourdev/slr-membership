@@ -24,7 +24,6 @@ type UserDetailResponse = {
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
-    trustHost: true,
     providers: [
         Credentials({
             credentials: { email: {}, password: {} },
