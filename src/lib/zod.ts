@@ -4,7 +4,7 @@ import { email, literal, object, string, union, enum as zEnum } from 'zod';
 
 export const SignInSchema = object({
     // `SLRAdmin` is a dev-only bypass login while the auth API is under development.
-    email: union([email('Invalid Email'), literal('SLRAdmin')]),
+    email: union([email('Invalid Email'), literal('SLRadmin')]),
     password: string().min(8, 'Password must be more than 8 characters')
 });
 
