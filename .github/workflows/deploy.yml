@@ -1,121 +1,68 @@
-name: Deploy to VPS
+name: Export Carousel & Notify n8n
 
+# Trigger otomatis kalau ada HTML carousel baru di branch main.
+# Pull request TIDAK di-trigger — kita gak mau notify n8n / post ke Buffer
+# dari draft yang belum di-merge.
 on:
   push:
-    branches:
-      - main
-
-concurrency:
-  group: deploy-slr-membership-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  REGISTRY: ghcr.io
+    branches: [ "main" ]
+    paths:
+      - "carousels/**.html"
+  # Buat testing manual — bisa pilih file HTML spesifik lewat tab Actions
+  workflow_dispatch:
+    inputs:
+      html_file:
+        description: "Path ke file HTML (kosongkan untuk auto-detect dari commit terakhir)"
+        required: false
+        default: ""
 
 jobs:
-  build-and-deploy:
+  export:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Set image name (lowercase)
-        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
-      - name: Create .env file from GitHub Secret
-        run: echo "${{ secrets.ENV_FILE }}" > .env
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 2   # perlu HEAD^ buat diff, default checkout cuma ambil 1 commit
 
-      - name: Extract metadata (tags, labels)
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,prefix=
-            type=raw,value=latest
+          python-version: "3.11"
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Configure SSH Key
+      - name: Install dependencies
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.SSH_PORT || 22 }} -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
 
-      - name: Copy .env file to VPS
+      - name: Determine target HTML file
+        id: target
         run: |
-          ssh -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ~/frontend/slr-membership"
-          scp -P ${{ secrets.SSH_PORT || 22 }} .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/frontend/slr-membership/.env
+          if [ -n "${{ github.event.inputs.html_file }}" ]; then
+            FILE="${{ github.event.inputs.html_file }}"
+          else
+            FILE=$(git diff --name-only HEAD^ HEAD -- 'carousels/*.html' | head -n 1)
+          fi
 
-      - name: Deploy container via SSH
+          if [ -z "$FILE" ]; then
+            echo "❌ Tidak ada file HTML carousel yang berubah atau di-input."
+            exit 1
+          fi
+
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+          echo "Target file: $FILE"
+
+      - name: Export slides to PNG
         run: |
-          ssh -p ${{ secrets.SSH_PORT || 22 }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" <<EOF
-            # Login to ghcr.io on VPS
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          python scripts/export-slider-content.py "${{ steps.target.outputs.file }}" \
+            --selector "section" \
+            --scale 3 \
+            --out ./output
 
-            # Pull latest image
-            docker pull ${REGISTRY}/${{ env.IMAGE_NAME }}:latest
-
-            # Stop and remove existing container (if any)
-            docker stop slr-membership 2>/dev/null || true
-            docker rm slr-membership 2>/dev/null || true
-
-            # Run new container with env vars
-            docker run -d \
-              --name slr-membership \
-              --restart unless-stopped \
-              --network shared-network \
-              --env-file ~/frontend/slr-membership/.env \
-              -p 3000:3000 \
-              ${REGISTRY}/${{ env.IMAGE_NAME }}:latest
-
-            # Verify container is running
-            sleep 3
-            if docker ps --filter "name=slr-membership" --filter "status=running" -q | grep -q .; then
-              echo "✅ Container is running successfully"
-            else
-              echo "❌ Container failed to start. Logs:"
-              docker logs slr-membership 2>&1 || true
-              exit 1
-            fi
-
-            # Clean up old images
-            docker image prune -af
-          EOF
-
-  cleanup-registry:
-    needs: build-and-deploy
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Delete old images from ghcr.io
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: ${{ github.event.repository.name }}
-          package-type: container
-          min-versions-to-keep: 3
-          delete-only-untagged-versions: false
+      - name: Upload images & notify n8n
+        env:
+          CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
+          N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+        run: |
+          python scripts/notify.py "${{ steps.target.outputs.file }}" ./output
