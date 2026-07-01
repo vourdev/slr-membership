@@ -7,9 +7,10 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { goldButtonStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
+import type { SubTierCode } from '@/types/member';
 
-import { BENY_PRICE, SignUpFormData, TierKey } from './types';
-import { ArrowLeft, Check } from 'lucide-react';
+import { BENY_PRICE, SignUpFormData, TierKey, subTierPrice, subTierTokens, subTiersForGroup } from './types';
+import { ArrowLeft, Check, Sparkles } from 'lucide-react';
 
 type TierOption = {
     key: TierKey;
@@ -41,7 +42,7 @@ const tiers: TierOption[] = [
     {
         key: 'red',
         name: 'SLR Red',
-        price: '$10',
+        price: 'From $10',
         note: '/ month',
         tagline: 'The everyday rewards plan.',
         perks: ['Up to 7 weekly draws', '4–7 entries per cycle', 'Unlock all discount codes', 'Read all e-books'],
@@ -54,8 +55,8 @@ const tiers: TierOption[] = [
     },
     {
         key: 'blue',
-        name: 'SLR Premium',
-        price: '$26',
+        name: 'SLR Blue',
+        price: 'From $26',
         note: '/ month',
         tagline: 'Maximum draws, member-only deals.',
         perks: ['Everything in Red', '10+ entries per cycle', 'Premium prize pool', 'Member-only deals'],
@@ -73,23 +74,147 @@ type StepTierProps = {
     onBack: () => void;
 };
 
+const backBtn =
+    'h-11 min-w-max flex-1 rounded-xl border border-white/10 bg-white/5 px-6 font-semibold text-white hover:bg-white/10 hover:text-white sm:flex-none';
+const nextBtn = 'h-11 min-w-max flex-1 rounded-xl font-bold uppercase shadow-md transition-opacity hover:opacity-90';
+
 const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
-    const [selected, setSelected] = useState<TierKey | null>(data.tier);
+    const [phase, setPhase] = useState<'group' | 'subtier'>('group');
+    const [group, setGroup] = useState<TierKey | null>(data.tier);
+    const [subCode, setSubCode] = useState<SubTierCode | null>(data.sub_tier);
     const [beny, setBeny] = useState<boolean>(data.beny);
     const [touched, setTouched] = useState(false);
 
-    const isPaid = selected === 'red' || selected === 'blue';
-    const canContinue = selected !== null;
-
-    const handleContinue = () => {
-        if (!canContinue) {
+    const handleGroupContinue = () => {
+        if (!group) {
             setTouched(true);
 
             return;
         }
-        onNext({ tier: selected, beny: isPaid ? beny : false });
+        if (group === 'visitor') {
+            onNext({ tier: 'visitor', sub_tier: 'VISITOR', beny: false });
+
+            return;
+        }
+        // Paid → sub-tier step. Default to Standard if none valid for this group.
+        const subs = subTiersForGroup(group);
+        if (!subCode || !subs.some((s) => s.code === subCode)) {
+            setSubCode(subs[0].code);
+        }
+        setPhase('subtier');
     };
 
+    // ── Sub-tier phase (RED / BLUE) ──────────────────────────────────────────
+    if (phase === 'subtier' && (group === 'red' || group === 'blue')) {
+        const subs = subTiersForGroup(group);
+        const groupName = group === 'red' ? 'SLR Red' : 'SLR Blue';
+
+        return (
+            <div className='flex flex-col gap-6'>
+                <div>
+                    <h2 className='font-bebas-neue text-3xl tracking-wider text-white uppercase md:text-4xl'>
+                        Choose your {groupName} plan
+                    </h2>
+                    <p className='text-slr-muted mt-1 text-sm'>
+                        More tokens = more entries per draw. Token-upgrade plans get a spin at checkout.
+                    </p>
+                </div>
+
+                <div className='space-y-3'>
+                    {subs.map((opt) => {
+                        const on = subCode === opt.code;
+                        const tokens = subTierTokens(opt.code);
+
+                        return (
+                            <button
+                                key={opt.code}
+                                type='button'
+                                onClick={() => setSubCode(opt.code)}
+                                className={cn(
+                                    'flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-all',
+                                    on
+                                        ? 'border-[#D4AF37] bg-[#D4AF370D] ring-1 ring-[#D4AF37]'
+                                        : 'border-white/10 bg-white/2 hover:border-white/20'
+                                )}>
+                                <span
+                                    className={cn(
+                                        'flex size-5 shrink-0 items-center justify-center rounded-full border',
+                                        on ? 'border-[#D4AF37] bg-[#D4AF37]' : 'border-white/30'
+                                    )}>
+                                    {on && <Check className='size-3 text-[#0C1132]' />}
+                                </span>
+                                <div className='min-w-0 flex-1'>
+                                    <div className='flex items-baseline justify-between gap-2'>
+                                        <span className='font-bebas-neue text-lg tracking-wider text-white uppercase'>
+                                            {opt.level}
+                                        </span>
+                                        <span className='shrink-0'>
+                                            <span className='text-gradient-gold font-bebas-neue text-2xl'>
+                                                ${subTierPrice(opt.code)}
+                                            </span>
+                                            <span className='text-xs text-white/60'>/mo</span>
+                                        </span>
+                                    </div>
+                                    <div className='mt-1 flex flex-wrap items-center gap-2 text-xs text-white/70'>
+                                        <span className='text-sm'>
+                                            {tokens} token{tokens === 1 ? '' : 's'} · entries per draw
+                                        </span>
+                                        {opt.spinDiscount > 0 && (
+                                            <span
+                                                className='inline-flex items-center gap-1 rounded-md border border-[#D4AF3759] px-1.5 py-0.5 text-xs font-semibold text-[#FFDC75]'
+                                                style={{ background: '#291F0A' }}>
+                                                <Sparkles className='size-3' /> Spin — win ${opt.spinDiscount} off
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                <label
+                    className={cn(
+                        'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors',
+                        beny ? 'border-[#D4AF3759] bg-[#D4AF370D]' : 'border-white/10 bg-white/2 hover:border-white/20'
+                    )}>
+                    <input
+                        type='checkbox'
+                        checked={beny}
+                        onChange={(e) => setBeny(e.target.checked)}
+                        className='mt-0.5 size-4 shrink-0 cursor-pointer accent-[#D4AF37]'
+                    />
+                    <div className='flex-1'>
+                        <div className='flex flex-wrap items-baseline gap-2'>
+                            <span className='font-bebas-neue text-lg tracking-wider text-white uppercase'>
+                                Add BENY
+                            </span>
+                            <span className='text-sm font-semibold text-[#FFDC75]'>+${BENY_PRICE}/month</span>
+                        </div>
+                        <p className='text-slr-muted mt-0.5 text-xs'>
+                            Premium third-party discount platform. Optional. Requires phone for activation.
+                        </p>
+                    </div>
+                </label>
+
+                <div className='flex flex-wrap gap-3'>
+                    <Button type='button' variant='outline' onClick={() => setPhase('group')} className={backBtn}>
+                        <ArrowLeft className='h-4 w-4' />
+                        Back
+                    </Button>
+                    <Button
+                        type='button'
+                        onClick={() => group && subCode && onNext({ tier: group, sub_tier: subCode, beny })}
+                        style={goldButtonStyle}
+                        className={nextBtn}>
+                        Continue
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // ── Group phase (Visitor / RED / BLUE) ───────────────────────────────────
     return (
         <div className='flex flex-col gap-6'>
             <div>
@@ -101,13 +226,13 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
 
             <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 {tiers.map((tier) => {
-                    const isSelected = selected === tier.key;
+                    const isSelected = group === tier.key;
 
                     return (
                         <button
                             key={tier.key}
                             type='button'
-                            onClick={() => setSelected(tier.key)}
+                            onClick={() => setGroup(tier.key)}
                             className={cn(
                                 'relative flex h-full flex-col rounded-2xl text-left transition-all',
                                 isSelected
@@ -119,7 +244,6 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                                     'relative isolate flex flex-1 flex-col rounded-2xl',
                                     tier.isPaid ? 'p-[1.25px]' : ''
                                 )}>
-                                {/* Gradient border layer (paid tiers only) */}
                                 {tier.isPaid && tier.borderGradient && (
                                     <div
                                         className={`absolute inset-0 -z-10 rounded-2xl ${tier.borderGradient} mask-exclude [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]`}
@@ -127,14 +251,12 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                                     />
                                 )}
 
-                                {/* Card body */}
                                 <div
                                     className={cn(
                                         'flex flex-1 flex-col rounded-2xl p-5',
                                         tier.isPaid ? tier.innerBg : tier.cardBg,
                                         tier.isPaid && 'rounded-[calc(1rem-1.25px)]'
                                     )}>
-                                    {/* Badge */}
                                     {tier.badge && (
                                         <div
                                             className='absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-[9px] font-bold tracking-widest uppercase'
@@ -147,7 +269,6 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                                         </div>
                                     )}
 
-                                    {/* Icon + name row */}
                                     <div className='flex items-center gap-3'>
                                         {tier.icon && (
                                             <Image
@@ -182,7 +303,6 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
 
                                     <div className='my-3 h-px w-full bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.35)_50%,rgba(255,255,255,0)_100%)]' />
 
-                                    {/* Perks */}
                                     <ul className='space-y-1.5'>
                                         {tier.perks.map((p) => (
                                             <li key={p} className='flex items-start gap-1.5 text-xs text-white/80'>
@@ -198,48 +318,14 @@ const StepTier = ({ data, onNext, onBack }: StepTierProps) => {
                 })}
             </div>
 
-            {touched && !canContinue && <p className='text-xs text-red-400'>Choose a tier to continue.</p>}
-
-            {isPaid && (
-                <label
-                    className={cn(
-                        'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors',
-                        beny ? 'border-[#D4AF3759] bg-[#D4AF370D]' : 'border-white/10 bg-white/2 hover:border-white/20'
-                    )}>
-                    <input
-                        type='checkbox'
-                        checked={beny}
-                        onChange={(e) => setBeny(e.target.checked)}
-                        className='mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[#D4AF37]'
-                    />
-                    <div className='flex-1'>
-                        <div className='flex flex-wrap items-baseline gap-2'>
-                            <span className='font-bebas-neue text-lg tracking-wider text-white uppercase'>
-                                Add BENY
-                            </span>
-                            <span className='text-sm font-semibold text-[#FFDC75]'>+${BENY_PRICE}/month</span>
-                        </div>
-                        <p className='text-slr-muted mt-0.5 text-xs'>
-                            Premium third-party discount platform. Optional. Requires phone for activation.
-                        </p>
-                    </div>
-                </label>
-            )}
+            {touched && !group && <p className='text-xs text-red-400'>Choose a tier to continue.</p>}
 
             <div className='flex flex-wrap gap-3'>
-                <Button
-                    type='button'
-                    variant='outline'
-                    onClick={onBack}
-                    className='h-11 min-w-max flex-1 rounded-xl border border-white/10 bg-white/5 px-6 font-semibold text-white hover:bg-white/10 hover:text-white sm:flex-none'>
+                <Button type='button' variant='outline' onClick={onBack} className={backBtn}>
                     <ArrowLeft className='h-4 w-4' />
                     Back
                 </Button>
-                <Button
-                    type='button'
-                    onClick={handleContinue}
-                    style={goldButtonStyle}
-                    className='h-11 min-w-max flex-1 rounded-xl font-bold uppercase shadow-md transition-opacity hover:opacity-90'>
+                <Button type='button' onClick={handleGroupContinue} style={goldButtonStyle} className={nextBtn}>
                     Continue
                 </Button>
             </div>

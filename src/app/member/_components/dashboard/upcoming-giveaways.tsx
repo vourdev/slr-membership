@@ -14,7 +14,7 @@ function GiveawayCard({ giveaway }: { giveaway: UpcomingGiveaway }) {
             <div className='flex items-center justify-between gap-2'>
                 <TierGroupBadge group={giveaway.tier_group} />
                 {giveaway.locked && (
-                    <span className='text-slr-dim inline-flex items-center gap-1 text-[10px] font-semibold tracking-wide uppercase'>
+                    <span className='text-slr-dim inline-flex items-center gap-1 text-xs font-semibold tracking-wide uppercase'>
                         <Lock className='size-3' /> Locked
                     </span>
                 )}

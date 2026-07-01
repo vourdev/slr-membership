@@ -15,17 +15,18 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useInitials } from '@/hooks/use-initials';
 import { logoutAction } from '@/lib/logout-action';
-import type { CurrentMember } from '@/types/member';
+import type { CurrentMember, MemberNotification } from '@/types/member';
 
-import { Bell, ChevronDown, LogOut, UserCircle } from 'lucide-react';
+import { NotificationsPanel } from './notifications-panel';
+import { ChevronDown, LogOut, UserCircle } from 'lucide-react';
 
 interface MemberHeaderProps {
     user: { name?: string | null; email?: string | null; image?: string | null } | null;
     member: CurrentMember;
-    notificationsCount: number;
+    notifications: MemberNotification[];
 }
 
-export function MemberHeader({ user, member, notificationsCount }: MemberHeaderProps) {
+export function MemberHeader({ user, member, notifications }: MemberHeaderProps) {
     const getInitials = useInitials();
     const email = user?.email ?? '';
     const firstName = member.name.split(' ')[0];
@@ -35,19 +36,7 @@ export function MemberHeader({ user, member, notificationsCount }: MemberHeaderP
             <SidebarTrigger className='-ml-1' />
 
             <div className='ml-auto flex items-center gap-1.5 sm:gap-2'>
-                <button
-                    type='button'
-                    aria-label={
-                        notificationsCount > 0 ? `Notifications, ${notificationsCount} unread` : 'Notifications'
-                    }
-                    className='text-slr-muted hover:text-foreground relative inline-flex size-9 items-center justify-center rounded-lg border border-white/5 bg-white/3 transition-colors hover:bg-white/6'>
-                    <Bell className='size-4' />
-                    {notificationsCount > 0 && (
-                        <span className='absolute -top-1 -right-1 inline-flex min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] leading-4 font-bold text-white'>
-                            {notificationsCount}
-                        </span>
-                    )}
-                </button>
+                <NotificationsPanel initial={notifications} />
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

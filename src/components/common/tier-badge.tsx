@@ -11,7 +11,7 @@ const GROUP_ICON: Record<TierGroup, LucideIcon> = {
 };
 
 const SIZES = {
-    sm: { wrap: 'h-5 gap-1 px-2 text-[10px]', icon: 'size-3' },
+    sm: { wrap: 'h-5 gap-1 px-2 text-xs', icon: 'size-3' },
     md: { wrap: 'h-6 gap-1.5 px-2.5 text-xs', icon: 'size-3.5' }
 } as const;
 
@@ -35,7 +35,7 @@ export function TierBadge({ subTier, size = 'md', showGroup = true, className }:
     return (
         <span
             className={cn(
-                'inline-flex items-center rounded-full border font-semibold tracking-wide uppercase',
+                'inline-flex w-fit items-center rounded-full border font-semibold tracking-wide uppercase',
                 sz.wrap,
                 visual.textClass,
                 className
@@ -62,7 +62,7 @@ export function TierGroupBadge({ group, size = 'sm', className }: TierGroupBadge
     return (
         <span
             className={cn(
-                'inline-flex items-center rounded-full border font-semibold tracking-wide uppercase',
+                'inline-flex w-fit items-center rounded-full border font-semibold tracking-wide uppercase',
                 sz.wrap,
                 visual.textClass,
                 className

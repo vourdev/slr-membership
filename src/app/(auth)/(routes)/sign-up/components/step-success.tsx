@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { AU_STATES } from '@/constant/au-states';
 import { goldButtonStyle } from '@/lib/styles';
 
-import { SignUpFormData, SpinPrize, TIER_LABEL, TIER_PRICE } from './types';
+import { SignUpFormData, SpinPrize, subTierLabel, subTierPrice } from './types';
 import { Check, Mail, PartyPopper } from 'lucide-react';
 
 type StepSuccessProps = {
@@ -18,13 +18,15 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
     const tier = data.tier ?? 'visitor';
     const isPaid = tier !== 'visitor';
     const stateLabel = AU_STATES.find((s) => s.code === data.state)?.label ?? data.state;
+    const planLabel = isPaid && data.sub_tier ? subTierLabel(data.sub_tier) : 'Visitor';
+    const planPrice = isPaid && data.sub_tier ? subTierPrice(data.sub_tier) : 0;
 
     const benefits = isPaid
         ? [
               `Welcome email sent to ${data.email}`,
               `Payment confirmation + invoice on the way`,
               `Entries allocated to SLR ${tier === 'red' ? 'Red' : 'Blue'} ${data.state}`,
-              spinPrize && spinPrize.discountPercent > 0 ? `${spinPrize.label} applied to your first month` : null
+              spinPrize && spinPrize.discountAmount > 0 ? `${spinPrize.label} applied to your first month` : null
           ].filter(Boolean)
         : [
               `Welcome email sent to ${data.email}`,
@@ -49,7 +51,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
                 </h2>
                 <p className='text-slr-muted mt-2 text-sm md:text-base'>
                     {isPaid
-                        ? `Your ${TIER_LABEL[tier]} membership is active. Your first cycle starts now.`
+                        ? `Your ${planLabel} membership is active. Your first cycle starts now.`
                         : `Your free Visitor account is ready. Browse the platform and get entered into the weekly draw.`}
                 </p>
             </div>
@@ -76,10 +78,7 @@ const StepSuccess = ({ data, spinPrize }: StepSuccessProps) => {
                         <Detail label='Name' value={data.name} />
                         <Detail label='Email' value={data.email} />
                         <Detail label='State' value={`${data.state} · ${stateLabel}`} />
-                        <Detail
-                            label='Plan'
-                            value={`${TIER_LABEL[tier]}${isPaid ? ` · $${TIER_PRICE[tier]}/mo` : ''}`}
-                        />
+                        <Detail label='Plan' value={`${planLabel}${isPaid ? ` · $${planPrice}/mo` : ''}`} />
                     </dl>
                 </div>
             </div>

@@ -21,3 +21,11 @@ export const goldButtonStyle: CSSProperties = {
 export const goldBgStyle: CSSProperties = {
     background: GOLD_GRADIENT
 };
+
+/**
+ * Dark form-input style — matches the sign-up (register) inputs. Apply to a
+ * shadcn `<Input>` / `<SelectTrigger>` via `className`. h-11, subtle glass fill,
+ * gold focus ring.
+ */
+export const inputClassName =
+    'h-11 rounded-lg border-white/10 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20';

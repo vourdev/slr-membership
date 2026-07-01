@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { AU_STATES } from '@/constant/au-states';
 import { goldButtonStyle } from '@/lib/styles';
 
-import { BENY_PRICE, SignUpFormData, SpinPrize, TIER_LABEL, TIER_PRICE } from './types';
+import { BENY_PRICE, SignUpFormData, SpinPrize, subTierLabel, subTierPrice } from './types';
 import { ArrowLeft, CreditCard, Loader2Icon, ShieldCheck } from 'lucide-react';
 
 type StepCheckoutProps = {
@@ -20,22 +20,22 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
     const [redirecting, setRedirecting] = useState(false);
 
     const tier = data.tier;
-    if (!tier || tier === 'visitor') {
+    const subTier = data.sub_tier;
+    if (!tier || tier === 'visitor' || !subTier) {
         return null;
     }
 
-    const tierPrice = TIER_PRICE[tier];
+    const tierPrice = subTierPrice(subTier);
     const benyPrice = data.beny ? BENY_PRICE : 0;
     const subtotal = tierPrice + benyPrice;
-    const discountPercent = spinPrize?.discountPercent ?? 0;
-    const discount = (subtotal * discountPercent) / 100;
+    const discount = Math.min(spinPrize?.discountAmount ?? 0, subtotal);
     const total = subtotal - discount;
 
     const stateLabel = AU_STATES.find((s) => s.code === data.state)?.label ?? data.state;
 
     const handleCheckout = async () => {
         setRedirecting(true);
-        await new Promise((r) => setTimeout(r, 1400));
+        await new Promise((resolve) => setTimeout(resolve, 1400));
         onNext();
     };
 
@@ -53,7 +53,7 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
             <div className='rounded-2xl border border-[#A0B4D259] bg-[linear-gradient(154.36deg,#141820_0.82%,#1E2530_49.73%,#141820_98.65%)] p-6 shadow-[0px_0px_20px_0px_#776D6D26] md:p-8'>
                 <div className='space-y-4'>
                     <SummaryRow
-                        label={TIER_LABEL[tier]}
+                        label={subTierLabel(subTier)}
                         sub='Monthly subscription'
                         value={`$${tierPrice.toFixed(2)}`}
                     />
@@ -68,7 +68,7 @@ const StepCheckout = ({ data, spinPrize, onNext, onBack }: StepCheckoutProps) =>
                     <div className='h-px w-full bg-white/10' />
 
                     <SummaryRow label='Subtotal' value={`$${subtotal.toFixed(2)}`} muted />
-                    {discountPercent > 0 && (
+                    {discount > 0 && (
                         <SummaryRow
                             label='Spin Wheel discount'
                             sub={`${spinPrize?.label}, first month only`}

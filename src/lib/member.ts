@@ -11,6 +11,31 @@ export function tierGroupOf(code: SubTierCode): TierGroup {
     return SUB_TIERS[code].group;
 }
 
+// ── Giveaway tier-access rules (PRD §4.3 role visibility) ─────────────────────
+
+const TIER_RANK: Record<TierGroup, number> = { visitor: 0, red: 1, blue: 2 };
+
+export function tierRank(group: TierGroup): number {
+    return TIER_RANK[group];
+}
+
+/**
+ * Tier tabs a member may see on the Giveaways page (PRD §4.3).
+ * Visitor sees NO RED/BLUE segmented control — only the weekly Visitor draw.
+ * RED and BLUE members both see the RED and BLUE tabs.
+ */
+export function visibleGiveawayTabs(memberGroup: TierGroup): TierGroup[] {
+    return memberGroup === 'visitor' ? [] : ['red', 'blue'];
+}
+
+/**
+ * A giveaway is locked (upsell) when its tier is above the member's tier.
+ * Equal/below → the member is entered (BLUE has full access to RED + BLUE).
+ */
+export function isGiveawayLocked(giveawayTier: TierGroup, memberGroup: TierGroup): boolean {
+    return tierRank(giveawayTier) > tierRank(memberGroup);
+}
+
 const audFormatter = new Intl.NumberFormat('en-AU', {
     style: 'currency',
     currency: 'AUD',

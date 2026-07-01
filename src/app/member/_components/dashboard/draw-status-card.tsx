@@ -1,37 +1,18 @@
-'use client';
-
+import { CountdownBoxes } from '@/components/common/countdown';
 import { EntryStatusBadge } from '@/components/common/entry-status-badge';
-import { useCountdown } from '@/hooks/use-countdown';
 import { cn } from '@/lib/utils';
 import type { DrawStatus } from '@/types/member';
 
 import { MapPin, Ticket, Trophy } from 'lucide-react';
 
-function Unit({ value, label, mounted }: { value: number; label: string; mounted: boolean }) {
-    return (
-        <div className='flex flex-col items-center gap-1'>
-            <span className='border-slr-navy-border flex h-12 w-full items-center justify-center rounded-lg border bg-black/30 md:h-14'>
-                <span className='font-bebas-neue text-xl leading-none text-white tabular-nums sm:text-2xl md:text-3xl'>
-                    {mounted ? String(value).padStart(2, '0') : '--'}
-                </span>
-            </span>
-            <span className='text-slr-dim text-[9px] tracking-widest uppercase sm:text-[10px]'>{label}</span>
-        </div>
-    );
-}
-
 interface DrawStatusCardProps {
     draw: DrawStatus;
-    // Preformatted on the server so SSR and client markup match (avoids a
-    // timezone-dependent hydration mismatch — the countdown digits below are
-    // already guarded by `mounted`).
+    // Preformatted on the server so SSR and client markup match (timezone-safe).
     drawsAtLabel: string;
     className?: string;
 }
 
 export function DrawStatusCard({ draw, drawsAtLabel, className }: DrawStatusCardProps) {
-    const { days, hours, minutes, seconds, done, mounted } = useCountdown(draw.draws_at);
-
     return (
         <div
             className={cn(
@@ -60,19 +41,7 @@ export function DrawStatusCard({ draw, drawsAtLabel, className }: DrawStatusCard
             </div>
 
             <div className='mt-5'>
-                {done ? (
-                    <div className='inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm font-semibold text-emerald-400'>
-                        <span className='size-2 animate-pulse rounded-full bg-emerald-400' />
-                        Drawing now…
-                    </div>
-                ) : (
-                    <div className='grid max-w-xs grid-cols-4 gap-1.5 sm:gap-2'>
-                        <Unit value={days} label='Days' mounted={mounted} />
-                        <Unit value={hours} label='Hrs' mounted={mounted} />
-                        <Unit value={minutes} label='Min' mounted={mounted} />
-                        <Unit value={seconds} label='Sec' mounted={mounted} />
-                    </div>
-                )}
+                <CountdownBoxes targetIso={draw.draws_at} />
             </div>
 
             <div className='mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-4'>

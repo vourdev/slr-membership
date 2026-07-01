@@ -9,23 +9,29 @@ import { SpinPrize } from './types';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { motion, useAnimationControls } from 'motion/react';
 
-type Segment = { label: string; discountPercent: number; fill: string; textColor: string };
+type Segment = { label: string; isWin: boolean; fill: string; textColor: string };
 
-const segments: Segment[] = [
-    { label: 'No prize', discountPercent: 0, fill: '#1E2530', textColor: '#8EA0B8' },
-    { label: '10% off', discountPercent: 10, fill: '#D4AF37', textColor: '#0C1132' },
-    { label: 'No prize', discountPercent: 0, fill: '#1E2530', textColor: '#8EA0B8' },
-    { label: 'No prize', discountPercent: 0, fill: '#2A0810', textColor: '#E88888' },
-    { label: 'No prize', discountPercent: 0, fill: '#1E2530', textColor: '#8EA0B8' },
-    { label: '20% off', discountPercent: 20, fill: '#FFE066', textColor: '#0C1132' },
-    { label: 'No prize', discountPercent: 0, fill: '#1E2530', textColor: '#8EA0B8' },
-    { label: 'No prize', discountPercent: 0, fill: '#142034', textColor: '#6AB0F0' }
-];
-
-const SEGMENT_COUNT = segments.length;
+const SEGMENT_COUNT = 8;
 const SEGMENT_ANGLE = 360 / SEGMENT_COUNT;
 const RADIUS = 140;
 const CENTER = 150;
+
+// Spin win = a fixed $ discount for this sub-tier (PRD §4.1 step 7). Two winning
+// segments out of eight; the actual win chance is fixed at 1/4 below.
+const buildSegments = (winDiscount: number): Segment[] => {
+    const win = `$${winDiscount} off`;
+
+    return [
+        { label: 'No prize', isWin: false, fill: '#1E2530', textColor: '#8EA0B8' },
+        { label: win, isWin: true, fill: '#D4AF37', textColor: '#0C1132' },
+        { label: 'No prize', isWin: false, fill: '#1E2530', textColor: '#8EA0B8' },
+        { label: 'No prize', isWin: false, fill: '#2A0810', textColor: '#E88888' },
+        { label: 'No prize', isWin: false, fill: '#1E2530', textColor: '#8EA0B8' },
+        { label: win, isWin: true, fill: '#FFE066', textColor: '#0C1132' },
+        { label: 'No prize', isWin: false, fill: '#1E2530', textColor: '#8EA0B8' },
+        { label: 'No prize', isWin: false, fill: '#142034', textColor: '#6AB0F0' }
+    ];
+};
 
 const arcPath = (startAngle: number, endAngle: number): string => {
     const start = polarToCartesian(CENTER, CENTER, RADIUS, endAngle);
@@ -41,17 +47,11 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleDeg: number) =
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 };
 
-const pickSegmentIndex = (): number => {
-    const winners = segments
-        .map((s, i) => ({ s, i }))
-        .filter(({ s }) => s.discountPercent > 0)
-        .map(({ i }) => i);
-    const losers = segments
-        .map((s, i) => ({ s, i }))
-        .filter(({ s }) => s.discountPercent === 0)
-        .map(({ i }) => i);
+const pickSegmentIndex = (segments: Segment[]): number => {
+    const winners = segments.map((s, i) => ({ s, i })).filter(({ s }) => s.isWin).map(({ i }) => i);
+    const losers = segments.map((s, i) => ({ s, i })).filter(({ s }) => !s.isWin).map(({ i }) => i);
 
-    // 1/4 chance of winning per PRD flow chart
+    // 1/4 chance of winning per PRD flow.
     if (Math.random() < 0.25) {
         return winners[Math.floor(Math.random() * winners.length)];
     }
@@ -60,11 +60,13 @@ const pickSegmentIndex = (): number => {
 };
 
 type StepSpinWheelProps = {
+    winDiscount: number;
     onNext: (prize: SpinPrize) => void;
     onBack: () => void;
 };
 
-const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
+const StepSpinWheel = ({ winDiscount, onNext, onBack }: StepSpinWheelProps) => {
+    const segments = buildSegments(winDiscount);
     const [spinning, setSpinning] = useState(false);
     const [result, setResult] = useState<{ index: number; segment: Segment } | null>(null);
     const controls = useAnimationControls();
@@ -74,7 +76,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
         setSpinning(true);
         setResult(null);
 
-        const targetIndex = pickSegmentIndex();
+        const targetIndex = pickSegmentIndex(segments);
         const targetAngle = targetIndex * SEGMENT_ANGLE + SEGMENT_ANGLE / 2;
         const fullSpins = 5;
         const finalRotation = 360 * fullSpins - targetAngle;
@@ -92,7 +94,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
         if (!result) return;
         onNext({
             label: result.segment.label,
-            discountPercent: result.segment.discountPercent
+            discountAmount: result.segment.isWin ? winDiscount : 0
         });
     };
 
@@ -103,7 +105,7 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                     One free spin
                 </h2>
                 <p className='text-slr-muted mt-1 text-sm'>
-                    Every new paid member gets one spin. You might win a discount on your first month.
+                    Win up to ${winDiscount} off your first invoice. One spin per new paid member.
                 </p>
             </div>
 
@@ -180,19 +182,17 @@ const StepSpinWheel = ({ onNext, onBack }: StepSpinWheelProps) => {
                 {result && (
                     <div
                         className={
-                            result.segment.discountPercent > 0
+                            result.segment.isWin
                                 ? 'rounded-xl border border-[#D4AF3759] bg-[#D4AF370D] px-6 py-4 text-center'
                                 : 'rounded-xl border border-white/10 bg-white/2 px-6 py-4 text-center'
                         }>
-                        {result.segment.discountPercent > 0 ? (
+                        {result.segment.isWin ? (
                             <>
                                 <Sparkles className='mx-auto h-6 w-6 text-[#FFDC75]' />
                                 <p className='font-bebas-neue mt-2 text-2xl tracking-wider text-white uppercase'>
                                     You won {result.segment.label}!
                                 </p>
-                                <p className='text-slr-muted mt-1 text-xs'>
-                                    Your discount will be applied at checkout.
-                                </p>
+                                <p className='text-slr-muted mt-1 text-xs'>Your discount will be applied at checkout.</p>
                             </>
                         ) : (
                             <>

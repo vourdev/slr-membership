@@ -53,6 +53,28 @@ export interface UpcomingGiveaway {
     locked: boolean; // true when the giveaway tier is above the member's (upgrade required)
 }
 
+// ── Notifications (member bell panel) ────────────────────────────────────────
+
+export type NotificationType =
+    | 'draw_win'
+    | 'draw_result'
+    | 'renewal'
+    | 'spin'
+    | 'referral'
+    | 'tier_change'
+    | 'beny'
+    | 'system';
+
+export interface MemberNotification {
+    id: string;
+    type: NotificationType;
+    title: string;
+    body: string;
+    created_at: string; // ISO
+    read_at: string | null; // null = unread
+    href?: string; // optional navigation target on click
+}
+
 export interface MemberDashboard {
     member: CurrentMember;
     summary: MembershipSummary;
@@ -60,4 +82,139 @@ export interface MemberDashboard {
     featured_discounts: FeaturedDiscount[];
     upcoming_giveaways: UpcomingGiveaway[];
     notifications_count: number;
+}
+
+// ── Giveaways (PRD §4.3) ─────────────────────────────────────────────────────
+
+export interface Giveaway {
+    id: string;
+    title: string;
+    tier_group: TierGroup;
+    draw_pool: string; // state + tier, e.g. 'SLR Red · NSW'
+    prize_label: string;
+    entered: boolean; // "You're Entered" — member has active entries in this draw
+    entry_status: EntryStatus; // active/inactive only — never draw_pass
+    total_entries: number; // member's entries in this draw (token count; 0 if not entered)
+    pool_entries: number; // aggregate community entries in the pool (odds context)
+    locked: boolean; // giveaway tier above the member's → upgrade required
+    draws_at: string; // ISO datetime — drives the countdown
+}
+
+export interface GiveawayEntryRow {
+    cycle: string; // e.g. 'Cycle 12 · Jun 2026'
+    entries: number; // token-based, safe to render
+    status: EntryStatus;
+}
+
+export interface PastWinner {
+    name: string;
+    state: string; // AU state code
+    prize: string;
+    drawn_at: string; // ISO date
+}
+
+export interface GiveawayDetail extends Giveaway {
+    prize_description: string;
+    rules: string[];
+    tpal_note: string;
+    entry_history: GiveawayEntryRow[];
+    past_winners: PastWinner[];
+}
+
+// ── Prizes (PRD §"Sistem Stage Prize Pool") ──────────────────────────────────
+// Informational, CMS-editable page. Every field below is a plain text/number
+// the admin edits per stage — no system logic. Prize pool figures are marketing
+// language; actual draws happen externally at TPAL.
+
+export interface PrizeTierBreakdown {
+    tier_group: TierGroup;
+    tier_label: string; // e.g. 'SLR RED'
+    price_label: string; // e.g. '$10/month' / 'Free to join'
+    weekly: string; // weekly reward copy
+    monthly: string | null; // monthly bonus copy, or null when none
+}
+
+export interface PrizeStage {
+    stage: number;
+    members_required: number; // total paid members (RED + BLUE) that defines the stage
+}
+
+export interface PrizePool {
+    headline: string; // CMS text, e.g. '$2,100'
+    prizes_sublabel: string; // e.g. '@ 22 Prizes • One Month'
+    stage_label: string; // e.g. 'For 100 Members • Stage 1'
+    current_stage: number;
+    current_members: number; // paid members currently displayed (CMS)
+    odds_label: string; // e.g. '9 in 10 wins yearly'
+    tiers: PrizeTierBreakdown[];
+    stages: PrizeStage[];
+}
+
+// ── Discounts (PRD §4.4) ─────────────────────────────────────────────────────
+// Basic partner discounts: RED/BLUE only (Visitor sees an upgrade gate). BENY is
+// a separate $4/mo external add-on — web collects contact details then admin
+// activates manually; no system integration.
+
+export interface Discount {
+    id: string;
+    brand: string;
+    category: string; // one of DISCOUNT_CATEGORIES
+    value_label: string; // e.g. '5% off', '4¢ / L'
+    code: string; // copy-to-clipboard promo code
+    description: string;
+    terms: string;
+}
+
+export interface BenyStatus {
+    active: boolean; // member currently subscribed to the BENY add-on
+}
+
+// ── Entry History (PRD §"Entry History Page") ────────────────────────────────
+// Per-cycle record. Shows token counts (renderable) + entry_status only — the
+// internal draw_pass number is NEVER exposed (active = draw_pass > 0).
+
+export type TierChange = 'upgrade' | 'downgrade' | null;
+
+export interface EntryHistoryEntry {
+    id: string;
+    cycle_label: string; // e.g. 'Cycle 12'
+    cycle_range: string; // e.g. '5 Jun – 3 Jul 2026'
+    sub_tier: SubTierCode; // tier held during that cycle
+    base_tokens: number; // base tokens for the tier
+    referral_bonus: number; // bonus tokens from referrals (0 if none)
+    total_tokens: number; // active tokens = base + referral
+    entry_status: EntryStatus; // active/inactive (draw_pass projection)
+    inactive_reason?: string; // shown when inactive (e.g. previous winner / grace)
+    tier_change: TierChange; // tier change that took effect this cycle
+    changed_from?: SubTierCode; // the previous tier, when tier_change is set
+}
+
+// ── Profile & Account (PRD §4.7) ─────────────────────────────────────────────
+
+export interface Invoice {
+    id: string;
+    date: string; // ISO
+    description: string; // e.g. 'SLR RED (R4) — 28-day cycle'
+    amount_cents: number;
+    status: 'paid' | 'failed' | 'refunded';
+}
+
+// Paid→Paid tier changes are SCHEDULED (applied at next renewal) and cancelable.
+export interface PendingUpgrade {
+    to_sub_tier: SubTierCode;
+    effective_date: string; // ISO — applied at next renewal
+}
+
+export interface MemberProfile {
+    name: string;
+    email: string;
+    sub_tier: SubTierCode;
+    state: string;
+    member_id: string; // shown on the digital card / QR
+    joined_at: string; // ISO
+    billing_status: BillingStatus;
+    next_payment_date: string; // ISO
+    price_cents: number;
+    pending_upgrade: PendingUpgrade | null;
+    invoices: Invoice[];
 }

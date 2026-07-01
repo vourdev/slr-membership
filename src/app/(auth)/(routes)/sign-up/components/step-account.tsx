@@ -154,9 +154,10 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                     <Input
                         id='phone'
                         type='tel'
-                        placeholder='04xx xxx xxx'
+                        inputMode='numeric'
+                        placeholder='0412345678'
                         value={values.phone}
-                        onChange={(e) => update('phone', e.target.value)}
+                        onChange={(e) => update('phone', e.target.value.replace(/\D/g, ''))}
                         autoComplete='tel'
                         className='h-11 rounded-lg border-white/10 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20'
                     />

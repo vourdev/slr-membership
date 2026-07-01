@@ -56,15 +56,17 @@ export function MemberSidebar({ user, member }: MemberSidebarProps) {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarGroup className='px-2'>
-                    <SidebarGroupLabel>Menu</SidebarGroupLabel>
-                    <SidebarMenu>
+                <SidebarGroup className='px-2 py-2'>
+                    <SidebarGroupLabel className='mb-1'>Menu</SidebarGroupLabel>
+                    <SidebarMenu className='gap-1.5'>
                         {MEMBER_NAV.map((item) => (
                             <SidebarMenuItem key={item.href}>
                                 <SidebarMenuButton
                                     asChild
+                                    size='lg'
                                     isActive={isActive(item.href)}
-                                    tooltip={{ children: item.title }}>
+                                    tooltip={{ children: item.title }}
+                                    className='gap-3 text-base [&>svg]:size-5'>
                                     <Link href={item.href}>
                                         <item.icon />
                                         <span>{item.title}</span>
