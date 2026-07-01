@@ -35,6 +35,8 @@ export function Navbar({ user }: NavbarProps) {
     const [scrolled, setScrolled] = useState<boolean>(false);
     const pathname = usePathname();
 
+    if (pathname.startsWith('/ebooks') && !user) return null;
+
     const toggleMenu = () => setIsOpen(!isOpen);
 
     // Track current hash so hash-based menu items can show their active state
