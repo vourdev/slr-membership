@@ -2,6 +2,7 @@ import type { FC } from 'react';
 
 import EmptyState from '@/components/common/empty-state';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { handleApiAuthError } from '@/lib/api/guard';
 import { type AdminDashboard, getAdminDashboard } from '@/lib/api/resources/admin';
 import { getAccessToken } from '@/lib/api/server';
 
@@ -52,7 +53,8 @@ export default async function DashboardHome() {
     let data: AdminDashboard | null = null;
     try {
         data = token ? await getAdminDashboard(token) : null;
-    } catch {
+    } catch (error) {
+        handleApiAuthError(error); // expired session → force logout
         data = null;
     }
 

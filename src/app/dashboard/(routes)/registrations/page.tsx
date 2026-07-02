@@ -1,4 +1,5 @@
 import EmptyState from '@/components/common/empty-state';
+import { handleApiAuthError } from '@/lib/api/guard';
 import { getAdminMembers } from '@/lib/api/resources/admin';
 import { getAccessToken } from '@/lib/api/server';
 
@@ -22,7 +23,8 @@ export default async function RegistrationsPage() {
             status: m.status,
             registered_at: m.created_at.slice(0, 10)
         }));
-    } catch {
+    } catch (error) {
+        handleApiAuthError(error); // expired session → force logout
         failed = true;
     }
 

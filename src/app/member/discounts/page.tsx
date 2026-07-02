@@ -4,6 +4,7 @@ import Link from 'next/link';
 import EmptyState from '@/components/common/empty-state';
 import { getBenyStatus } from '@/data/discounts';
 import { getCurrentMember } from '@/data/member-dashboard';
+import { handleApiAuthError } from '@/lib/api/guard';
 import { type Discount, getDiscounts } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
 import { tierGroupOf } from '@/lib/member';
@@ -31,7 +32,8 @@ export default async function DiscountsPage() {
             const list = token ? await getDiscounts(token) : [];
             // Only show discounts that actually carry data.
             discounts = list.filter((d) => d.title?.trim() || d.partner_name?.trim());
-        } catch {
+        } catch (error) {
+            handleApiAuthError(error); // expired session → force logout
             failed = true;
         }
     }
