@@ -3,6 +3,8 @@ import { JSX } from 'react';
 export interface IMenuItem {
     text: string;
     url: string;
+    /** When true, the item only shows in nav for a logged-in user. */
+    authRequired?: boolean;
 }
 
 export interface IBenefit {

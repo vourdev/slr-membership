@@ -39,6 +39,9 @@ export function Navbar({ user }: NavbarProps) {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
+    // Auth-gated items (e.g. E-Books) only appear once a session exists.
+    const visibleMenuItems = menuItems.filter((item) => !item.authRequired || !!user);
+
     // Track current hash so hash-based menu items can show their active state
     useEffect(() => {
         const updateHash = () => setActiveHash(window.location.hash || '');
@@ -120,7 +123,7 @@ export function Navbar({ user }: NavbarProps) {
 
                     {/* Desktop Menu */}
                     <ul className='hidden items-center gap-1 xl:flex'>
-                        {menuItems.map((item) => {
+                        {visibleMenuItems.map((item) => {
                             const active = isActive(item.url);
 
                             return (
@@ -203,7 +206,7 @@ export function Navbar({ user }: NavbarProps) {
                 leaveTo='opacity-0 -translate-y-2'>
                 <div id='mobile-menu' style={glassStyle} className='mx-auto rounded-b-2xl shadow-lg xl:hidden'>
                     <ul className='flex flex-col gap-1 px-4 py-4'>
-                        {menuItems.map((item) => {
+                        {visibleMenuItems.map((item) => {
                             const active = isActive(item.url);
 
                             return (

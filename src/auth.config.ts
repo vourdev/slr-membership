@@ -12,7 +12,8 @@ export const authConfig = {
             const { pathname } = nextUrl;
 
             // Both the admin dashboard and the member area require a session.
-            const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/member');
+            const isProtectedRoute =
+                pathname.startsWith('/dashboard') || pathname.startsWith('/member') || pathname.startsWith('/ebooks');
             const isAuthPage = pathname.startsWith('/sign-in');
 
             if (!isLoggedIn && isProtectedRoute) {

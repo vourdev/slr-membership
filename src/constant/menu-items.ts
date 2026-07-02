@@ -15,7 +15,12 @@ export const menuItems: IMenuItem[] = [
     },
     {
         text: 'E-Books',
-        url: '/ebooks'
+        url: '/ebooks',
+        authRequired: true
+    },
+    {
+        text: 'E-Book Library',
+        url: '/ebook-library'
     },
     {
         text: 'About',
