@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { DISCOUNT_CATEGORIES, getBenyStatus, getDiscounts } from '@/data/discounts';
+import EmptyState from '@/components/common/empty-state';
+import { getBenyStatus } from '@/data/discounts';
 import { getCurrentMember } from '@/data/member-dashboard';
+import { type Discount, getDiscounts } from '@/lib/api/resources/discounts';
+import { getAccessToken } from '@/lib/api/server';
 import { tierGroupOf } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
 
 import { BenySection } from './_components/beny-section';
 import { DiscountsExplorer } from './_components/discounts-explorer';
-import { ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight, CircleAlert, Lock, Tag } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Discounts · SLR Member'
@@ -19,8 +22,22 @@ export default async function DiscountsPage() {
     // PRD §4.4: basic discounts are RED/BLUE only — Visitor sees an upgrade gate.
     const canAccess = tierGroupOf(member.sub_tier) !== 'visitor';
 
-    const discounts = canAccess ? await getDiscounts() : [];
+    let discounts: Discount[] = [];
+    let failed = false;
+
+    if (canAccess) {
+        const token = await getAccessToken();
+        try {
+            const list = token ? await getDiscounts(token) : [];
+            // Only show discounts that actually carry data.
+            discounts = list.filter((d) => d.title?.trim() || d.partner_name?.trim());
+        } catch {
+            failed = true;
+        }
+    }
+
     const beny = canAccess ? await getBenyStatus() : null;
+    const categories = Array.from(new Set(discounts.map((d) => d.category))).sort();
 
     return (
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
@@ -33,7 +50,21 @@ export default async function DiscountsPage() {
 
             {canAccess ? (
                 <>
-                    <DiscountsExplorer discounts={discounts} categories={DISCOUNT_CATEGORIES} />
+                    {failed ? (
+                        <EmptyState
+                            icon={CircleAlert}
+                            title='Discounts Unavailable'
+                            description='We couldn’t load partner offers right now. Please try again shortly.'
+                        />
+                    ) : discounts.length > 0 ? (
+                        <DiscountsExplorer discounts={discounts} categories={categories} />
+                    ) : (
+                        <EmptyState
+                            icon={Tag}
+                            title='No Discounts Yet'
+                            description='New partner offers are on the way — check back soon.'
+                        />
+                    )}
                     <BenySection active={beny?.active ?? false} />
                 </>
             ) : (

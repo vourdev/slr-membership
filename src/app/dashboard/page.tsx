@@ -1,173 +1,110 @@
-import type { ReactNode } from 'react';
+import type { FC } from 'react';
 
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import EmptyState from '@/components/common/empty-state';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { type AdminDashboard, getAdminDashboard } from '@/lib/api/resources/admin';
+import { getAccessToken } from '@/lib/api/server';
 
-import { CalendarClock, Coins, Crown, Sparkles, Tag, Ticket, Trophy } from 'lucide-react';
+import { AlertTriangle, CircleAlert, CreditCard, DollarSign, Gift, type LucideIcon, Users } from 'lucide-react';
 
-// Dummy data — swap for API once auth/data endpoints are ready.
-const member = {
-    name: 'SLR Admin',
-    tier: 'SLR Blue',
-    tierLabel: 'Premium',
-    tokens: 1250,
-    spinAvailable: true,
-    cycleProgress: 64
-};
+const StatCard: FC<{ label: string; value: string; icon: LucideIcon; hint?: string }> = ({
+    label,
+    value,
+    icon: Icon,
+    hint
+}) => (
+    <Card>
+        <CardHeader>
+            <CardDescription>{label}</CardDescription>
+            <CardTitle className='flex items-center gap-2 text-2xl font-semibold tabular-nums'>
+                <Icon className='text-slr-gold-label size-5' /> {value}
+            </CardTitle>
+        </CardHeader>
+        {hint && <CardContent className='text-muted-foreground -mt-2 text-xs'>{hint}</CardContent>}
+    </Card>
+);
 
-const entry = {
-    count: 26,
-    status: 'Active',
-    pool: 'SLR Blue · NSW',
-    resets: '1 Jul 2026'
-};
+const Breakdown: FC<{ title: string; rows: { label: string; count: number }[] }> = ({ title, rows }) => (
+    <Card>
+        <CardHeader>
+            <CardTitle className='text-base'>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className='space-y-2 text-sm'>
+            {rows.length === 0 ? (
+                <p className='text-muted-foreground'>No data.</p>
+            ) : (
+                rows.map((r) => (
+                    <div key={r.label} className='flex items-center justify-between'>
+                        <span className='text-muted-foreground uppercase'>{r.label}</span>
+                        <span className='font-semibold tabular-nums'>{r.count.toLocaleString()}</span>
+                    </div>
+                ))
+            )}
+        </CardContent>
+    </Card>
+);
 
-const nextDraw = {
-    date: 'Sat, 5 Jul 2026',
-    time: '8:00 PM AEST',
-    pool: 'SLR Blue · NSW',
-    prizePool: '$24,000',
-    entriesInPool: '1,840'
-};
+const formatMrr = (cents: number) => `$${Math.round(cents / 100).toLocaleString('en-AU')}`;
 
-const discounts = [
-    { brand: 'Coles', category: 'Groceries', value: '5% off' },
-    { brand: 'BP', category: 'Fuel', value: '4¢ / L' },
-    { brand: 'JB Hi-Fi', category: 'Electronics', value: '10% off' },
-    { brand: 'Woolworths', category: 'Groceries', value: '5% off' }
-];
+export default async function DashboardHome() {
+    const token = await getAccessToken();
 
-function Row({ label, children }: { label: string; children: ReactNode }) {
-    return (
-        <div className='flex items-center justify-between'>
-            <span className='text-muted-foreground'>{label}</span>
-            {children}
-        </div>
-    );
-}
+    let data: AdminDashboard | null = null;
+    try {
+        data = token ? await getAdminDashboard(token) : null;
+    } catch {
+        data = null;
+    }
 
-export default function DashboardHome() {
+    if (!data) {
+        return (
+            <div className='px-4 py-8 md:px-6'>
+                <EmptyState
+                    icon={CircleAlert}
+                    title='Dashboard Unavailable'
+                    description='Could not load admin metrics right now. Please try again shortly.'
+                />
+            </div>
+        );
+    }
+
     return (
         <div className='flex flex-1 flex-col gap-6 px-4 py-6 md:px-6'>
-            {/* Header */}
-            <div className='flex flex-wrap items-center justify-between gap-3'>
-                <div>
-                    <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>Welcome back, {member.name}</h1>
-                    <p className='text-muted-foreground text-sm'>Your SLR membership &amp; draw summary.</p>
-                </div>
-                <Badge variant='outline' className='border-slr-gold-label/40 text-slr-gold-label gap-1'>
-                    <Crown className='size-3.5' /> {member.tier} · {member.tierLabel}
-                </Badge>
+            <div>
+                <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>Dashboard</h1>
+                <p className='text-muted-foreground text-sm'>Platform overview & metrics.</p>
             </div>
 
-            {/* Summary cards */}
-            <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                {/* Tier & Token Summary */}
-                <Card>
-                    <CardHeader>
-                        <CardDescription>Tier &amp; Token Summary</CardDescription>
-                        <CardTitle className='flex items-center gap-2 text-2xl font-semibold tabular-nums'>
-                            <Coins className='text-slr-gold-label size-5' /> {member.tokens.toLocaleString()} Tokens
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className='space-y-3 text-sm'>
-                        <Row label='Current tier'>
-                            <span className='font-medium'>{member.tier}</span>
-                        </Row>
-                        <div className='space-y-1.5'>
-                            <div className='text-muted-foreground flex justify-between text-xs'>
-                                <span>Cycle progress</span>
-                                <span>{member.cycleProgress}%</span>
-                            </div>
-                            <Progress value={member.cycleProgress} />
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Badge variant='outline' className='gap-1'>
-                            <Sparkles className='size-3.5' />
-                            {member.spinAvailable ? 'Spin available' : 'Spin used'}
-                        </Badge>
-                    </CardFooter>
-                </Card>
-
-                {/* Entry Status */}
-                <Card>
-                    <CardHeader>
-                        <CardDescription>Entry Status</CardDescription>
-                        <CardTitle className='flex items-center gap-2 text-2xl font-semibold tabular-nums'>
-                            <Ticket className='text-slr-gold-label size-5' /> {entry.count} Entries
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className='space-y-2 text-sm'>
-                        <Row label='Status'>
-                            <Badge className='border-transparent bg-emerald-600/15 text-emerald-500'>
-                                {entry.status}
-                            </Badge>
-                        </Row>
-                        <Row label='Draw pool'>
-                            <span className='font-medium'>{entry.pool}</span>
-                        </Row>
-                        <Row label='Cycle reset'>
-                            <span className='font-medium'>{entry.resets}</span>
-                        </Row>
-                    </CardContent>
-                    <CardFooter className='text-muted-foreground text-xs'>Entries reset each cycle.</CardFooter>
-                </Card>
-
-                {/* Next Draw */}
-                <Card className='xl:col-span-1'>
-                    <CardHeader>
-                        <CardDescription>Next Draw</CardDescription>
-                        <CardTitle className='flex items-center gap-2 text-2xl font-semibold'>
-                            <CalendarClock className='text-slr-gold-label size-5' /> {nextDraw.date}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className='space-y-2 text-sm'>
-                        <Row label='Time'>
-                            <span className='font-medium'>{nextDraw.time}</span>
-                        </Row>
-                        <Row label='Pool'>
-                            <span className='font-medium'>{nextDraw.pool}</span>
-                        </Row>
-                        <Row label='Total prize'>
-                            <span className='text-slr-gold-label flex items-center gap-1 font-semibold'>
-                                <Trophy className='size-4' />
-                                {nextDraw.prizePool}
-                            </span>
-                        </Row>
-                        <Row label='Entries in pool'>
-                            <span className='font-medium'>{nextDraw.entriesInPool}</span>
-                        </Row>
-                    </CardContent>
-                </Card>
+            <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
+                <StatCard label='Total Members' value={data.total_members.toLocaleString()} icon={Users} />
+                <StatCard
+                    label='Active Subscriptions'
+                    value={data.active_subscriptions.toLocaleString()}
+                    icon={CreditCard}
+                />
+                <StatCard label='Monthly Recurring Revenue' value={formatMrr(data.mrr_cents)} icon={DollarSign} />
+                <StatCard
+                    label='Failed Payments (30d)'
+                    value={data.alerts.failed_payments_30d.toLocaleString()}
+                    icon={AlertTriangle}
+                    hint={`${data.alerts.pending_beny_activations} pending BENY activations`}
+                />
             </div>
 
-            {/* Featured Discounts */}
-            <div className='space-y-3'>
-                <div className='flex flex-wrap items-center justify-between gap-2'>
-                    <h2 className='text-lg font-semibold'>Featured Discounts</h2>
-                    <span className='text-muted-foreground text-sm'>Selected partner offers</span>
-                </div>
-                <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                    {discounts.map((d) => (
-                        <Card key={d.brand}>
-                            <CardHeader>
-                                <div className='bg-gold-tint flex size-10 items-center justify-center rounded-xl border border-[#D4AF3759]'>
-                                    <Tag className='text-slr-gold-label size-5' />
-                                </div>
-                                <CardTitle className='pt-2 text-base'>{d.brand}</CardTitle>
-                                <CardDescription>{d.category}</CardDescription>
-                            </CardHeader>
-                            <CardFooter>
-                                <Badge variant='outline' className='border-slr-gold-label/40 text-slr-gold-label'>
-                                    {d.value}
-                                </Badge>
-                            </CardFooter>
-                        </Card>
-                    ))}
-                </div>
+            <div className='grid gap-4 md:grid-cols-2'>
+                <Breakdown
+                    title='Members by Tier'
+                    rows={data.members_by_tier.map((t) => ({ label: t.tier, count: t.count }))}
+                />
+                <Breakdown
+                    title='Members by State'
+                    rows={data.members_by_state.map((s) => ({ label: s.state, count: s.count }))}
+                />
             </div>
+
+            <p className='text-muted-foreground flex items-center gap-2 text-xs'>
+                <Gift className='size-3.5' /> Draws, winners & TPAL export live under their own admin sections.
+            </p>
         </div>
     );
 }

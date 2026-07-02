@@ -11,21 +11,34 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
             const { pathname } = nextUrl;
 
-            // Both the admin dashboard and the member area require a session.
-            const isProtectedRoute =
-                pathname.startsWith('/dashboard') || pathname.startsWith('/member') || pathname.startsWith('/ebooks');
+            const role = ((auth?.user as { role?: string })?.role ?? '').toLowerCase();
+            // admin + super_admin are staff → dashboard only. Everyone else (member:
+            // visitor/red/blue) → member area only.
+            const isAdmin = role.includes('admin');
+            const home = isAdmin ? '/dashboard' : '/member';
+
+            const isDashboard = pathname.startsWith('/dashboard');
+            const isMemberArea = pathname.startsWith('/member') || pathname.startsWith('/ebooks');
             const isAuthPage = pathname.startsWith('/sign-in');
 
-            if (!isLoggedIn && isProtectedRoute) {
+            // Not logged in → any protected route → sign-in.
+            if (!isLoggedIn && (isDashboard || isMemberArea)) {
                 return Response.redirect(new URL('/sign-in', nextUrl));
             }
 
-            if (isLoggedIn && isAuthPage) {
-                // Land staff on the admin dashboard, members on the member area.
-                const role = (auth!.user as { role?: string }).role ?? '';
-                const isStaff = /ADMIN|SPV/.test(role);
-
-                return Response.redirect(new URL(isStaff ? '/dashboard' : '/member', nextUrl));
+            if (isLoggedIn) {
+                // Role-based separation: admins can't enter the member area,
+                // members can't enter the dashboard.
+                if (isDashboard && !isAdmin) {
+                    return Response.redirect(new URL('/member', nextUrl));
+                }
+                if (isMemberArea && isAdmin) {
+                    return Response.redirect(new URL('/dashboard', nextUrl));
+                }
+                // Already authed on the sign-in page → send to their home.
+                if (isAuthPage) {
+                    return Response.redirect(new URL(home, nextUrl));
+                }
             }
 
             return true;
@@ -33,9 +46,12 @@ export const authConfig = {
         async jwt({ token, user }) {
             if (user) {
                 token.accessToken = (user as any).accessToken;
+                token.refreshToken = (user as any).refreshToken;
                 token.role = (user as any).role;
                 token.user_id = (user as any).user_id;
-                token.region_id = (user as any).region_id;
+                token.tier = (user as any).tier;
+                token.sub_tier = (user as any).sub_tier;
+                token.state = (user as any).state;
             }
 
             return token;
@@ -44,9 +60,12 @@ export const authConfig = {
         async session({ session, token }) {
             if (session.user) {
                 (session.user as any).accessToken = token.accessToken;
+                (session.user as any).refreshToken = token.refreshToken;
                 (session.user as any).role = token.role;
                 (session.user as any).user_id = token.user_id;
-                (session.user as any).region_id = token.region_id;
+                (session.user as any).tier = token.tier;
+                (session.user as any).sub_tier = token.sub_tier;
+                (session.user as any).state = token.state;
             }
 
             return session;

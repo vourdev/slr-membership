@@ -1,99 +1,57 @@
 import { authConfig } from '@/auth.config';
-import { API_BASE_URL, API_ENDPOINTS } from '@/lib/api-endpoints';
+import { login as apiLogin, getMe } from '@/lib/api/resources/auth';
+import { ApiError } from '@/lib/api/types';
 
-import axios from 'axios';
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-
-type LoginResponse = {
-    success: boolean;
-    data?: {
-        token: string;
-        message?: string;
-        user: { user_id: string; full_name: string; email: string };
-        roles: { name: string }[];
-    };
-};
-
-type UserDetailResponse = {
-    success: boolean;
-    data?: {
-        region?: { region_id?: string | null };
-    };
-};
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
         Credentials({
             credentials: { email: {}, password: {} },
-            async authorize(credentials, req) {
+            async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
 
-                // Dev-only bypass while the auth API is under development.
+                const email = String(credentials.email);
+                const password = String(credentials.password);
+
+                // Dev-only bypass while integrating (gated by env).
                 const devLoginEnabled = process.env.NEXT_PUBLIC_ALLOW_DEV_LOGIN === 'true';
-                if (devLoginEnabled && credentials.email === 'SLRadmin' && credentials.password === 'SLRadmin') {
+                if (devLoginEnabled && email === 'SLRadmin' && password === 'SLRadmin') {
                     return {
                         id: 'dev-admin',
                         user_id: 'dev-admin',
                         name: 'SLR Admin',
                         email: 'admin@slr.dev',
                         role: 'ROLE_ADMIN',
+                        tier: 'admin',
+                        sub_tier: null,
+                        state: '',
                         accessToken: 'dev-token',
-                        region_id: ''
+                        refreshToken: null
                     };
                 }
 
-                const forwarded = req.headers.get('x-forwarded-for');
-                const clientIp = typeof forwarded === 'string' ? forwarded.split(',')[0] : '127.0.0.1';
-
                 try {
-                    const { data } = await axios.post<LoginResponse>(
-                        `${API_BASE_URL}${API_ENDPOINTS.authLogin}`,
-                        {
-                            email: credentials.email,
-                            password: credentials.password
-                        },
-                        {
-                            headers: {
-                                'X-Forwarded-For': clientIp,
-                                'X-Real-IP': clientIp
-                            }
-                        }
-                    );
-
-                    if (!data.success || !data.data) return null;
-
-                    const { user, token, roles } = data.data;
-
-                    let region_id = '';
-                    try {
-                        const detail = await axios.get<UserDetailResponse>(
-                            `${API_BASE_URL}/api/users/${user.user_id}`,
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                    'X-Forwarded-For': clientIp
-                                }
-                            }
-                        );
-                        region_id = detail.data?.data?.region?.region_id ?? '';
-                    } catch {
-                        region_id = '';
-                    }
+                    // Login returns the token + minimal user; /auth/me fills name/email/state.
+                    const session = await apiLogin(email, password);
+                    const me = await getMe(session.access_token);
 
                     return {
-                        id: user.user_id,
-                        user_id: user.user_id,
-                        name: user.full_name,
-                        email: user.email,
-                        role: roles?.[0]?.name ?? 'ROLE_USER',
-                        accessToken: token,
-                        region_id
+                        id: me.user_id,
+                        user_id: me.user_id,
+                        name: me.full_name,
+                        email: me.email,
+                        role: session.user.role,
+                        tier: session.user.tier,
+                        sub_tier: session.user.sub_tier ?? null,
+                        state: me.state,
+                        accessToken: session.access_token,
+                        refreshToken: session.refresh_token ?? null
                     };
-                } catch (error: any) {
-                    const errorMessage = error.response?.data?.message || 'Login failed';
-                    throw new Error(errorMessage);
+                } catch (error) {
+                    throw new Error(error instanceof ApiError ? error.message : 'Login failed');
                 }
             }
         })

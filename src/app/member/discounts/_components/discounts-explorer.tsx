@@ -3,9 +3,9 @@
 import { useMemo, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
+import type { Discount } from '@/lib/api/resources/discounts';
 import { inputClassName } from '@/lib/styles';
 import { cn } from '@/lib/utils';
-import type { Discount } from '@/types/member';
 
 import { DiscountCard } from './discount-card';
 import { Search } from 'lucide-react';
@@ -19,7 +19,11 @@ export function DiscountsExplorer({ discounts, categories }: { discounts: Discou
 
         return discounts.filter((d) => {
             const matchesCategory = category === 'All' || d.category === category;
-            const matchesQuery = !q || d.brand.toLowerCase().includes(q) || d.category.toLowerCase().includes(q);
+            const matchesQuery =
+                !q ||
+                d.partner_name.toLowerCase().includes(q) ||
+                d.title.toLowerCase().includes(q) ||
+                d.category.toLowerCase().includes(q);
 
             return matchesCategory && matchesQuery;
         });
@@ -59,7 +63,7 @@ export function DiscountsExplorer({ discounts, categories }: { discounts: Discou
             {filtered.length > 0 ? (
                 <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                     {filtered.map((d) => (
-                        <DiscountCard key={d.id} discount={d} />
+                        <DiscountCard key={d.discount_id} discount={d} />
                     ))}
                 </div>
             ) : (

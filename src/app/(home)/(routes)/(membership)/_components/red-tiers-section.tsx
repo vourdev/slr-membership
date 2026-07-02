@@ -19,6 +19,8 @@ const mainBenefits = [
 type TierRow = {
     icon: string;
     name: string;
+    /** Sub-tier code — used to map live prices from the API. */
+    code: string;
     price: string;
     tokens: string;
     /** Spin-wheel discount label, e.g. "$5 Off" — null for the standard tier. */
@@ -50,6 +52,7 @@ const tiers: TierRow[] = [
     {
         icon: '/icons/ic-list-slr-red-reward-1.webp',
         name: 'Standard',
+        code: 'R1',
         price: '$10',
         tokens: '1 Token',
         spin: null,
@@ -61,6 +64,7 @@ const tiers: TierRow[] = [
     {
         icon: '/icons/ic-list-slr-red-reward-2.webp',
         name: 'Plus',
+        code: 'R4',
         price: '$20',
         tokens: '4 Tokens',
         spin: '$5 Off',
@@ -72,6 +76,7 @@ const tiers: TierRow[] = [
     {
         icon: '/icons/ic-list-slr-red-reward-3.webp',
         name: 'Premium',
+        code: 'R7',
         price: '$30',
         tokens: '7 Tokens',
         spin: '$10 Off',
@@ -94,7 +99,7 @@ const Badge: FC<{ children: ReactNode; icon?: ReactNode }> = ({ children, icon }
     </span>
 );
 
-const RedTiersSection = () => {
+const RedTiersSection = ({ prices }: { prices?: Record<string, string> }) => {
     return (
         <section className='bg-slr-ink relative isolate overflow-hidden py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
@@ -219,7 +224,7 @@ const RedTiersSection = () => {
                                         </div>
                                         <p className='mt-1 flex items-baseline gap-1.5'>
                                             <span className='text-gradient-gold font-bebas-neue text-3xl font-extrabold xl:text-4xl'>
-                                                {tier.price}
+                                                {prices?.[tier.code] ?? tier.price}
                                             </span>
                                             <span className='text-xs text-white/70'>/month</span>
                                         </p>

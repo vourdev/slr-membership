@@ -1,7 +1,8 @@
 'use server';
+import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
 
-import { signIn } from '@/auth';
+import { auth, signIn } from '@/auth';
 import { SignInSchema, SignUpSchema } from '@/lib/zod';
 
 import { AuthError } from 'next-auth';
@@ -48,7 +49,7 @@ export const signInCredentials = async (prevState: unknown, formData: FormData) 
     const { password, email } = validateFields.data;
 
     try {
-        await signIn('credentials', { email, password, redirectTo: '/dashboard' });
+        await signIn('credentials', { email, password, redirect: false });
     } catch (error) {
         if (error instanceof AuthError) {
             const apiMessage = error.cause?.err?.message;
@@ -62,4 +63,10 @@ export const signInCredentials = async (prevState: unknown, formData: FormData) 
         }
         throw error;
     }
+
+    // Land staff on the dashboard, members on the member area. Middleware
+    // enforces the same split as a fallback.
+    const session = await auth();
+    const role = ((session?.user as { role?: string })?.role ?? '').toLowerCase();
+    redirect(role.includes('admin') ? '/dashboard' : '/member');
 };
