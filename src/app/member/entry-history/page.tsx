@@ -1,16 +1,59 @@
 import type { Metadata } from 'next';
 
-import { ComingSoon } from '../_components/coming-soon';
+import EmptyState from '@/components/common/empty-state';
+import { getAccessToken } from '@/lib/api/server';
+import { handleApiAuthError } from '@/lib/api/guard';
+import { getEntryHistory, type EntryCycle, type EntryHistoryResponse } from '@/lib/api/resources/entries';
+
+import { EntryHistoryTable } from './_components/entry-history-table';
+import { History, CircleAlert } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Entry History · SLR Member'
 };
 
-export default function EntryHistoryPage() {
+export default async function EntryHistoryPage() {
+    const token = await getAccessToken();
+    if (!token) return null; // handled by middleware/layout
+
+    let data: EntryHistoryResponse | null = null;
+    let failed = false;
+
+    try {
+        data = await getEntryHistory(token);
+    } catch (error) {
+        handleApiAuthError(error);
+        failed = true;
+    }
+
+    const entries: EntryCycle[] = [];
+    if (data?.current_cycle) entries.push(data.current_cycle);
+    if (data?.history?.length) entries.push(...data.history);
+
     return (
-        <ComingSoon
-            title='Entry History'
-            description='Your per-cycle entry history — tokens, referral bonus, tier changes and entry status — will be available here soon.'
-        />
+        <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
+            <header className='space-y-1'>
+                <h1 className='font-bebas-neue text-3xl tracking-wide uppercase sm:text-4xl'>Entry History</h1>
+                <p className='text-slr-muted text-sm md:text-base'>
+                    Your entry status and tokens grouped by billing cycle. Tokens are allocated to all eligible draws within that cycle.
+                </p>
+            </header>
+
+            {failed ? (
+                <EmptyState
+                    icon={CircleAlert}
+                    title='History Unavailable'
+                    description='We couldn’t load your entry history right now. Please try again shortly.'
+                />
+            ) : !entries.length ? (
+                <EmptyState
+                    icon={History}
+                    title='No Entry History'
+                    description='You do not have any entry cycles yet. Your entries will appear here once your cycle starts.'
+                />
+            ) : (
+                <EntryHistoryTable entries={entries} />
+            )}
+        </div>
     );
 }

@@ -1,35 +1,24 @@
 import { EntryStatusBadge } from '@/components/common/entry-status-badge';
 import { TierBadge } from '@/components/common/tier-badge';
 import { SUB_TIERS } from '@/constant/tiers';
+import type { EntryCycle } from '@/lib/api/resources/entries';
 import { cn } from '@/lib/utils';
-import type { EntryHistoryEntry, SubTierCode, TierChange } from '@/types/member';
-
-import { ArrowDown, ArrowUp } from 'lucide-react';
-
-function TierChangeBadge({ change, from }: { change: TierChange; from?: SubTierCode }) {
-    if (!change) return null;
-    const up = change === 'upgrade';
-
-    return (
-        <span
-            className={cn(
-                'inline-flex items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-xs font-semibold uppercase',
-                up
-                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-                    : 'border-amber-500/30 bg-amber-500/10 text-amber-400'
-            )}>
-            {up ? <ArrowUp className='size-3' /> : <ArrowDown className='size-3' />}
-            {up ? 'Upgrade' : 'Downgrade'}
-            {from && <span className='font-normal opacity-80'>from {SUB_TIERS[from].label}</span>}
-        </span>
-    );
-}
+import type { SubTierCode } from '@/types/member';
 
 function tokenText(value: number, prefix = ''): string {
-    return value > 0 ? `${prefix}${value}` : '—';
+    return value > 0 ? `${prefix}${value}` : '-';
 }
 
-export function EntryHistoryTable({ entries }: { entries: EntryHistoryEntry[] }) {
+function formatDateRange(startStr: string, endStr: string): string {
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    const fmt = new Intl.DateTimeFormat('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+    return `${fmt.format(start)} – ${fmt.format(end)}`;
+}
+
+export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
+    if (!entries.length) return null;
+
     return (
         <>
             {/* Desktop table */}
@@ -46,32 +35,28 @@ export function EntryHistoryTable({ entries }: { entries: EntryHistoryEntry[] })
                         </tr>
                     </thead>
                     <tbody>
-                        {entries.map((e) => (
-                            <tr key={e.id} className='border-slr-navy-border/50 border-b last:border-0'>
+                        {entries.map((e, index) => (
+                            <tr key={e.cycle_id} className='border-slr-navy-border/50 border-b last:border-0'>
                                 <td className='px-4 py-3'>
-                                    <p className='font-medium text-white'>{e.cycle_label}</p>
-                                    <p className='text-slr-dim text-xs'>{e.cycle_range}</p>
+                                    <p className='font-medium text-white'>{index === 0 ? 'Current Cycle' : 'Past Cycle'}</p>
+                                    <p className='text-slr-dim text-xs'>{formatDateRange(e.start_at, e.end_at)}</p>
                                 </td>
                                 <td className='px-4 py-3'>
                                     <div className='flex items-center gap-2'>
-                                        <TierBadge subTier={e.sub_tier} size='sm' />
-                                        <TierChangeBadge change={e.tier_change} from={e.changed_from} />
+                                        <TierBadge subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'} size='sm' />
                                     </div>
                                 </td>
                                 <td className='px-4 py-3 text-right text-white/90 tabular-nums'>
-                                    {tokenText(e.base_tokens)}
+                                    {tokenText(e.base_token)}
                                 </td>
                                 <td className='px-4 py-3 text-right text-white/90 tabular-nums'>
                                     {tokenText(e.referral_bonus, '+')}
                                 </td>
                                 <td className='px-4 py-3 text-right font-semibold text-white tabular-nums'>
-                                    {e.total_tokens}
+                                    {e.total_token || 0}
                                 </td>
                                 <td className='px-4 py-3'>
                                     <EntryStatusBadge status={e.entry_status} />
-                                    {e.inactive_reason && (
-                                        <p className='text-slr-dim mt-1 text-xs'>{e.inactive_reason}</p>
-                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -81,25 +66,24 @@ export function EntryHistoryTable({ entries }: { entries: EntryHistoryEntry[] })
 
             {/* Mobile cards */}
             <div className='space-y-3 md:hidden'>
-                {entries.map((e) => (
-                    <div key={e.id} className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-4'>
+                {entries.map((e, index) => (
+                    <div key={e.cycle_id} className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-4'>
                         <div className='flex items-start justify-between gap-2'>
                             <div>
-                                <p className='font-medium text-white'>{e.cycle_label}</p>
-                                <p className='text-slr-dim text-xs'>{e.cycle_range}</p>
+                                <p className='font-medium text-white'>{index === 0 ? 'Current Cycle' : 'Past Cycle'}</p>
+                                <p className='text-slr-dim text-xs'>{formatDateRange(e.start_at, e.end_at)}</p>
                             </div>
                             <EntryStatusBadge status={e.entry_status} />
                         </div>
 
                         <div className='mt-3 flex flex-wrap items-center gap-2'>
-                            <TierBadge subTier={e.sub_tier} size='sm' />
-                            <TierChangeBadge change={e.tier_change} from={e.changed_from} />
+                            <TierBadge subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'} size='sm' />
                         </div>
 
                         <div className='mt-3 grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-center'>
                             <div>
                                 <p className='text-slr-dim text-xs uppercase'>Base</p>
-                                <p className='text-white tabular-nums'>{tokenText(e.base_tokens)}</p>
+                                <p className='text-white tabular-nums'>{tokenText(e.base_token)}</p>
                             </div>
                             <div>
                                 <p className='text-slr-dim text-xs uppercase'>Referral</p>
@@ -107,11 +91,9 @@ export function EntryHistoryTable({ entries }: { entries: EntryHistoryEntry[] })
                             </div>
                             <div>
                                 <p className='text-slr-dim text-xs uppercase'>Total</p>
-                                <p className='font-semibold text-white tabular-nums'>{e.total_tokens}</p>
+                                <p className='font-semibold text-white tabular-nums'>{e.total_token || 0}</p>
                             </div>
                         </div>
-
-                        {e.inactive_reason && <p className='text-slr-dim mt-2 text-xs'>{e.inactive_reason}</p>}
                     </div>
                 ))}
             </div>

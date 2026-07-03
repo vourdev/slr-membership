@@ -1,23 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
+import { resendOtp, verifyOtp } from '@/lib/api/resources/auth';
+import { ApiError } from '@/lib/api/types';
 import { goldButtonStyle } from '@/lib/styles';
 
 import { ArrowLeft, Loader2Icon, MailCheck } from 'lucide-react';
+import { toast } from 'sonner';
 
 type StepOtpProps = {
     email: string;
+    userId: string;
     onNext: () => void;
     onBack: () => void;
 };
 
-const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
+const RESEND_COOLDOWN = 30;
+
+const StepOtp = ({ email, userId, onNext, onBack }: StepOtpProps) => {
     const [code, setCode] = useState('');
     const [verifying, setVerifying] = useState(false);
+    const [resending, setResending] = useState(false);
+    const [cooldown, setCooldown] = useState(0);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (cooldown <= 0) return;
+        const timer = setInterval(() => setCooldown((c) => c - 1), 1000);
+
+        return () => clearInterval(timer);
+    }, [cooldown]);
 
     const handleVerify = async () => {
         if (code.length !== 6) {
@@ -27,14 +42,30 @@ const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
         }
         setError(null);
         setVerifying(true);
-        await new Promise((resolve) => setTimeout(resolve, 900));
-        setVerifying(false);
-        onNext();
+        try {
+            await verifyOtp(userId, code);
+            onNext();
+        } catch (err) {
+            setError(err instanceof ApiError ? err.message : 'Verification failed. Please try again.');
+        } finally {
+            setVerifying(false);
+        }
     };
 
     const handleResend = async () => {
+        if (cooldown > 0 || resending) return;
         setCode('');
         setError(null);
+        setResending(true);
+        try {
+            await resendOtp(userId);
+            setCooldown(RESEND_COOLDOWN);
+            toast.success('A new code is on its way to your inbox.');
+        } catch (err) {
+            toast.error(err instanceof ApiError ? err.message : 'Could not resend the code. Please try again.');
+        } finally {
+            setResending(false);
+        }
     };
 
     return (
@@ -81,8 +112,9 @@ const StepOtp = ({ email, onNext, onBack }: StepOtpProps) => {
                     <button
                         type='button'
                         onClick={handleResend}
-                        className='font-semibold text-[#FFDC75] hover:underline'>
-                        Resend code
+                        disabled={cooldown > 0 || resending}
+                        className='font-semibold text-[#FFDC75] hover:underline disabled:cursor-not-allowed disabled:text-white/40 disabled:no-underline'>
+                        {resending ? 'Sending…' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
                     </button>
                 </p>
             </div>

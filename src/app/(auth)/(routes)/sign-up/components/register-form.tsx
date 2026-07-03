@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { register } from '@/lib/api/resources/auth';
+import { ApiError } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
 import StepAccount from './step-account';
@@ -12,6 +14,8 @@ import StepSuccess from './step-success';
 import StepTier from './step-tier';
 import Stepper from './stepper';
 import { SignUpFormData, SpinPrize, isSpinEligible, spinDiscountFor } from './types';
+import { Loader2Icon } from 'lucide-react';
+import { toast } from 'sonner';
 
 const glassStyle: React.CSSProperties = {
     background: 'linear-gradient(117.58deg, rgba(215, 237, 237, 0.16) -47.79%, rgba(204, 235, 235, 0) 100%)',
@@ -54,15 +58,50 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
     const [data, setData] = useState<SignUpFormData>(initialData);
     const [spinPrize, setSpinPrize] = useState<SpinPrize | null>(null);
     const [step, setStep] = useState<Step>('account');
+    // Visitor registration state — the created account whose OTP we verify next.
+    const [userId, setUserId] = useState<string | null>(null);
+    const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+    const [registering, setRegistering] = useState(false);
 
     const patchData = (patch: Partial<SignUpFormData>) => {
         setData((d) => ({ ...d, ...patch }));
     };
 
+    // Visitor path: create the account (sends the OTP email), then verify.
+    // Skip re-registering if we already created this exact email (Back → forward
+    // must not 409 on a duplicate).
+    const registerVisitor = async () => {
+        if (userId && registeredEmail === data.email) {
+            setStep('otp');
+
+            return;
+        }
+        setRegistering(true);
+        try {
+            const res = await register({
+                full_name: data.name,
+                email: data.email,
+                password: data.password,
+                state: data.state as Exclude<SignUpFormData['state'], ''>,
+                phone: data.phone,
+                tier: 'visitor'
+            });
+            setUserId(res.user_id);
+            setRegisteredEmail(data.email);
+            setStep('otp');
+        } catch (err) {
+            toast.error(err instanceof ApiError ? err.message : 'Registration failed. Please try again.');
+            // Send them back to the account step to fix the email/phone.
+            setStep('account');
+        } finally {
+            setRegistering(false);
+        }
+    };
+
     const goNextFromTier = (patch: Partial<SignUpFormData>) => {
         patchData(patch);
         if (patch.tier === 'visitor') {
-            setStep('otp');
+            registerVisitor();
 
             return;
         }
@@ -76,6 +115,14 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
     };
 
     const renderStep = () => {
+        if (registering) {
+            return (
+                <div className='flex flex-col items-center gap-4 py-16 text-center'>
+                    <Loader2Icon className='h-8 w-8 animate-spin text-[#FFDC75]' />
+                    <p className='text-slr-muted text-sm'>Creating your account…</p>
+                </div>
+            );
+        }
         switch (step) {
             case 'account':
                 return (
@@ -98,7 +145,14 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                     />
                 );
             case 'otp':
-                return <StepOtp email={data.email} onNext={() => setStep('success')} onBack={() => setStep('tier')} />;
+                return (
+                    <StepOtp
+                        email={data.email}
+                        userId={userId ?? ''}
+                        onNext={() => setStep('success')}
+                        onBack={() => setStep('tier')}
+                    />
+                );
             case 'checkout':
                 return (
                     <StepCheckout

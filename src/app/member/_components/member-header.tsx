@@ -16,6 +16,8 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useInitials } from '@/hooks/use-initials';
 import { logoutAction } from '@/lib/logout-action';
 import type { CurrentMember, MemberNotification } from '@/types/member';
+import type { NotificationDto } from '@/lib/api/resources/notifications';
+import { notificationDtoToMemberNotification } from '@/lib/api/resources/notifications';
 
 import { NotificationsPanel } from './notifications-panel';
 import { ChevronDown, LogOut, UserCircle } from 'lucide-react';
@@ -23,10 +25,12 @@ import { ChevronDown, LogOut, UserCircle } from 'lucide-react';
 interface MemberHeaderProps {
     user: { name?: string | null; email?: string | null; image?: string | null } | null;
     member: CurrentMember;
-    notifications: MemberNotification[];
+    notifications: NotificationDto[];
+    token: string | null;
 }
 
-export function MemberHeader({ user, member, notifications }: MemberHeaderProps) {
+export function MemberHeader({ user, member, notifications, token }: MemberHeaderProps) {
+    const memberNotifications: MemberNotification[] = notifications.map(notificationDtoToMemberNotification);
     const getInitials = useInitials();
     const email = user?.email ?? '';
     const firstName = member.name.split(' ')[0];
@@ -36,7 +40,7 @@ export function MemberHeader({ user, member, notifications }: MemberHeaderProps)
             <SidebarTrigger className='-ml-1' />
 
             <div className='ml-auto flex items-center gap-1.5 sm:gap-2'>
-                <NotificationsPanel initial={notifications} />
+                <NotificationsPanel initial={memberNotifications} token={token} />
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

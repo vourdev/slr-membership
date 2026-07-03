@@ -67,16 +67,23 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 6 / 75 endpoints integrated (called from the app).**
+**Ratio: 13 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
 | `POST /api/v1/auth/login` | `auth.ts` | NextAuth credentials |
 | `GET /api/v1/auth/me` | `auth.ts` | name/email/state/tier |
+| `POST /api/v1/auth/register` | `sign-up/.../register-form.tsx` | Visitor-only (paid deferred to Stripe task); returns `{user_id, requires_otp, requires_payment, spin_available}`. Dedup guard skips re-register on Back→forward |
+| `POST /api/v1/auth/verify-otp` | `sign-up/.../step-otp.tsx` | Visitor OTP; 401 on bad/expired code (caught locally, no forced logout). Returned session discarded → user signs in after |
+| `POST /api/v1/auth/resend-otp` | `sign-up/.../step-otp.tsx` | 30s client cooldown |
+| `POST /api/v1/auth/forgot-password` | `forgot-password/page.tsx` | Reset request |
+| `POST /api/v1/auth/reset-password` | `reset-password/.../reset-password-form.tsx` | Body `{reset_token, new_password}`; `reset_token` ≥20 chars server-validated. Reads `?token=` from email link |
 | `GET /api/v1/memberships/tiers` | `membership/page.tsx` | live prices + EmptyState (public) |
 | `GET /api/v1/admin/members` | `dashboard/(routes)/registrations` | live table |
 | `GET /api/v1/admin/dashboard` | `dashboard/page.tsx` | ops metrics |
 | `GET /api/v1/discounts/` | `member/discounts/page.tsx` | card reduced to API fields |
+| `GET /api/v1/entries/` | `member/entry-history/page.tsx` | user entry history + empty states |
+| `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
 
 **Mapped in `endpoints.ts`, not called:** `POST /auth/refresh`, `POST /auth/logout`, `GET /memberships/me`.
 
@@ -85,6 +92,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **Discounts API** lacks `value_label` / promo `code` / `terms` (list + detail).
 - **Dummy leftovers:** `data/discounts.ts` (`getDiscounts`, `DISCOUNTS`) orphaned; `data/member-dashboard.ts` mock; member dashboard "Featured Discounts", giveaways, entry-history, referral, billing, spin, ebooks still mock.
 - `getCurrentMember()` (discounts gate) reads dummy — should use session tier.
+- **Paid registration deferred** — register wizard only wires the Visitor path (register → OTP → sign-in). RED/BLUE still flow into the mock spin/checkout screens; `requires_payment`/`spin_available` flags + Stripe checkout land in the next task.
+- **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
 
 ### Suggested next
 `memberships/me` + `giveaways/` (member dashboard) · `ebooks/` (reader) · `auth/refresh` (stop forced logouts) · admin member detail/status/tier.
@@ -110,15 +119,15 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/api/v1/admin/members/{userId}` | admin | Get detailed member profile and history |
 | ✅ | GET | `/api/v1/admin/members` | admin | List all members with filters and pagination |
 | ❌ | GET | `/api/v1/audit/` | audit | Admin: query audit log (filter + cursor or page) |
-| ❌ | POST | `/api/v1/auth/forgot-password` | auth | Request password reset email |
+| ✅ | POST | `/api/v1/auth/forgot-password` | auth | Request password reset email |
 | ✅ | POST | `/api/v1/auth/login` | auth | Login with email + password |
 | 🟡 | POST | `/api/v1/auth/logout` | auth | Logout (revokes current session) |
 | ✅ | GET | `/api/v1/auth/me` | auth | Current user profile |
 | 🟡 | POST | `/api/v1/auth/refresh` | auth | Rotate refresh token, get a new access token |
-| ❌ | POST | `/api/v1/auth/register` | auth | Register a new user |
-| ❌ | POST | `/api/v1/auth/resend-otp` | auth | Resend OTP code |
-| ❌ | POST | `/api/v1/auth/reset-password` | auth | Confirm password reset with token |
-| ❌ | POST | `/api/v1/auth/verify-otp` | auth | Verify OTP code |
+| ✅ | POST | `/api/v1/auth/register` | auth | Register a new user |
+| ✅ | POST | `/api/v1/auth/resend-otp` | auth | Resend OTP code |
+| ✅ | POST | `/api/v1/auth/reset-password` | auth | Confirm password reset with token |
+| ✅ | POST | `/api/v1/auth/verify-otp` | auth | Verify OTP code |
 | ❌ | GET | `/api/v1/beny/status` | beny | Get current user BENY status |
 | ❌ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription |
 | ❌ | POST | `/api/v1/beny/subscribe` | beny | Subscribe to BENY add-on |
@@ -138,7 +147,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | DELETE | `/api/v1/ebooks/{id}` | ebooks | Admin: delete ebook |
 | ❌ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked |
 | ❌ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
-| ❌ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
+| ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
 | ❌ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier |
 | ❌ | GET | `/api/v1/giveaways/winners` | giveaways | List past giveaway winners |
 | ❌ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information |
@@ -150,10 +159,10 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | GET | `/api/v1/memberships/tiers` | membership | Active membership tiers |
 | ❌ | DELETE | `/api/v1/memberships/upgrade` | membership | Cancel scheduled pending upgrade/downgrade |
 | ❌ | POST | `/api/v1/memberships/upgrade` | membership | Upgrade or downgrade membership tier (Paid -> Paid scheduling) |
-| ❌ | GET | `/api/v1/notifications/` | notifications | Get my in-app notifications |
+| ✅ | GET | `/api/v1/notifications/` | notifications | Get my in-app notifications |
 | ❌ | GET | `/api/v1/notifications/admin/logs` | notifications | Admin: list sent notification delivery logs |
 | ❌ | POST | `/api/v1/notifications/admin/send` | notifications | Admin: send manual email notification |
-| ❌ | PUT | `/api/v1/notifications/{id}/read` | notifications | Mark notification as read |
+| ✅ | PUT | `/api/v1/notifications/{id}/read` | notifications | Mark notification as read |
 | ❌ | GET | `/api/v1/payments/` | payments | Admin: list payments |
 | ❌ | GET | `/api/v1/payments/me` | payments | My payments/invoice list |
 | ❌ | GET | `/api/v1/payments/{id}` | payments | Admin: payment detail |

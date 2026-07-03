@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { goldButtonStyle } from '@/lib/styles';
+import { requestPasswordReset } from '@/lib/api/resources/auth';
+import { toast } from 'sonner';
 
 import { Loader2Icon, MailCheck } from 'lucide-react';
 
@@ -26,9 +28,14 @@ const ForgotPasswordForm = () => {
         event.preventDefault();
         if (!email) return;
         setPending(true);
-        await new Promise((resolve) => setTimeout(resolve, 900));
-        setPending(false);
-        setSent(true);
+        try {
+            await requestPasswordReset(email);
+            setSent(true);
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to request password reset. Please try again.');
+        } finally {
+            setPending(false);
+        }
     };
 
     return (

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import type { MemberNotification, NotificationType } from '@/types/member';
+import { markNotificationRead } from '@/lib/api/resources/notifications';
+import { toast } from 'sonner';
 
 import {
     Bell,
@@ -45,19 +47,34 @@ function timeAgo(iso: string): string {
     return `${Math.floor(days / 7)}w`;
 }
 
-export function NotificationsPanel({ initial }: { initial: MemberNotification[] }) {
+export function NotificationsPanel({ initial, token }: { initial: MemberNotification[]; token: string | null }) {
     const router = useRouter();
     const [items, setItems] = useState<MemberNotification[]>(initial);
 
     const unread = items.filter((n) => !n.read_at).length;
 
-    const markAllRead = () =>
+    const markAllRead = () => {
+        // Optimistic update
         setItems((xs) => xs.map((n) => (n.read_at ? n : { ...n, read_at: new Date().toISOString() })));
+        // TODO: call API to mark all read (backend needs this endpoint)
+        toast.info('Mark all read (backend not implemented)');
+    };
 
-    const openItem = (n: MemberNotification) => {
+    const openItem = async (n: MemberNotification) => {
+        // Optimistic update
         setItems((xs) =>
             xs.map((x) => (x.id === n.id && !x.read_at ? { ...x, read_at: new Date().toISOString() } : x))
         );
+        // Call API to mark read
+        if (token && !n.read_at) {
+            try {
+                await markNotificationRead(n.id, token);
+            } catch (err: any) {
+                toast.error(err.message || 'Failed to mark notification as read.');
+                // Revert optimistic update if API fails
+                setItems(initial);
+            }
+        }
         if (n.href) router.push(n.href);
     };
 

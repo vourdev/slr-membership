@@ -6,7 +6,12 @@ export const API = {
         login: '/api/v1/auth/login',
         me: '/api/v1/auth/me',
         refresh: '/api/v1/auth/refresh',
-        logout: '/api/v1/auth/logout'
+        logout: '/api/v1/auth/logout',
+        register: '/api/v1/auth/register',
+        verifyOtp: '/api/v1/auth/verify-otp',
+        resendOtp: '/api/v1/auth/resend-otp',
+        forgotPassword: '/api/v1/auth/forgot-password',
+        resetPassword: '/api/v1/auth/reset-password'
     },
     memberships: {
         tiers: '/api/v1/memberships/tiers',
@@ -18,5 +23,12 @@ export const API = {
     },
     discounts: {
         list: '/api/v1/discounts/'
+    },
+    entries: {
+        history: '/api/v1/entries/'
+    },
+    notifications: {
+        list: '/api/v1/notifications/',
+        read: (id: string) => `/api/v1/notifications/${id}/read`
     }
 } as const;
