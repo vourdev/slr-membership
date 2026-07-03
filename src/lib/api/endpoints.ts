@@ -19,10 +19,17 @@ export const API = {
     },
     admin: {
         members: '/api/v1/admin/members',
-        dashboard: '/api/v1/admin/dashboard'
+        dashboard: '/api/v1/admin/dashboard',
+        memberDetail: (userId: string) => `/api/v1/admin/members/${userId}`,
+        deleteMember: (userId: string) => `/api/v1/admin/members/${userId}`
     },
     discounts: {
-        list: '/api/v1/discounts/'
+        list: '/api/v1/discounts/',
+        create: '/api/v1/discounts/',
+        remove: (id: string) => `/api/v1/discounts/${id}`
+    },
+    giveaways: {
+        winners: '/api/v1/giveaways/winners'
     },
     entries: {
         history: '/api/v1/entries/'

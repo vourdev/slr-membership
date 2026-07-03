@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './endpoints';
+import { logApi } from './logger';
 import { type ApiEnvelope, ApiError } from './types';
 
 type ApiFetchOptions = {
@@ -33,19 +34,35 @@ export async function apiFetch<T>(path: string, opts: ApiFetchOptions = {}): Pro
             ? { revalidate: revalidate === false ? undefined : revalidate, tags }
             : undefined;
 
-    const res = await fetch(`${API_BASE_URL}${path}`, {
-        method,
-        headers: {
-            Accept: 'application/json',
-            ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...headers
-        },
-        body: body !== undefined ? JSON.stringify(body) : undefined,
-        signal,
-        ...(cache ? { cache } : {}),
-        ...(next ? { next } : {})
-    });
+    const start = Date.now();
+
+    let res: Response;
+    try {
+        res = await fetch(`${API_BASE_URL}${path}`, {
+            method,
+            headers: {
+                Accept: 'application/json',
+                ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                ...headers
+            },
+            body: body !== undefined ? JSON.stringify(body) : undefined,
+            signal,
+            ...(cache ? { cache } : {}),
+            ...(next ? { next } : {})
+        });
+    } catch (networkError) {
+        // Request never reached the API (DNS, offline, aborted).
+        logApi({
+            method,
+            path,
+            status: 0,
+            ms: Date.now() - start,
+            ok: false,
+            error: { message: String(networkError) }
+        });
+        throw networkError;
+    }
 
     let json: ApiEnvelope<T> | undefined;
     try {
@@ -54,9 +71,23 @@ export async function apiFetch<T>(path: string, opts: ApiFetchOptions = {}): Pro
         // Non-JSON response (e.g. gateway error page).
     }
 
+    const ms = Date.now() - start;
+
     if (!res.ok || !json?.success) {
+        logApi({
+            method,
+            path,
+            status: res.status,
+            statusText: res.statusText,
+            message: json?.message ?? `Request failed (${res.status})`,
+            ms,
+            ok: false,
+            error: json ?? { message: `Request failed (${res.status})` }
+        });
         throw new ApiError(res.status, json?.message ?? `Request failed (${res.status})`, json);
     }
+
+    logApi({ method, path, status: res.status, message: json.message, ms, ok: true, data: json.data });
 
     return json.data;
 }

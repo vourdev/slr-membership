@@ -18,7 +18,7 @@ export default async function AppSidebarLayout({ children, breadcrumbs = [] }: A
         <AppShell variant='sidebar'>
             <AppSidebar user={user} />
             <AppContent variant='sidebar' className='overflow-x-hidden'>
-                <AppSidebarHeader breadcrumbs={breadcrumbs} />
+                <AppSidebarHeader breadcrumbs={breadcrumbs} user={user} />
                 {children}
             </AppContent>
         </AppShell>

@@ -16,13 +16,6 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild onClick={() => logoutAction()}>
-                <div className='block w-full' data-test='logout-button'>
-                    <LogOut className='mr-2' />
-                    Log out
-                </div>
-            </DropdownMenuItem>
         </>
     );
 }

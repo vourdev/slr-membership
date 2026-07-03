@@ -9,7 +9,7 @@ interface AppLayoutProps {
 }
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
-    <div className='slr-admin dark bg-background text-foreground min-h-screen'>
+    <div className='dashboard-theme dark bg-background text-foreground min-h-screen'>
         <AppSidebarLayout breadcrumbs={breadcrumbs} {...props}>
             <Toaster />
             {children}

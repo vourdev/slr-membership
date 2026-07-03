@@ -100,10 +100,10 @@
     --sidebar-ring: oklch(0.439 0 0);
 }
 
-/* Admin/dashboard scoped theme — dark SLR palette with gold primary. */
+/* Admin/dashboard scoped theme — matches the member navy palette (navy-deep base). */
 .slr-admin {
     color-scheme: dark;
-    --background: #040404;
+    --background: #131619;
     --foreground: oklch(0.985 0 0);
     --card: oklch(22% 0.05 250);
     --card-foreground: oklch(0.985 0 0);
@@ -122,11 +122,11 @@
     --border: oklch(30% 0.04 250);
     --input: oklch(30% 0.04 250);
     --ring: var(--slr-gold);
-    --sidebar: #0a0b0d;
+    --sidebar: #0f1316;
     --sidebar-foreground: oklch(0.95 0 0);
     --sidebar-primary: var(--slr-gold);
     --sidebar-primary-foreground: #0c1132;
-    --sidebar-accent: oklch(0.27 0.03 250);
+    --sidebar-accent: oklch(0.26 0.04 250);
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(28% 0.03 250);
     --sidebar-ring: var(--slr-gold);
@@ -163,6 +163,46 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(28% 0.03 250);
     --sidebar-ring: var(--slr-gold);
+}
+
+/* Dashboard-only theme — shadcn-admin dark palette (slate). Copied verbatim from
+   the shadcn-admin `.dark` tokens; scoped to the dashboard wrapper only so the
+   member area and public pages keep their SLR navy/gold themes. */
+.dashboard-theme {
+    color-scheme: dark;
+    --radius: 0.625rem;
+    --background: oklch(0.129 0.042 264.695);
+    --foreground: oklch(0.984 0.003 247.858);
+    --card: oklch(0.14 0.04 259.21);
+    --card-foreground: oklch(0.984 0.003 247.858);
+    --popover: oklch(0.208 0.042 265.755);
+    --popover-foreground: oklch(0.984 0.003 247.858);
+    --primary: oklch(0.929 0.013 255.508);
+    --primary-foreground: oklch(0.208 0.042 265.755);
+    --secondary: oklch(0.279 0.041 260.031);
+    --secondary-foreground: oklch(0.984 0.003 247.858);
+    --muted: oklch(0.279 0.041 260.031);
+    --muted-foreground: oklch(0.704 0.04 256.788);
+    --accent: oklch(0.279 0.041 260.031);
+    --accent-foreground: oklch(0.984 0.003 247.858);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.984 0.003 247.858);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.551 0.027 264.364);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.129 0.042 264.695);
+    --sidebar-foreground: oklch(0.984 0.003 247.858);
+    --sidebar-primary: oklch(0.929 0.013 255.508);
+    --sidebar-primary-foreground: oklch(0.208 0.042 265.755);
+    --sidebar-accent: oklch(0.279 0.041 260.031);
+    --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
 @theme inline {

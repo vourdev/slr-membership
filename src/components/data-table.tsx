@@ -221,7 +221,9 @@ const TableHeaderComponent = ({ columns }: { columns: Column[] }) => {
         <TableHeader>
             <TableRow>
                 {columns.map((column) => (
-                    <TableHead key={column.key} className={column.key === 'action' ? 'w-20' : 'font-semibold'}>
+                    <TableHead
+                        key={column.key}
+                        className={column.key === 'action' ? 'w-20' : 'text-muted-foreground font-medium'}>
                         {column.label}
                     </TableHead>
                 ))}

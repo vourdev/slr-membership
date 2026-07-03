@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
-import { Box, ChevronDown, ClipboardList, LayoutGrid, UsersIcon } from 'lucide-react';
+import { Box, ChevronDown, ClipboardList, LayoutGrid, Ticket, Trophy, UsersIcon } from 'lucide-react';
 
 export function NavMain({ user }) {
     const isSuperAdmin = user?.role?.includes('ROLE_SUPER_ADMIN');
@@ -27,9 +27,19 @@ export function NavMain({ user }) {
             icon: LayoutGrid
         },
         {
-            title: 'Registrations',
-            href: '/dashboard/registrations',
+            title: 'Members',
+            href: '/dashboard/members',
             icon: ClipboardList
+        },
+        {
+            title: 'Winners',
+            href: '/dashboard/winners',
+            icon: Trophy
+        },
+        {
+            title: 'Discounts',
+            href: '/dashboard/discounts',
+            icon: Ticket
         }
     ];
 
@@ -91,10 +101,10 @@ export function NavMain({ user }) {
                     if (!hasChildren) {
                         return (
                             <SidebarMenuItem key={href ?? item.title}>
-                                <SidebarMenuButton asChild isActive={isActive} tooltip={{ children: item.title }}>
+                                <SidebarMenuButton asChild isActive={isActive} tooltip={{ children: item.title, className: 'dashboard-theme dark' }}>
                                     <Link href={href ?? '#'} prefetch>
                                         {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
+                                        <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -107,9 +117,9 @@ export function NavMain({ user }) {
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton
                                         isActive={isChildActive || isActive}
-                                        tooltip={{ children: item.title }}>
+                                        tooltip={{ children: item.title, className: 'dashboard-theme dark' }}>
                                         {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
+                                        <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                                         <ChevronDown className='ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180' />
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
