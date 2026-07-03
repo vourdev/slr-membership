@@ -45,7 +45,7 @@ export interface AdminMemberDetailMembership {
     tier: string;
     tier_code: string;
     billing_status: string;
-    renew_at: string;
+    renew_at: string | null;
 }
 
 export interface AdminMemberDetailSubscription {
@@ -83,7 +83,7 @@ export interface AdminMemberDetail {
     status: 'active' | 'suspended' | 'deactivated' | string;
     created_at: string;
     membership: AdminMemberDetailMembership;
-    subscription: AdminMemberDetailSubscription;
+    subscription: AdminMemberDetailSubscription | null;
     cycles: AdminMemberDetailCycle[];
     wins: AdminMemberDetailWin[];
 }

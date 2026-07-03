@@ -16,25 +16,29 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { DiscountAdmin } from '@/lib/api/resources/discounts';
+import type { EbookAdmin, EbookTier } from '@/lib/api/resources/ebooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { discountsColumns } from './_components/columns';
-import { createDiscountAction, deleteDiscountAction } from './actions';
+import { ebooksColumns } from './_components/columns';
+import { createEbookAction, deleteEbookAction, updateEbookAction } from './actions';
 import { Loader2Icon, Plus, TriangleAlert } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-export type DiscountRow = {
+export type EbookRow = {
     id: string;
     title: string;
-    partner: string;
+    subtitle: string;
+    description: string;
+    coverUrl: string;
     category: string;
-    featured: string;
-    active: string;
+    tier?: EbookTier;
+    reading: number;
+    chapters: number;
+    locked: string;
 };
 
 export type ListError = {
@@ -44,81 +48,111 @@ export type ListError = {
     requestId: string | null;
 };
 
+const TIERS: EbookTier[] = ['VISITOR', 'RED', 'BLUE'];
+
 const formSchema = z.object({
     title: z.string().min(1, 'Title is required'),
-    partnerName: z.string().min(1, 'Partner name is required'),
-    category: z.string().min(1, 'Category is required'),
+    subtitle: z.string().optional(),
+    coverUrl: z.string().optional(),
     description: z.string().optional(),
-    isFeatured: z.boolean(),
-    isActive: z.boolean()
+    category: z.string().optional(),
+    tierAccess: z.enum(['VISITOR', 'RED', 'BLUE']),
+    readingTimeMinutes: z.number().min(0, 'Must be 0 or more')
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const adminToRow = (d: DiscountAdmin): DiscountRow => ({
-    id: d.id,
-    title: d.title || '-',
-    partner: d.partnerName || '-',
-    category: d.category || '-',
-    featured: d.isFeatured ? 'Yes' : 'No',
-    active: d.isActive ? 'Yes' : 'No'
+const EMPTY: FormValues = {
+    title: '',
+    subtitle: '',
+    coverUrl: '',
+    description: '',
+    category: '',
+    tierAccess: 'RED',
+    readingTimeMinutes: 0
+};
+
+const adminToRow = (e: EbookAdmin): EbookRow => ({
+    id: e.id,
+    title: e.title || '-',
+    subtitle: e.subtitle ?? '',
+    description: e.description ?? '',
+    coverUrl: e.coverUrl ?? '',
+    category: e.category || '-',
+    tier: e.tierAccess,
+    reading: e.readingTimeMinutes ?? 0,
+    chapters: e.chapterCount ?? 0,
+    locked: e.tierAccess === 'VISITOR' ? 'No' : 'Yes'
 });
 
 const ListErrorCard = ({ error }: { error: ListError }) => (
     <div className='rounded-xl border border-red-500/40 bg-red-500/5 p-4'>
         <div className='flex items-center gap-2 text-red-400'>
             <TriangleAlert className='h-4 w-4' />
-            <p className='text-sm font-semibold'>Discounts list unavailable — report this to the backend</p>
+            <p className='text-sm font-semibold'>Ebooks list failed — report this to the backend</p>
         </div>
-        <p className='text-muted-foreground mt-1 text-xs'>
-            {`GET /api/v1/discounts/ failed, so existing discounts can't be shown. New discounts you create below still work and can be deleted.`}
-        </p>
         <dl className='mt-3 grid grid-cols-1 gap-1 font-mono text-xs sm:grid-cols-2'>
             <div className='flex gap-2'>
                 <dt className='text-muted-foreground'>status</dt>
-                <dd className='text-white select-all'>{error.status}</dd>
+                <dd className='select-all'>{error.status}</dd>
             </div>
             <div className='flex gap-2'>
                 <dt className='text-muted-foreground'>code</dt>
-                <dd className='text-white select-all'>{error.code ?? '-'}</dd>
+                <dd className='select-all'>{error.code ?? '-'}</dd>
             </div>
             <div className='flex gap-2 sm:col-span-2'>
                 <dt className='text-muted-foreground'>message</dt>
-                <dd className='text-white select-all'>{error.message}</dd>
+                <dd className='select-all'>{error.message}</dd>
             </div>
             <div className='flex gap-2 sm:col-span-2'>
                 <dt className='text-muted-foreground'>requestId</dt>
-                <dd className='text-white select-all'>{error.requestId ?? '-'}</dd>
+                <dd className='select-all'>{error.requestId ?? '-'}</dd>
             </div>
         </dl>
     </div>
 );
 
-export function DiscountsClient({
-    initialRows,
-    listError
-}: {
-    initialRows: DiscountRow[];
-    listError: ListError | null;
-}) {
-    const [rows, setRows] = useState<DiscountRow[]>(initialRows);
+export function EbooksClient({ initialRows, listError }: { initialRows: EbookRow[]; listError: ListError | null }) {
+    const [rows, setRows] = useState<EbookRow[]>(initialRows);
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState<DiscountRow | null>(null);
+    const [editing, setEditing] = useState<EbookRow | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<EbookRow | null>(null);
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues: { title: '', partnerName: '', category: '', description: '', isFeatured: false, isActive: true }
+        resolver: zodResolver(formSchema) as Resolver<FormValues>,
+        defaultValues: EMPTY
     });
+
+    const openCreate = () => {
+        setEditing(null);
+        form.reset(EMPTY);
+        setDialogOpen(true);
+    };
+
+    const openEdit = (row: EbookRow) => {
+        setEditing(row);
+        form.reset({
+            title: row.title === '-' ? '' : row.title,
+            subtitle: row.subtitle,
+            coverUrl: row.coverUrl,
+            description: row.description,
+            category: row.category === '-' ? '' : row.category,
+            tierAccess: row.tier ?? 'RED',
+            readingTimeMinutes: row.reading
+        });
+        setDialogOpen(true);
+    };
 
     const onSubmit = (values: FormValues) => {
         startTransition(async () => {
-            const res = await createDiscountAction(values);
+            const res = editing ? await updateEbookAction(editing.id, values) : await createEbookAction(values);
             if (res.ok) {
-                setRows((prev) => [adminToRow(res.data), ...prev]);
+                const row = adminToRow(res.data);
+                setRows((prev) => (editing ? prev.map((r) => (r.id === editing.id ? row : r)) : [row, ...prev]));
                 toast.success(res.message);
-                form.reset();
                 setDialogOpen(false);
+                setEditing(null);
             } else {
                 toast.error(res.code ? `${res.message} (${res.code})` : res.message);
             }
@@ -129,12 +163,12 @@ export function DiscountsClient({
         if (!deleteTarget) return;
         const { id } = deleteTarget;
         startTransition(async () => {
-            const res = await deleteDiscountAction(id);
+            const res = await deleteEbookAction(id);
             if (res.ok) {
                 setRows((prev) => prev.filter((r) => r.id !== id));
                 toast.success(res.message);
             } else {
-                toast.error(res.message);
+                toast.error(res.code ? `${res.message} (${res.code})` : res.message);
             }
             setDeleteTarget(null);
         });
@@ -143,10 +177,10 @@ export function DiscountsClient({
     return (
         <div className='mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-auto px-4 py-6'>
             <div className='flex items-center justify-between'>
-                <Heading title='Discounts' description='Create and remove partner discounts' />
-                <Button onClick={() => setDialogOpen(true)}>
+                <Heading title='Ebooks' description='Create, edit and remove ebooks' />
+                <Button onClick={openCreate}>
                     <Plus className='mr-2 h-4 w-4' />
-                    New Discount
+                    New Ebook
                 </Button>
             </div>
 
@@ -154,16 +188,21 @@ export function DiscountsClient({
 
             <DataTable
                 searchKey='title'
-                columns={discountsColumns}
+                columns={ebooksColumns}
                 data={rows}
-                onDelete={(row) => setDeleteTarget(row as DiscountRow)}
+                onEdit={(row) => openEdit(row as EbookRow)}
+                onDelete={(row) => setDeleteTarget(row as EbookRow)}
             />
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className='dashboard-theme dark sm:max-w-lg'>
                     <DialogHeader>
-                        <DialogTitle>New discount</DialogTitle>
-                        <DialogDescription>Add a partner discount to the platform.</DialogDescription>
+                        <DialogTitle>{editing ? 'Edit ebook' : 'New ebook'}</DialogTitle>
+                        <DialogDescription>
+                            {editing
+                                ? 'The list does not expose the tier, so re-select it before saving.'
+                                : 'Add an ebook to the library.'}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <Form {...form}>
@@ -175,7 +214,7 @@ export function DiscountsClient({
                                     <FormItem>
                                         <FormLabel>Title</FormLabel>
                                         <FormControl>
-                                            <Input placeholder='20% off at …' {...field} />
+                                            <Input placeholder='Smart Money Essentials' {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -183,25 +222,12 @@ export function DiscountsClient({
                             />
                             <FormField
                                 control={form.control}
-                                name='partnerName'
+                                name='subtitle'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Partner name</FormLabel>
+                                        <FormLabel>Subtitle</FormLabel>
                                         <FormControl>
-                                            <Input placeholder='Partner Pty Ltd' {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='category'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder='Dining, Travel, …' {...field} />
+                                            <Input placeholder='Optional subtitle' {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -214,38 +240,82 @@ export function DiscountsClient({
                                     <FormItem>
                                         <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Textarea rows={3} placeholder='Optional details' {...field} />
+                                            <Textarea rows={3} placeholder='Optional description' {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                            <div className='flex gap-8'>
+                            <FormField
+                                control={form.control}
+                                name='coverUrl'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Cover URL</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder='https://…' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className='grid grid-cols-2 gap-4'>
                                 <FormField
                                     control={form.control}
-                                    name='isFeatured'
+                                    name='category'
                                     render={({ field }) => (
-                                        <FormItem className='flex items-center gap-2'>
+                                        <FormItem>
+                                            <FormLabel>Category</FormLabel>
                                             <FormControl>
-                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                <Input placeholder='Finance' {...field} />
                                             </FormControl>
-                                            <FormLabel className='mt-0!'>Featured</FormLabel>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                                 <FormField
                                     control={form.control}
-                                    name='isActive'
+                                    name='readingTimeMinutes'
                                     render={({ field }) => (
-                                        <FormItem className='flex items-center gap-2'>
+                                        <FormItem>
+                                            <FormLabel>Reading (min)</FormLabel>
                                             <FormControl>
-                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                <Input
+                                                    type='number'
+                                                    min={0}
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
+                                                />
                                             </FormControl>
-                                            <FormLabel className='mt-0!'>Active</FormLabel>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
+                            <FormField
+                                control={form.control}
+                                name='tierAccess'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tier access</FormLabel>
+                                        <Select value={field.value} onValueChange={field.onChange}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder='Select tier' />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className='dashboard-theme dark'>
+                                                {TIERS.map((t) => (
+                                                    <SelectItem key={t} value={t}>
+                                                        {t}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <DialogFooter>
                                 <Button type='button' variant='outline' onClick={() => setDialogOpen(false)}>
@@ -253,7 +323,7 @@ export function DiscountsClient({
                                 </Button>
                                 <Button type='submit' disabled={isPending}>
                                     {isPending ? <Loader2Icon className='mr-2 h-4 w-4 animate-spin' /> : null}
-                                    Create
+                                    {editing ? 'Save' : 'Create'}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -266,7 +336,7 @@ export function DiscountsClient({
                 onClose={() => setDeleteTarget(null)}
                 onConfirm={confirmDelete}
                 loading={isPending}
-                className='slr-admin dark'
+                className='dashboard-theme dark'
             />
         </div>
     );

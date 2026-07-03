@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
-import { Box, ChevronDown, ClipboardList, LayoutGrid, Ticket, Trophy, UsersIcon } from 'lucide-react';
+import { BookOpen, Box, ChevronDown, ClipboardList, LayoutGrid, Ticket, Trophy, UsersIcon } from 'lucide-react';
 
 export function NavMain({ user }) {
     const isSuperAdmin = user?.role?.includes('ROLE_SUPER_ADMIN');
@@ -40,6 +40,11 @@ export function NavMain({ user }) {
             title: 'Discounts',
             href: '/dashboard/discounts',
             icon: Ticket
+        },
+        {
+            title: 'Ebooks',
+            href: '/dashboard/ebooks',
+            icon: BookOpen
         }
     ];
 

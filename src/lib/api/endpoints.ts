@@ -28,6 +28,12 @@ export const API = {
         create: '/api/v1/discounts/',
         remove: (id: string) => `/api/v1/discounts/${id}`
     },
+    ebooks: {
+        list: '/api/v1/ebooks/',
+        create: '/api/v1/ebooks/',
+        update: (id: string) => `/api/v1/ebooks/${id}`,
+        remove: (id: string) => `/api/v1/ebooks/${id}`
+    },
     giveaways: {
         winners: '/api/v1/giveaways/winners'
     },

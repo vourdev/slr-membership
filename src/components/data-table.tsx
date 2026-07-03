@@ -317,7 +317,7 @@ const TableRowComponent = ({
                                             <MoreHorizontal className='h-4 w-4' />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align='end'>
+                                    <DropdownMenuContent align='end' className='dashboard-theme dark'>
                                         <DropdownMenuItem
                                             className='cursor-pointer'
                                             onClick={() => onEdit && onEdit(item)}>
@@ -333,15 +333,15 @@ const TableRowComponent = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
-                                <AlertDialogContent>
+                                <AlertDialogContent className='dashboard-theme dark'>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+                                        <AlertDialogTitle className='text-white'>Delete this record?</AlertDialogTitle>
                                         <AlertDialogDescription>
                                             This action cannot be undone. Deleted data cannot be recovered.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogCancel className='text-white'>Cancel</AlertDialogCancel>
                                         <AlertDialogAction onClick={handleConfirmDelete}>Yes, delete</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
@@ -359,7 +359,7 @@ const TableRowComponent = ({
                                             <MoreHorizontal className='h-4 w-4' />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
+                                    <DropdownMenuContent className='dashboard-theme dark'>
                                         <DropdownMenuItem
                                             className='cursor-pointer'
                                             onClick={() => onEdit && onEdit(item)}>

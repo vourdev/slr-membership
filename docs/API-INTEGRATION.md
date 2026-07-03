@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 16 / 75 endpoints integrated (called from the app).**
+**Ratio: 21 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -85,6 +85,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/discounts/` | `member/discounts/page.tsx` | card reduced to API fields |
 | `POST /api/v1/discounts/` | `dashboard/(routes)/discounts` | admin create (server action, camelCase body); returns `{id, partnerName, isFeatured, isActive, …}` |
 | `DELETE /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin delete (server action) |
+| `GET /api/v1/admin/members/{userId}` | `dashboard/(routes)/members/[userId]` | member detail (profile/membership/subscription/cycles/wins); renders `entry_status`, never `draw_pass` |
+| `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` | user entry history + empty states |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
 
@@ -100,6 +102,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **🐞 BACKEND: `GET /admin/members` 400s** — returns `{code:"BAD_REQUEST","Unable to process your request"}` for every param combo (OpenAPI says no params). Generic error (not `VALIDATION_ERROR`) = server-side crash. Members page (`dashboard/(routes)/members`) degrades to EmptyState; needs a backend fix, not FE.
 - **Dashboard theme** — `.slr-admin` now uses the member navy palette (`#131619` base) so the dashboard matches the member area; dashboard keeps its own sidebar/shell.
 - **🐞 BACKEND: `GET /discounts/` 403 for admin** — the list is tier-gated to RED/BLUE members, so admin gets `FORBIDDEN` ("Upgrade membership to unlock this benefit"). No admin-list variant exists → the dashboard Discounts page can create + delete but **can't list** existing rows (it surfaces the 403 for reporting). Backend should exempt admin/super_admin from the tier gate or add an admin list. Note field-name mismatch: list = snake_case, create/patch = camelCase (`id`, `partnerName`, `isFeatured`, `isActive`).
+- **Ebooks admin CRUD works** (list + create + edit + delete, all live-verified). Two gaps: (1) `GET /ebooks/{id}` is **403 for admin** (tier-gated) and the list omits `tierAccess`, so **edit re-selects the tier** (other fields prefill from the row); (2) `PATCH` resets unsent numeric fields → the FE sends the full object. Chapters CRUD deferred. Same snake (list) vs camel (mutation) mismatch as discounts.
 
 ### Suggested next
 `memberships/me` + `giveaways/` (member dashboard) · `ebooks/` (reader) · `auth/refresh` (stop forced logouts) · admin member detail/status/tier.
@@ -122,7 +125,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | POST | `/api/v1/admin/members/{userId}/adjust-draw-pass` | admin | Adjust active cycle draw passes |
 | ❌ | PUT | `/api/v1/admin/members/{userId}/status` | admin | Update member status (ACTIVE, SUSPENDED, DEACTIVATED) |
 | ❌ | PUT | `/api/v1/admin/members/{userId}/tier` | admin | Update member tier config |
-| ❌ | GET | `/api/v1/admin/members/{userId}` | admin | Get detailed member profile and history |
+| ✅ | GET | `/api/v1/admin/members/{userId}` | admin | Get detailed member profile and history |
 | ✅ | GET | `/api/v1/admin/members` | admin | List all members with filters and pagination |
 | ❌ | GET | `/api/v1/audit/` | audit | Admin: query audit log (filter + cursor or page) |
 | ✅ | POST | `/api/v1/auth/forgot-password` | auth | Request password reset email |
@@ -145,14 +148,14 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | DELETE | `/api/v1/discounts/{id}` | discounts | Admin: delete discount |
 | ❌ | GET | `/api/v1/discounts/{id}` | discounts | Get discount details |
 | ❌ | PATCH | `/api/v1/discounts/{id}` | discounts | Admin: update discount |
-| ❌ | GET | `/api/v1/ebooks/` | ebooks | List published ebooks with is_locked properties |
-| ❌ | POST | `/api/v1/ebooks/` | ebooks | Admin: create ebook |
+| ✅ | GET | `/api/v1/ebooks/` | ebooks | List published ebooks with is_locked properties |
+| ✅ | POST | `/api/v1/ebooks/` | ebooks | Admin: create ebook |
 | ❌ | DELETE | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: delete chapter |
 | ❌ | PATCH | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: update chapter |
 | ❌ | POST | `/api/v1/ebooks/{id}/chapters` | ebooks | Admin: create chapter |
-| ❌ | DELETE | `/api/v1/ebooks/{id}` | ebooks | Admin: delete ebook |
-| ❌ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked |
-| ❌ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
+| ✅ | DELETE | `/api/v1/ebooks/{id}` | ebooks | Admin: delete ebook |
+| ❌ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked (403 for admin — tier-gated) |
+| ✅ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
 | ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
 | ❌ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier |
 | ✅ | GET | `/api/v1/giveaways/winners` | giveaways | List past giveaway winners |
