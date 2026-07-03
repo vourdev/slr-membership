@@ -29,14 +29,14 @@ Auth: `auth.ts` (NextAuth Credentials) → `POST /auth/login` → `GET /auth/me`
 ## RULES — adding an integration (follow exactly)
 
 1. Add the path to `API` in `endpoints.ts` (domain namespace).
-2. Add `resources/<domain>.ts`: declare a **DTO interface for the response** (mirror the OpenAPI schema — build interfaces for EVERY response), then a function wrapped in `React.cache`:
+2. **Hit the live endpoint FIRST** (curl with a real token / throwaway account) and read the actual response body — then declare the **DTO interface off that real response**, not just the OpenAPI schema (schema can drift). Build interfaces for EVERY response. Mirror the real shape so the data is trivial to render on the frontend. Then a function wrapped in `React.cache`:
    - Public: `export const getX = cache(() => apiFetch<X>(API.x.y, { revalidate: 3600 }))`
    - Authed: `export const getX = cache((token: string) => apiFetch<X>(API.x.y, { token, cache: 'no-store' }))`
 3. Consume in a **Server Component**: `const token = await getAccessToken();` then call inside `try/catch`.
 4. Catch: `catch (error) { handleApiAuthError(error); failed = true; }` — 401 force-logs-out; else falls through.
 5. No data / failed → render `<EmptyState icon title description />` (`@/components/common/empty-state`).
 6. Marketing pages MAY keep a static fallback (e.g. tiers); data pages show `EmptyState`.
-7. **Never render `draw_pass`** — only `entry_status`. Missing display fields → `-` or omit.
+7. **Never render `draw_pass`** — only `entry_status`. **Empty/missing display field → default value, never blank/`undefined`/`null`/`NaN`:** string → `"-"`, number → `0` (money still `/100` after defaulting). Omit the field only when a `-` would be meaningless.
 8. Perf: one fetch per page (no waterfalls; `Promise.all` for independent), no barrel imports, no inline components, ternary conditionals.
 9. Theme: admin `.slr-admin` (gold primary), member `.slr-member`; both dark. Reuse SLR tokens.
 10. Verify: `npm run type-check` + `npx eslint <files>` + curl with a real token.
@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 13 / 75 endpoints integrated (called from the app).**
+**Ratio: 16 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -79,9 +79,12 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/auth/forgot-password` | `forgot-password/page.tsx` | Reset request |
 | `POST /api/v1/auth/reset-password` | `reset-password/.../reset-password-form.tsx` | Body `{reset_token, new_password}`; `reset_token` ≥20 chars server-validated. Reads `?token=` from email link |
 | `GET /api/v1/memberships/tiers` | `membership/page.tsx` | live prices + EmptyState (public) |
-| `GET /api/v1/admin/members` | `dashboard/(routes)/registrations` | live table |
-| `GET /api/v1/admin/dashboard` | `dashboard/page.tsx` | ops metrics |
+| `GET /api/v1/admin/members` | `dashboard/(routes)/members` | live table. ⚠️ **backend currently 400s** (`BAD_REQUEST`, no params accepted) → page shows EmptyState. FE row-map hardened (`-` defaults). Needs backend fix |
+| `GET /api/v1/admin/dashboard` | `dashboard/page.tsx` | ops metrics. `members_by_tier` can repeat a label (r4+b4 = "Plus") → rows aggregated by label so keys stay unique |
+| `GET /api/v1/giveaways/winners` | `dashboard/(routes)/winners` | admin Winners table; read-only, `-` defaults, EmptyState when none |
 | `GET /api/v1/discounts/` | `member/discounts/page.tsx` | card reduced to API fields |
+| `POST /api/v1/discounts/` | `dashboard/(routes)/discounts` | admin create (server action, camelCase body); returns `{id, partnerName, isFeatured, isActive, …}` |
+| `DELETE /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin delete (server action) |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` | user entry history + empty states |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
 
@@ -94,6 +97,9 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - `getCurrentMember()` (discounts gate) reads dummy — should use session tier.
 - **Paid registration deferred** — register wizard only wires the Visitor path (register → OTP → sign-in). RED/BLUE still flow into the mock spin/checkout screens; `requires_payment`/`spin_available` flags + Stripe checkout land in the next task.
 - **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
+- **🐞 BACKEND: `GET /admin/members` 400s** — returns `{code:"BAD_REQUEST","Unable to process your request"}` for every param combo (OpenAPI says no params). Generic error (not `VALIDATION_ERROR`) = server-side crash. Members page (`dashboard/(routes)/members`) degrades to EmptyState; needs a backend fix, not FE.
+- **Dashboard theme** — `.slr-admin` now uses the member navy palette (`#131619` base) so the dashboard matches the member area; dashboard keeps its own sidebar/shell.
+- **🐞 BACKEND: `GET /discounts/` 403 for admin** — the list is tier-gated to RED/BLUE members, so admin gets `FORBIDDEN` ("Upgrade membership to unlock this benefit"). No admin-list variant exists → the dashboard Discounts page can create + delete but **can't list** existing rows (it surfaces the 403 for reporting). Backend should exempt admin/super_admin from the tier gate or add an admin list. Note field-name mismatch: list = snake_case, create/patch = camelCase (`id`, `partnerName`, `isFeatured`, `isActive`).
 
 ### Suggested next
 `memberships/me` + `giveaways/` (member dashboard) · `ebooks/` (reader) · `auth/refresh` (stop forced logouts) · admin member detail/status/tier.
@@ -135,8 +141,8 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | POST | `/api/v1/billing/pay-manual` | billing | Pay manual for grace period invoice |
 | ❌ | GET | `/api/v1/billing/status` | billing | Get current billing status |
 | ✅ | GET | `/api/v1/discounts/` | discounts | List partner discounts (RED/BLUE only) |
-| ❌ | POST | `/api/v1/discounts/` | discounts | Admin: create discount |
-| ❌ | DELETE | `/api/v1/discounts/{id}` | discounts | Admin: delete discount |
+| ✅ | POST | `/api/v1/discounts/` | discounts | Admin: create discount |
+| ✅ | DELETE | `/api/v1/discounts/{id}` | discounts | Admin: delete discount |
 | ❌ | GET | `/api/v1/discounts/{id}` | discounts | Get discount details |
 | ❌ | PATCH | `/api/v1/discounts/{id}` | discounts | Admin: update discount |
 | ❌ | GET | `/api/v1/ebooks/` | ebooks | List published ebooks with is_locked properties |
@@ -149,7 +155,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
 | ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
 | ❌ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier |
-| ❌ | GET | `/api/v1/giveaways/winners` | giveaways | List past giveaway winners |
+| ✅ | GET | `/api/v1/giveaways/winners` | giveaways | List past giveaway winners |
 | ❌ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information |
 | ❌ | GET | `/api/v1/health/livez` | health | Liveness probe |
 | ❌ | GET | `/api/v1/health/readyz` | health | Readiness probe (DB + Redis) |

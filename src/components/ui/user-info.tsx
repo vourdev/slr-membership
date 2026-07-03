@@ -17,11 +17,9 @@ export function UserInfo({
 
     return (
         <div className={cn('flex items-center gap-3', className)}>
-            <Avatar className='h-8 w-8'>
-                <AvatarImage src={user?.avatar ?? ''} alt={user.name} />
-                <AvatarFallback className='rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white'>
-                    {getInitials(user?.name ?? 'User')}
-                </AvatarFallback>
+            <Avatar className='h-8 w-8 rounded-lg'>
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className='rounded-lg'>{getInitials(user?.name ?? 'User')}</AvatarFallback>
             </Avatar>
             <div className='grid flex-1 text-left text-sm leading-tight'>
                 {showUsername && <span className='truncate font-medium'>{user.name}</span>}
