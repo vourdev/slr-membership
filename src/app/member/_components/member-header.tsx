@@ -42,14 +42,14 @@ export function MemberHeader({ user, member, notifications }: MemberHeaderProps)
                     <DropdownMenuTrigger asChild>
                         <button
                             type='button'
-                            className='flex items-center gap-2 rounded-lg border border-white/5 bg-white/3 py-1 pr-2 pl-1 transition-colors hover:bg-white/6'>
+                            className='flex items-center gap-2 rounded-lg border border-sidebar-border bg-sidebar-accent/10 py-1 pr-2 pl-1 transition-colors hover:bg-sidebar-accent/20'>
                             <Avatar className='size-7'>
                                 <AvatarImage src={user?.image ?? ''} alt={member.name} />
-                                <AvatarFallback className='bg-slr-navy-card text-xs font-semibold text-white'>
+                                <AvatarFallback className='bg-slr-navy-card text-xs font-semibold text-sidebar-foreground'>
                                     {getInitials(member.name)}
                                 </AvatarFallback>
                             </Avatar>
-                            <span className='hidden text-sm font-medium text-white sm:inline'>{firstName}</span>
+                            <span className='hidden text-sm font-medium text-sidebar-foreground sm:inline'>{firstName}</span>
                             <TierBadge
                                 subTier={member.sub_tier}
                                 size='sm'

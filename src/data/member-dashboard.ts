@@ -1,4 +1,5 @@
 import { formatDrawPool } from '@/lib/member';
+import { getSessionIdentity } from '@/lib/session-member';
 import type { CurrentMember, MemberDashboard } from '@/types/member';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,9 +72,21 @@ const DASHBOARD: MemberDashboard = {
 };
 
 export async function getCurrentMember(): Promise<CurrentMember> {
-    return MEMBER;
+    const id = await getSessionIdentity();
+
+    return {
+        name: id.name ?? MEMBER.name,
+        sub_tier: id.sub_tier ?? MEMBER.sub_tier,
+        state: id.state ?? MEMBER.state
+    };
 }
 
 export async function getMemberDashboard(): Promise<MemberDashboard> {
-    return DASHBOARD;
+    const member = await getCurrentMember();
+
+    return {
+        ...DASHBOARD,
+        member,
+        summary: { ...DASHBOARD.summary, sub_tier: member.sub_tier, state: member.state }
+    };
 }

@@ -66,10 +66,10 @@ export function MemberSidebar({ user, member }: MemberSidebarProps) {
                                     size='lg'
                                     isActive={isActive(item.href)}
                                     tooltip={{ children: item.title }}
-                                    className='gap-3 text-base [&>svg]:size-5'>
+                                    className='gap-3 text-base group-data-[collapsible=icon]:gap-0! group-data-[collapsible=icon]:pl-0! [&>svg]:size-5'>
                                     <Link href={item.href}>
                                         <item.icon />
-                                        <span>{item.title}</span>
+                                        <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -79,15 +79,15 @@ export function MemberSidebar({ user, member }: MemberSidebarProps) {
             </SidebarContent>
 
             <SidebarFooter>
-                <div className='flex items-center gap-2 rounded-lg border border-white/5 bg-white/2 p-2 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0'>
+                <div className='flex items-center gap-2 rounded-lg border border-sidebar-border bg-sidebar-accent/10 p-2 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0'>
                     <Avatar className='size-8'>
                         <AvatarImage src={user?.image ?? ''} alt={member.name} />
-                        <AvatarFallback className='bg-slr-navy-card text-xs font-semibold text-white'>
+                        <AvatarFallback className='bg-slr-navy-card text-xs font-semibold text-sidebar-foreground'>
                             {getInitials(member.name)}
                         </AvatarFallback>
                     </Avatar>
                     <div className='grid flex-1 leading-tight group-data-[collapsible=icon]:hidden'>
-                        <span className='truncate text-sm font-medium text-white'>{member.name}</span>
+                        <span className='truncate text-sm font-medium text-sidebar-foreground'>{member.name}</span>
                         <div className='mt-1'>
                             <TierBadge subTier={member.sub_tier} size='sm' />
                         </div>

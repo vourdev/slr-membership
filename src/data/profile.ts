@@ -1,3 +1,4 @@
+import { getSessionIdentity } from '@/lib/session-member';
 import type { MemberProfile } from '@/types/member';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -51,5 +52,13 @@ const PROFILE: MemberProfile = {
 };
 
 export async function getMemberProfile(): Promise<MemberProfile> {
-    return PROFILE;
+    const id = await getSessionIdentity();
+
+    return {
+        ...PROFILE,
+        name: id.name ?? PROFILE.name,
+        email: id.email ?? PROFILE.email,
+        sub_tier: id.sub_tier ?? PROFILE.sub_tier,
+        state: id.state ?? PROFILE.state
+    };
 }
