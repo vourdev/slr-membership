@@ -58,6 +58,7 @@ export interface MembershipRecord {
     createdAt: string;
     updatedAt: string;
     subTier: MembershipSubTier;
+}
 /** Display-ready tier fields derived from the live API (never exposes draw_pass). */
 export interface TierDisplay {
     price: string;
