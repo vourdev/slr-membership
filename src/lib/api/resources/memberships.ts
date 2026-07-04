@@ -28,6 +28,14 @@ export interface MembershipTiers {
     visitor: VisitorTier;
 }
 
+/** Display-ready tier fields derived from the live API (never exposes draw_pass). */
+export interface TierDisplay {
+    price: string;
+    tokens: string;
+    name: string;
+    spin: string | null;
+}
+
 // ─── Resource functions ──────────────────────────────────────────────────────
 
 /**
