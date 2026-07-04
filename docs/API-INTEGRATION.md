@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 21 / 75 endpoints integrated (called from the app).**
+**Ratio: 25 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -86,6 +86,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/discounts/` | `dashboard/(routes)/discounts` | admin create (server action, camelCase body); returns `{id, partnerName, isFeatured, isActive, …}` |
 | `DELETE /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin delete (server action) |
 | `GET /api/v1/admin/members/{userId}` | `dashboard/(routes)/members/[userId]` | member detail (profile/membership/subscription/cycles/wins); renders `entry_status`, never `draw_pass` |
+| `PUT /api/v1/admin/members/{userId}/status` | `dashboard/(routes)/members/[userId]` | admin status update (server action). Body `{status:'ACTIVE'\|'SUSPENDED'\|'DEACTIVATED'}` (uppercase enum); returns `{user_id, status}` (lowercase). Live round-trip verified |
+| `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. ⚠️ does **not** change `state` (no endpoint found that does). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored |
 | `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` | user entry history + empty states |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
@@ -104,6 +106,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **🐞 BACKEND: `GET /discounts/` 403 for admin** — the list is tier-gated to RED/BLUE members, so admin gets `FORBIDDEN` ("Upgrade membership to unlock this benefit"). No admin-list variant exists → the dashboard Discounts page can create + delete but **can't list** existing rows (it surfaces the 403 for reporting). Backend should exempt admin/super_admin from the tier gate or add an admin list. Note field-name mismatch: list = snake_case, create/patch = camelCase (`id`, `partnerName`, `isFeatured`, `isActive`).
 - **Ebooks admin CRUD works** (list + create + edit + delete, all live-verified). Two gaps: (1) `GET /ebooks/{id}` is **403 for admin** (tier-gated) and the list omits `tierAccess`, so **edit re-selects the tier** (other fields prefill from the row); (2) `PATCH` resets unsent numeric fields → the FE sends the full object. Chapters CRUD deferred. Same snake (list) vs camel (mutation) mismatch as discounts.
 
+- **Admin can't change a member's `state`** — neither `PUT /admin/members/{id}/tier` (base tier only) nor `POST /memberships/change-tier` (`{userId, subTierId}` only) accepts state; an extra `state` field is silently ignored. Draw-pool `state+tier` state moves need a backend endpoint. Member-detail admin actions cover status + tier/sub-tier only.
+
 ### Suggested next
 `memberships/me` + `giveaways/` (member dashboard) · `ebooks/` (reader) · `auth/refresh` (stop forced logouts) · admin member detail/status/tier.
 
@@ -117,14 +121,14 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 |---|---|---|---|---|
 | ❌ | GET | `/healthz` | - |  |
 | ❌ | GET | `/metrics` | - |  |
-| ❌ | GET | `/api/v1/admin/beny/pending` | admin | List pending BENY subscriptions |
-| ❌ | POST | `/api/v1/admin/beny/{id}/activate` | admin | Activate a pending BENY subscription |
+| ✅ | GET | `/api/v1/admin/beny/pending` | admin | List pending BENY subscriptions |
+| ✅ | POST | `/api/v1/admin/beny/{id}/activate` | admin | Activate a pending BENY subscription |
 | ❌ | POST | `/api/v1/admin/csv/generate` | admin | Generate 3 CSV files (visitor, red, blue) for draw entries |
 | ❌ | GET | `/api/v1/admin/csv/history` | admin | Get CSV generation log history |
 | ✅ | GET | `/api/v1/admin/dashboard` | admin | Admin dashboard overview and metrics |
 | ❌ | POST | `/api/v1/admin/members/{userId}/adjust-draw-pass` | admin | Adjust active cycle draw passes |
-| ❌ | PUT | `/api/v1/admin/members/{userId}/status` | admin | Update member status (ACTIVE, SUSPENDED, DEACTIVATED) |
-| ❌ | PUT | `/api/v1/admin/members/{userId}/tier` | admin | Update member tier config |
+| ✅ | PUT | `/api/v1/admin/members/{userId}/status` | admin | Update member status (ACTIVE, SUSPENDED, DEACTIVATED) |
+| ❌ | PUT | `/api/v1/admin/members/{userId}/tier` | admin | Update member tier config (base tier only; ignores state/sub_tier — **superseded by `/memberships/change-tier`** for admin tier control) |
 | ✅ | GET | `/api/v1/admin/members/{userId}` | admin | Get detailed member profile and history |
 | ✅ | GET | `/api/v1/admin/members` | admin | List all members with filters and pagination |
 | ❌ | GET | `/api/v1/audit/` | audit | Admin: query audit log (filter + cursor or page) |
@@ -162,7 +166,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information |
 | ❌ | GET | `/api/v1/health/livez` | health | Liveness probe |
 | ❌ | GET | `/api/v1/health/readyz` | health | Readiness probe (DB + Redis) |
-| ❌ | POST | `/api/v1/memberships/change-tier` | membership | Admin: change user's tier/state |
+| ✅ | POST | `/api/v1/memberships/change-tier` | membership | Admin: change user's tier/sub-tier (state NOT changed) |
 | 🟡 | GET | `/api/v1/memberships/me` | membership | My membership |
 | ❌ | GET | `/api/v1/memberships/stats` | membership | Membership counts grouped by tier+state |
 | ✅ | GET | `/api/v1/memberships/tiers` | membership | Active membership tiers |

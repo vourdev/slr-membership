@@ -88,6 +88,33 @@ export interface AdminMemberDetail {
     wins: AdminMemberDetailWin[];
 }
 
+// Live PUT /admin/members/{userId}/status accepts uppercase enum values.
+export type AdminMemberStatusValue = 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
+
+// Mirrors the live PUT /admin/members/{userId}/status response `data`.
+export interface AdminMemberStatusUpdate {
+    user_id: string;
+    status: string; // lowercase, e.g. 'active'
+}
+
+// Mirrors GET /admin/beny/pending items.
+export interface BenyPendingItem {
+    beny_subscription_id: string;
+    user_id: string;
+    name: string;
+    email: string;
+    phone: string;
+    status: string;
+    created_at: string;
+}
+
+// Mirrors POST /admin/beny/{id}/activate response.
+export interface BenyActivateResult {
+    beny_subscription_id: string;
+    status: string;
+    activated_at: string;
+}
+
 // ── Resource functions ──────────────────────────────────────────────────────
 
 export const getAdminDashboardMetrics = cache((token: string) => {
@@ -105,4 +132,20 @@ export const getAdminMemberDetail = cache((userId: string, token: string) => {
 
 export const deleteAdminMember = (userId: string, token: string) => {
     return apiFetch<null>(API.admin.deleteMember(userId), { method: 'DELETE', token });
+};
+
+export const updateAdminMemberStatus = (userId: string, status: AdminMemberStatusValue, token: string) => {
+    return apiFetch<AdminMemberStatusUpdate>(API.admin.updateMemberStatus(userId), {
+        method: 'PUT',
+        body: { status },
+        token
+    });
+};
+
+export const getBenyPending = cache((token: string) => {
+    return apiFetch<BenyPendingItem[]>(API.admin.benyPending, { token, cache: 'no-store' });
+});
+
+export const activateBeny = (id: string, token: string) => {
+    return apiFetch<BenyActivateResult>(API.admin.benyActivate(id), { method: 'POST', token });
 };
