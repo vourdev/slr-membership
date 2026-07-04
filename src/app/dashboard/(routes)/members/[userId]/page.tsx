@@ -10,6 +10,7 @@ import { handleApiAuthError } from '@/lib/api/guard';
 import { type AdminMemberDetail, getAdminMemberDetail } from '@/lib/api/resources/admin';
 import { getAccessToken } from '@/lib/api/server';
 
+import { MemberAdminActions } from './_components/member-admin-actions';
 import { ArrowLeft, CircleAlert } from 'lucide-react';
 
 const dash = (v: string | null | undefined) => (v && v.trim() ? v : '-');
@@ -95,6 +96,12 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                     <Field label='Renews' value={day(membership?.renew_at)} />
                 </InfoCard>
             </div>
+
+            <MemberAdminActions
+                userId={member.user_id}
+                currentStatus={member.status}
+                currentTierCode={membership?.tier_code ?? ''}
+            />
 
             <InfoCard title='Subscription'>
                 {subscription ? (

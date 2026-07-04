@@ -88,6 +88,15 @@ export interface AdminMemberDetail {
     wins: AdminMemberDetailWin[];
 }
 
+// Live PUT /admin/members/{userId}/status accepts uppercase enum values.
+export type AdminMemberStatusValue = 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
+
+// Mirrors the live PUT /admin/members/{userId}/status response `data`.
+export interface AdminMemberStatusUpdate {
+    user_id: string;
+    status: string; // lowercase, e.g. 'active'
+}
+
 // ── Resource functions ──────────────────────────────────────────────────────
 
 export const getAdminDashboardMetrics = cache((token: string) => {
@@ -105,4 +114,12 @@ export const getAdminMemberDetail = cache((userId: string, token: string) => {
 
 export const deleteAdminMember = (userId: string, token: string) => {
     return apiFetch<null>(API.admin.deleteMember(userId), { method: 'DELETE', token });
+};
+
+export const updateAdminMemberStatus = (userId: string, status: AdminMemberStatusValue, token: string) => {
+    return apiFetch<AdminMemberStatusUpdate>(API.admin.updateMemberStatus(userId), {
+        method: 'PUT',
+        body: { status },
+        token
+    });
 };
