@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 23 / 75 endpoints integrated (called from the app).**
+**Ratio: 25 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -121,8 +121,8 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 |---|---|---|---|---|
 | ❌ | GET | `/healthz` | - |  |
 | ❌ | GET | `/metrics` | - |  |
-| ❌ | GET | `/api/v1/admin/beny/pending` | admin | List pending BENY subscriptions |
-| ❌ | POST | `/api/v1/admin/beny/{id}/activate` | admin | Activate a pending BENY subscription |
+| ✅ | GET | `/api/v1/admin/beny/pending` | admin | List pending BENY subscriptions |
+| ✅ | POST | `/api/v1/admin/beny/{id}/activate` | admin | Activate a pending BENY subscription |
 | ❌ | POST | `/api/v1/admin/csv/generate` | admin | Generate 3 CSV files (visitor, red, blue) for draw entries |
 | ❌ | GET | `/api/v1/admin/csv/history` | admin | Get CSV generation log history |
 | ✅ | GET | `/api/v1/admin/dashboard` | admin | Admin dashboard overview and metrics |
