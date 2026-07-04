@@ -5,6 +5,7 @@ import Image from 'next/image';
 import GoldCtaButton from '@/components/common/gold-cta-button';
 import SectionEyebrow from '@/components/common/section-eyebrow';
 import SectionHeading from '@/components/common/section-heading';
+import type { TierDisplay } from '@/lib/api/resources/memberships';
 
 import { Disc3 } from 'lucide-react';
 
@@ -99,7 +100,7 @@ const Badge: FC<{ children: ReactNode; icon?: ReactNode }> = ({ children, icon }
     </span>
 );
 
-const RedTiersSection = ({ prices }: { prices?: Record<string, string> }) => {
+const RedTiersSection = ({ live, startFrom }: { live?: Record<string, TierDisplay>; startFrom?: string }) => {
     return (
         <section className='bg-slr-ink relative isolate overflow-hidden py-16 md:py-24'>
             <div className='mx-auto max-w-7xl px-4'>
@@ -141,7 +142,7 @@ const RedTiersSection = ({ prices }: { prices?: Record<string, string> }) => {
                                             Start From
                                         </span>
                                         <span className='text-gradient-gold font-bebas-neue text-3xl font-extrabold xl:text-4xl'>
-                                            $10
+                                            {startFrom ?? '$10'}
                                         </span>
                                         <span className='text-xs text-white/60'>/mo</span>
                                     </div>
@@ -197,53 +198,58 @@ const RedTiersSection = ({ prices }: { prices?: Record<string, string> }) => {
 
                     {/* RIGHT — tier rows */}
                     <div className='flex h-full flex-col gap-4'>
-                        {tiers.map((tier) => (
-                            <div
-                                key={tier.name}
-                                style={tier.cardStyle}
-                                className='flex flex-1 items-center justify-between gap-3 rounded-2xl p-3 sm:p-4'>
-                                <div className='flex min-w-0 flex-1 items-center gap-2 sm:gap-3'>
-                                    <Image
-                                        src={tier.icon}
-                                        alt={tier.name}
-                                        width={112}
-                                        height={112}
-                                        className='h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14 xl:h-20 xl:w-20'
-                                    />
-                                    <div className='min-w-0'>
-                                        <div className='flex flex-wrap items-center gap-2'>
-                                            <span className='text-sm font-bold tracking-[0.18em] text-white uppercase'>
-                                                {tier.name}
-                                            </span>
-                                            {tier.spin && (
-                                                <Badge icon={<Disc3 className='h-3 w-3' />}>
-                                                    Spin-Wheel {tier.spin}
-                                                </Badge>
-                                            )}
-                                            {tier.beny && <Badge>BENY</Badge>}
+                        {tiers.map((tier) => {
+                            const l = live?.[tier.code];
+                            const spin = l?.spin ?? tier.spin;
+
+                            return (
+                                <div
+                                    key={tier.name}
+                                    style={tier.cardStyle}
+                                    className='flex flex-1 items-center justify-between gap-3 rounded-2xl p-3 sm:p-4'>
+                                    <div className='flex min-w-0 flex-1 items-center gap-2 sm:gap-3'>
+                                        <Image
+                                            src={tier.icon}
+                                            alt={tier.name}
+                                            width={112}
+                                            height={112}
+                                            className='h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14 xl:h-20 xl:w-20'
+                                        />
+                                        <div className='min-w-0'>
+                                            <div className='flex flex-wrap items-center gap-2'>
+                                                <span className='text-sm font-bold tracking-[0.18em] text-white uppercase'>
+                                                    {l?.name ?? tier.name}
+                                                </span>
+                                                {spin && (
+                                                    <Badge icon={<Disc3 className='h-3 w-3' />}>
+                                                        Spin-Wheel {spin}
+                                                    </Badge>
+                                                )}
+                                                {tier.beny && <Badge>BENY</Badge>}
+                                            </div>
+                                            <p className='mt-1 flex items-baseline gap-1.5'>
+                                                <span className='text-gradient-gold font-bebas-neue text-3xl font-extrabold xl:text-4xl'>
+                                                    {l?.price ?? tier.price}
+                                                </span>
+                                                <span className='text-xs text-white/70'>/month</span>
+                                            </p>
                                         </div>
-                                        <p className='mt-1 flex items-baseline gap-1.5'>
-                                            <span className='text-gradient-gold font-bebas-neue text-3xl font-extrabold xl:text-4xl'>
-                                                {prices?.[tier.code] ?? tier.price}
-                                            </span>
-                                            <span className='text-xs text-white/70'>/month</span>
-                                        </p>
+                                    </div>
+
+                                    <div
+                                        style={tier.tokenBoxStyle}
+                                        className='flex shrink-0 flex-col items-center justify-center rounded-xl px-3 py-2 text-center xl:px-4 xl:py-2.5'>
+                                        <span
+                                            className={`font-bebas-neue text-xl leading-none font-extrabold sm:text-2xl xl:text-3xl ${tier.tokenClass}`}>
+                                            {l?.tokens ?? tier.tokens}
+                                        </span>
+                                        <span className='text-slr-dim mt-1 max-w-24 text-[10px] font-semibold tracking-widest uppercase sm:text-xs xl:max-w-26.5 xl:text-sm'>
+                                            Member Entries
+                                        </span>
                                     </div>
                                 </div>
-
-                                <div
-                                    style={tier.tokenBoxStyle}
-                                    className='flex shrink-0 flex-col items-center justify-center rounded-xl px-3 py-2 text-center xl:px-4 xl:py-2.5'>
-                                    <span
-                                        className={`font-bebas-neue text-xl leading-none font-extrabold sm:text-2xl xl:text-3xl ${tier.tokenClass}`}>
-                                        {tier.tokens}
-                                    </span>
-                                    <span className='text-slr-dim mt-1 max-w-24 text-[10px] font-semibold tracking-widest uppercase sm:text-xs xl:max-w-26.5 xl:text-sm'>
-                                        Member Entries
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>

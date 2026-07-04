@@ -1,7 +1,12 @@
 import { Metadata } from 'next';
 
 import EmptyState from '@/components/common/empty-state';
-import { type MembershipTiers, getMembershipTiers } from '@/lib/api/resources/memberships';
+import {
+    type MembershipTiers,
+    type TierDisplay,
+    type TierOption,
+    getMembershipTiers
+} from '@/lib/api/resources/memberships';
 
 import BlueTiersSection from '../(membership)/_components/blue-tiers-section';
 import RedTiersSection from '../(membership)/_components/red-tiers-section';
@@ -22,13 +27,22 @@ const formatPrice = (cents: number) => {
     return `$${Number.isInteger(dollars) ? dollars : dollars.toFixed(2)}`;
 };
 
-// Live prices keyed by sub_tier (R1/R4/…) — API returns lowercase codes.
-const toPriceMap = (tiers: MembershipTiers): Record<string, string> =>
-    [...tiers.red, ...tiers.blue].reduce<Record<string, string>>((map, tier) => {
-        map[tier.sub_tier.toUpperCase()] = formatPrice(tier.price_cents);
+// Live display data keyed by sub_tier (R1/R4/…) — API returns lowercase codes.
+const toDisplayMap = (options: TierOption[]): Record<string, TierDisplay> =>
+    options.reduce<Record<string, TierDisplay>>((map, t) => {
+        map[t.sub_tier.toUpperCase()] = {
+            price: formatPrice(t.price_cents),
+            tokens: `${t.token} Token${t.token === 1 ? '' : 's'}`,
+            name: t.marketing_name,
+            spin: t.spin ? `$${t.spin_discount_cents / 100} Off` : null
+        };
 
         return map;
     }, {});
+
+// Cheapest price in a group — for the hero "Start From" figure.
+const startFrom = (options: TierOption[]): string =>
+    formatPrice(Math.min(...options.map((t) => t.price_cents)));
 
 const MembershipPage = async () => {
     let tiers: MembershipTiers | null = null;
@@ -44,8 +58,8 @@ const MembershipPage = async () => {
         <main className='bg-slr-ink pt-12'>
             {hasTiers ? (
                 <>
-                    <RedTiersSection prices={toPriceMap(tiers!)} />
-                    <BlueTiersSection prices={toPriceMap(tiers!)} />
+                    <RedTiersSection live={toDisplayMap(tiers!.red)} startFrom={startFrom(tiers!.red)} />
+                    <BlueTiersSection live={toDisplayMap(tiers!.blue)} startFrom={startFrom(tiers!.blue)} />
                 </>
             ) : (
                 <section className='bg-slr-ink py-16 md:py-24'>
