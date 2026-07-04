@@ -21,7 +21,9 @@ export const API = {
         members: '/api/v1/admin/members',
         dashboard: '/api/v1/admin/dashboard',
         memberDetail: (userId: string) => `/api/v1/admin/members/${userId}`,
-        deleteMember: (userId: string) => `/api/v1/admin/members/${userId}`
+        deleteMember: (userId: string) => `/api/v1/admin/members/${userId}`,
+        benyPending: '/api/v1/admin/beny/pending',
+        benyActivate: (id: string) => `/api/v1/admin/beny/${id}/activate`
     },
     discounts: {
         list: '/api/v1/discounts/',

@@ -14,7 +14,17 @@ import {
 } from '@/components/ui/sidebar';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
-import { BookOpen, Box, ChevronDown, ClipboardList, LayoutGrid, Ticket, Trophy, UsersIcon } from 'lucide-react';
+import {
+    BookOpen,
+    Box,
+    ChevronDown,
+    ClipboardList,
+    LayoutGrid,
+    Ticket,
+    Trophy,
+    UserCheck,
+    UsersIcon
+} from 'lucide-react';
 
 export function NavMain({ user }) {
     const isSuperAdmin = user?.role?.includes('ROLE_SUPER_ADMIN');
@@ -45,6 +55,11 @@ export function NavMain({ user }) {
             title: 'Ebooks',
             href: '/dashboard/ebooks',
             icon: BookOpen
+        },
+        {
+            title: 'BENY',
+            href: '/dashboard/beny',
+            icon: UserCheck
         }
     ];
 
@@ -106,7 +121,10 @@ export function NavMain({ user }) {
                     if (!hasChildren) {
                         return (
                             <SidebarMenuItem key={href ?? item.title}>
-                                <SidebarMenuButton asChild isActive={isActive} tooltip={{ children: item.title, className: 'dashboard-theme dark' }}>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isActive}
+                                    tooltip={{ children: item.title, className: 'dashboard-theme dark' }}>
                                     <Link href={href ?? '#'} prefetch>
                                         {item.icon && <item.icon />}
                                         <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
