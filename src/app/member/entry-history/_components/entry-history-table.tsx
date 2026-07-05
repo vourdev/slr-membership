@@ -13,7 +13,8 @@ function formatDateRange(startStr: string, endStr: string): string {
     const start = new Date(startStr);
     const end = new Date(endStr);
     const fmt = new Intl.DateTimeFormat('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
-    return `${fmt.format(start)} – ${fmt.format(end)}`;
+    
+return `${fmt.format(start)} – ${fmt.format(end)}`;
 }
 
 export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {

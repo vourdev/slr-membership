@@ -25,7 +25,8 @@ function useThemeClass() {
         const el = document.querySelector('.slr-member') ?? document.querySelector('.slr-admin');
         if (el) setThemeClass(el.className.split(' ').filter((c) => c === 'slr-member' || c === 'slr-admin' || c === 'dark').join(' '));
     }, []);
-    return themeClass;
+    
+return themeClass;
 }
 
 function DropdownMenuContent({
@@ -34,7 +35,8 @@ function DropdownMenuContent({
     ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
     const themeClass = useThemeClass();
-    return (
+    
+return (
         <DropdownMenuPrimitive.Portal>
             <DropdownMenuPrimitive.Content
                 data-slot='dropdown-menu-content'
@@ -198,7 +200,8 @@ function DropdownMenuSubContent({
     ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
     const themeClass = useThemeClass();
-    return (
+    
+return (
         <DropdownMenuPrimitive.SubContent
             data-slot='dropdown-menu-sub-content'
             className={cn(
