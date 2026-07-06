@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { register } from '@/lib/api/resources/auth';
-import { ApiError } from '@/lib/api/types';
+import { ApiError, apiErrorMessage } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
 import StepAccount from './step-account';
@@ -90,7 +90,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
             setRegisteredEmail(data.email);
             setStep('otp');
         } catch (err) {
-            toast.error(err instanceof ApiError ? err.message : 'Registration failed. Please try again.');
+            toast.error(err instanceof ApiError ? apiErrorMessage(err) : 'Registration failed. Please try again.');
             // Send them back to the account step to fix the email/phone.
             setStep('account');
         } finally {

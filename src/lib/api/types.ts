@@ -19,3 +19,21 @@ export class ApiError extends Error {
         this.name = 'ApiError';
     }
 }
+
+/** One field-level validation error from a `VALIDATION_ERROR` envelope. */
+export interface ApiFieldError {
+    field: string;
+    message: string;
+}
+
+/**
+ * User-facing message for an ApiError. Prefers the first field-level validation
+ * message from the envelope's `errors` array (e.g. "must NOT have fewer than 10
+ * characters") over the generic top-level message; falls back to the latter.
+ */
+export function apiErrorMessage(error: ApiError): string {
+    const errors = (error.payload as { errors?: unknown } | null | undefined)?.errors;
+    const first = Array.isArray(errors) ? (errors[0] as { message?: unknown } | undefined) : undefined;
+
+    return typeof first?.message === 'string' && first.message.length > 0 ? first.message : error.message;
+}
