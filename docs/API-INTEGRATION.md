@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 25 / 75 endpoints integrated (called from the app).**
+**Ratio: 26 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -88,6 +88,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/admin/members/{userId}` | `dashboard/(routes)/members/[userId]` | member detail (profile/membership/subscription/cycles/wins); renders `entry_status`, never `draw_pass` |
 | `PUT /api/v1/admin/members/{userId}/status` | `dashboard/(routes)/members/[userId]` | admin status update (server action). Body `{status:'ACTIVE'\|'SUSPENDED'\|'DEACTIVATED'}` (uppercase enum); returns `{user_id, status}` (lowercase). Live round-trip verified |
 | `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. ⚠️ does **not** change `state` (no endpoint found that does). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored |
+| `GET /api/v1/memberships/stats` | `dashboard/(routes)/members` | member counts per **sub-tier**, rendered as a `SubTierStats` card above the list. ⚠️ **shape drift**: OpenAPI said "grouped by tier+state" but live returns Prisma-raw `[{ _count:{_all}, subTierId }]` grouped by **sub-tier only** (no state). Normalized → `{subTierId, count}`, present-only, canonical sort. Fetched via `Promise.allSettled` alongside `admin/members` so the list's 400 no longer blanks the card |
 | `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` | user entry history + empty states |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
@@ -168,7 +169,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/api/v1/health/readyz` | health | Readiness probe (DB + Redis) |
 | ✅ | POST | `/api/v1/memberships/change-tier` | membership | Admin: change user's tier/sub-tier (state NOT changed) |
 | 🟡 | GET | `/api/v1/memberships/me` | membership | My membership |
-| ❌ | GET | `/api/v1/memberships/stats` | membership | Membership counts grouped by tier+state |
+| ✅ | GET | `/api/v1/memberships/stats` | membership | Member counts grouped by **sub-tier** (NOT tier+state — OpenAPI drift) → `dashboard/(routes)/members` |
 | ✅ | GET | `/api/v1/memberships/tiers` | membership | Active membership tiers |
 | ❌ | DELETE | `/api/v1/memberships/upgrade` | membership | Cancel scheduled pending upgrade/downgrade |
 | ❌ | POST | `/api/v1/memberships/upgrade` | membership | Upgrade or downgrade membership tier (Paid -> Paid scheduling) |
