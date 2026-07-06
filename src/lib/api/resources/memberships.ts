@@ -87,3 +87,42 @@ export const changeMemberTier = (userId: string, subTierId: MemberSubTierId, tok
         token
     });
 };
+
+// ─── Membership stats (admin-viewable sub-tier distribution) ─────────────────
+
+// Raw Prisma-groupBy row as returned by GET /memberships/stats.
+interface RawSubTierStat {
+    _count: { _all: number };
+    subTierId: string;
+}
+
+// Normalized, display-ready count per sub-tier.
+export interface SubTierCount {
+    subTierId: string;
+    count: number;
+}
+
+// Canonical display order; unknown ids sort last.
+const SUB_TIER_ORDER: Record<string, number> = {
+    visitor: 0,
+    r1: 1,
+    r4: 2,
+    r7: 3,
+    b1: 4,
+    b4: 5,
+    b7: 6,
+    b10: 7
+};
+
+/**
+ * Admin: member counts grouped by sub-tier. The API returns a sparse, Prisma-raw
+ * array ({ _count: { _all }, subTierId }) — this normalizes to { subTierId, count }
+ * sorted in canonical tier order. Live counts → no-store.
+ */
+export const getMembershipStats = cache(async (token: string): Promise<SubTierCount[]> => {
+    const raw = await apiFetch<RawSubTierStat[]>(API.memberships.stats, { token, cache: 'no-store' });
+
+    return raw
+        .map((r) => ({ subTierId: r.subTierId || '-', count: r._count?._all ?? 0 }))
+        .sort((a, b) => (SUB_TIER_ORDER[a.subTierId] ?? 99) - (SUB_TIER_ORDER[b.subTierId] ?? 99));
+});

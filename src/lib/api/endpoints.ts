@@ -16,7 +16,8 @@ export const API = {
     memberships: {
         tiers: '/api/v1/memberships/tiers',
         me: '/api/v1/memberships/me',
-        changeTier: '/api/v1/memberships/change-tier'
+        changeTier: '/api/v1/memberships/change-tier',
+        stats: '/api/v1/memberships/stats'
     },
     admin: {
         members: '/api/v1/admin/members',
