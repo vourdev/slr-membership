@@ -5,7 +5,6 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { DataTable } from '@/components/data-table';
-import Heading from '@/components/ui/heading';
 
 import { membersColumns } from './_components/columns';
 import { deleteMemberAction } from './actions';
@@ -42,9 +41,7 @@ export function MembersClient({ data }: { data: MemberRow[] }) {
     };
 
     return (
-        <div className='mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-auto px-4 py-6'>
-            <Heading title='Members' description='Registered members' />
-
+        <div className='overflow-x-auto'>
             <DataTable
                 searchKey='name'
                 columns={membersColumns}
