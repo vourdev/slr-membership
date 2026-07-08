@@ -2,6 +2,8 @@
 
 Handoff doc for wiring the SLR web app to the Express backend. **Read this before adding an integration.**
 
+> **Backend error handoff:** endpoints returning errors / off-spec behavior (with example requests + responses) are collected in [BACKEND-ISSUES.md](BACKEND-ISSUES.md).
+
 - **API base:** `https://api.smartliferewards.com.au` · prefix `/api/v1`
 - **Swagger UI:** `https://api.smartliferewards.com.au/docsx-2s3crt3-199` · **OpenAPI JSON:** `…/docsx-2s3crt3-199/json`
 - **Auth:** Bearer JWT (`Authorization: Bearer <access_token>`) or `slr_at` cookie
@@ -79,7 +81,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/auth/forgot-password` | `forgot-password/page.tsx` | Reset request |
 | `POST /api/v1/auth/reset-password` | `reset-password/.../reset-password-form.tsx` | Body `{reset_token, new_password}`; `reset_token` ≥20 chars server-validated. Reads `?token=` from email link |
 | `GET /api/v1/memberships/tiers` | `membership/page.tsx` | live prices + EmptyState (public) |
-| `GET /api/v1/admin/members` | `dashboard/(routes)/members` | live table. ⚠️ **backend currently 400s** (`BAD_REQUEST`, no params accepted) → page shows EmptyState. FE row-map hardened (`-` defaults). Needs backend fix |
+| `GET /api/v1/admin/members` | `dashboard/(routes)/members` | live table. ✅ **now 200** (previously 400 `BAD_REQUEST` — backend fixed 2026-07-08); returns the member list + `meta` pagination. FE row-map hardened (`-` defaults) |
 | `GET /api/v1/admin/dashboard` | `dashboard/page.tsx` | ops metrics. `members_by_tier` can repeat a label (r4+b4 = "Plus") → rows aggregated by label so keys stay unique |
 | `GET /api/v1/giveaways/winners` | `dashboard/(routes)/winners` | admin Winners table; read-only, `-` defaults, EmptyState when none |
 | `GET /api/v1/discounts/` | `member/discounts/page.tsx` | card reduced to API fields |
@@ -119,7 +121,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - `getCurrentMember()` now reads the session (name/sub_tier/state) with safe defaults — no longer dummy.
 - **Paid registration deferred** — register wizard only wires the Visitor path (register → OTP → sign-in). RED/BLUE still flow into the mock spin/checkout screens; `requires_payment`/`spin_available` flags + Stripe checkout land in the next task.
 - **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
-- **🐞 BACKEND: `GET /admin/members` 400s** — returns `{code:"BAD_REQUEST","Unable to process your request"}` for every param combo (OpenAPI says no params). Generic error (not `VALIDATION_ERROR`) = server-side crash. Members page (`dashboard/(routes)/members`) degrades to EmptyState; needs a backend fix, not FE.
+- ✅ **RESOLVED: `GET /admin/members`** now returns 200 with the member list + `meta` pagination (was 400 `BAD_REQUEST`; backend fixed 2026-07-08). Members page + sub-tier stats no longer degrade. See [BACKEND-ISSUES.md](BACKEND-ISSUES.md).
 - **Dashboard theme** — `.slr-admin` now uses the member navy palette (`#131619` base) so the dashboard matches the member area; dashboard keeps its own sidebar/shell.
 - **🐞 BACKEND: `GET /discounts/` 403 for admin** — the list is tier-gated to RED/BLUE members, so admin gets `FORBIDDEN` ("Upgrade membership to unlock this benefit"). No admin-list variant exists → the dashboard Discounts page can create + delete but **can't list** existing rows (it surfaces the 403 for reporting). Backend should exempt admin/super_admin from the tier gate or add an admin list. Note field-name mismatch: list = snake_case, create/patch = camelCase (`id`, `partnerName`, `isFeatured`, `isActive`).
 - **Ebooks admin CRUD works** (list + create + edit + delete, all live-verified). Two gaps: (1) `GET /ebooks/{id}` is **403 for admin** (tier-gated) and the list omits `tierAccess`, so **edit re-selects the tier** (other fields prefill from the row); (2) `PATCH` resets unsent numeric fields → the FE sends the full object. Chapters CRUD deferred. Same snake (list) vs camel (mutation) mismatch as discounts.
