@@ -9,10 +9,22 @@ interface DrawStatusCardProps {
     draw: DrawStatus;
     // Preformatted on the server so SSR and client markup match (timezone-safe).
     drawsAtLabel: string;
+    /** Section label — defaults to the giveaway framing; pass "Current Cycle" for the cycle/renewal view. */
+    eyebrow?: string;
+    /** Prefix for the date footer, e.g. "Draws" (giveaway) or "Renews" (cycle). */
+    dateWord?: string;
     className?: string;
 }
 
-export function DrawStatusCard({ draw, drawsAtLabel, className }: DrawStatusCardProps) {
+export function DrawStatusCard({
+    draw,
+    drawsAtLabel,
+    eyebrow = 'Current Draw',
+    dateWord = 'Draws',
+    className
+}: DrawStatusCardProps) {
+    const hasPrize = Boolean(draw.prize_label) && draw.prize_label !== '-';
+
     return (
         <div
             className={cn(
@@ -23,7 +35,7 @@ export function DrawStatusCard({ draw, drawsAtLabel, className }: DrawStatusCard
             <div className='pointer-events-none absolute -top-16 -right-16 -z-10 hidden size-48 rounded-full bg-[#D4AF37]/10 blur-3xl xl:block' />
 
             <div className='flex items-start justify-between gap-2'>
-                <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase'>Current Draw</p>
+                <p className='text-slr-gold-label text-xs font-semibold tracking-widest uppercase'>{eyebrow}</p>
                 <EntryStatusBadge status={draw.entry_status} />
             </div>
 
@@ -45,11 +57,17 @@ export function DrawStatusCard({ draw, drawsAtLabel, className }: DrawStatusCard
             </div>
 
             <div className='mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-4'>
-                <span className='inline-flex items-center gap-2 font-semibold'>
-                    <Trophy className='text-slr-gold-label size-4' />
-                    <span className='text-gradient-gold'>{draw.prize_label}</span>
+                {hasPrize ? (
+                    <span className='inline-flex items-center gap-2 font-semibold'>
+                        <Trophy className='text-slr-gold-label size-4' />
+                        <span className='text-gradient-gold'>{draw.prize_label}</span>
+                    </span>
+                ) : (
+                    <span className='text-slr-muted text-xs'>Entries reset each 28-day cycle</span>
+                )}
+                <span className='text-slr-dim text-xs'>
+                    {dateWord} {drawsAtLabel}
                 </span>
-                <span className='text-slr-dim text-xs'>Draws {drawsAtLabel}</span>
             </div>
         </div>
     );

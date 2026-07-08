@@ -24,7 +24,7 @@ export interface MembershipSummary {
     billing_status: BillingStatus;
     price_cents: number; // integer cents AUD, billed per 28-day cycle
     next_payment_date: string; // ISO date — next renewal
-    beny_addon: boolean; // BENY $4/mo add-on active?
+    beny_addon: boolean | null; // BENY $4/mo add-on active; null = unknown (row hidden until the BENY endpoint lands)
 }
 
 export interface DrawStatus {

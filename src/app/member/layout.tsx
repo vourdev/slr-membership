@@ -3,10 +3,10 @@ import type { ReactNode } from 'react';
 import { auth } from '@/auth';
 import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
-import { getMemberDashboard } from '@/data/member-dashboard';
-import { getNotifications as getApiNotifications } from '@/lib/api/resources/notifications';
-import { getAccessToken } from '@/lib/api/server';
+import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
+import { type NotificationDto, getNotifications as getApiNotifications } from '@/lib/api/resources/notifications';
+import { getAccessToken } from '@/lib/api/server';
 
 import { MemberHeader } from './_components/member-header';
 import { MemberSidebar } from './_components/member-sidebar';
@@ -16,11 +16,11 @@ export default async function MemberLayout({ children }: { children: ReactNode }
     const user = session?.user ?? null;
     const token = await getAccessToken();
 
-    // Membership attributes (tier, state) aren't on the session yet — pull them
-    // from the mock API. Swap these for the Axios client later.
-    const [{ member }] = await Promise.all([getMemberDashboard()]);
-    
-    let notifications: any[] = [];
+    // Member identity (name, tier, state) from the session — state isn't on
+    // memberships/me, so it stays session-sourced.
+    const member = await getCurrentMember();
+
+    let notifications: NotificationDto[] = [];
     if (token) {
         try {
             notifications = await getApiNotifications(token);

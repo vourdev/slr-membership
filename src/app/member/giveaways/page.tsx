@@ -1,9 +1,15 @@
 import type { Metadata } from 'next';
 
-import { getGiveaways } from '@/data/giveaways';
+import EmptyState from '@/components/common/empty-state';
 import { getCurrentMember } from '@/data/member-dashboard';
+import { handleApiAuthError } from '@/lib/api/guard';
+import { getGiveaways, toGiveaway } from '@/lib/api/resources/giveaways';
+import { getAccessToken } from '@/lib/api/server';
+import { tierGroupOf } from '@/lib/member';
+import type { Giveaway } from '@/types/member';
 
 import { GiveawaysBoard } from './_components/giveaways-board';
+import { Gift } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Giveaways · SLR Member'
@@ -11,7 +17,21 @@ export const metadata: Metadata = {
 
 export default async function GiveawaysPage() {
     const member = await getCurrentMember();
-    const giveaways = await getGiveaways(member.sub_tier);
+    const token = await getAccessToken();
+    const memberGroup = tierGroupOf(member.sub_tier);
+
+    let giveaways: Giveaway[] = [];
+    let failed = false;
+
+    if (token) {
+        try {
+            const list = await getGiveaways(token);
+            giveaways = list.map((g) => toGiveaway(g, memberGroup, member.state));
+        } catch (error) {
+            handleApiAuthError(error); // expired session → force logout
+            failed = true;
+        }
+    }
 
     return (
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
@@ -22,7 +42,15 @@ export default async function GiveawaysPage() {
                 </p>
             </header>
 
-            <GiveawaysBoard giveaways={giveaways} memberSubTier={member.sub_tier} />
+            {failed || giveaways.length === 0 ? (
+                <EmptyState
+                    icon={Gift}
+                    title='No Giveaways Right Now'
+                    description='Active draws for your tier will appear here soon.'
+                />
+            ) : (
+                <GiveawaysBoard giveaways={giveaways} memberSubTier={member.sub_tier} />
+            )}
         </div>
     );
 }

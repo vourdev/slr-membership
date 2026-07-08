@@ -76,6 +76,16 @@ export interface TierDisplay {
 export const getMembershipTiers = cache(() => apiFetch<MembershipTiers>(API.memberships.tiers, { revalidate: 3600 }));
 
 /**
+ * My membership. Live GET /memberships/me returns the same shape as the
+ * change-tier response (`MembershipRecord`): subTierId, billingStatus (UPPERCASE),
+ * activatedAt (cycle anchor), and the nested subTier config. It carries NO
+ * `state` (that comes from the session) and NO next-payment/BENY fields.
+ */
+export const getMyMembership = cache((token: string) =>
+    apiFetch<MembershipRecord>(API.memberships.me, { token, cache: 'no-store' })
+);
+
+/**
  * Admin: change a member's tier/sub-tier (callable on behalf of any member
  * with an admin token). Body `{ userId, subTierId }`. This sets tier + sub-tier
  * granularity; it does NOT change the member's state.

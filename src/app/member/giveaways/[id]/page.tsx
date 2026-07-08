@@ -8,11 +8,13 @@ import { CountdownBoxes } from '@/components/common/countdown';
 import { EntryStatusBadge } from '@/components/common/entry-status-badge';
 import { TierGroupBadge } from '@/components/common/tier-badge';
 import { TIER_VISUALS } from '@/constant/tiers';
-import { getGiveawayById } from '@/data/giveaways';
 import { getCurrentMember } from '@/data/member-dashboard';
-import { formatDrawDateTime, formatShortDate } from '@/lib/member';
+import { handleApiAuthError } from '@/lib/api/guard';
+import { getGiveaway, toGiveawayDetail } from '@/lib/api/resources/giveaways';
+import { getAccessToken } from '@/lib/api/server';
+import { formatDrawDateTime, formatShortDate, tierGroupOf } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
-import type { GiveawayEntryRow, PastWinner } from '@/types/member';
+import type { GiveawayDetail, GiveawayEntryRow, PastWinner } from '@/types/member';
 
 import {
     ArrowLeft,
@@ -26,9 +28,28 @@ import {
     Trophy
 } from 'lucide-react';
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+// getGiveaway is React.cache'd on (id, token) → one network call even though
+// metadata + the page both load it. ⚠️ giveaways/{id} is unverifiable while the
+// list 500s → any failure degrades to notFound (see SP1 spec / API-INTEGRATION).
+async function loadGiveaway(id: string): Promise<GiveawayDetail | null> {
     const member = await getCurrentMember();
-    const giveaway = await getGiveawayById((await params).id, member.sub_tier);
+    const token = await getAccessToken();
+
+    if (!token) return null;
+
+    try {
+        const detail = await getGiveaway(id, token);
+
+        return toGiveawayDetail(detail, tierGroupOf(member.sub_tier), member.state);
+    } catch (error) {
+        handleApiAuthError(error); // expired session → force logout
+
+        return null;
+    }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const giveaway = await loadGiveaway((await params).id);
 
     return { title: giveaway ? `${giveaway.title} · SLR Giveaways` : 'Giveaway · SLR' };
 }
@@ -44,8 +65,7 @@ function InfoCard({ title, children }: { title: string; children: ReactNode }) {
 
 export default async function GiveawayDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const member = await getCurrentMember();
-    const giveaway = await getGiveawayById(id, member.sub_tier);
+    const giveaway = await loadGiveaway(id);
 
     if (!giveaway) notFound();
 

@@ -1,7 +1,34 @@
 import { SUB_TIERS, TIER_VISUALS } from '@/constant/tiers';
-import type { SubTierCode, TierGroup } from '@/types/member';
+import type { BillingStatus, SubTierCode, TierGroup } from '@/types/member';
 
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
+
+// ── API → UI mappers (memberships/me + entries) ──────────────────────────────
+
+/** Live subTierId is lowercase (`r4`); the UI keys off the uppercase `SubTierCode`. */
+export function subTierCodeOf(subTierId: string | undefined): SubTierCode {
+    const code = subTierId?.toUpperCase();
+
+    return code && code in SUB_TIERS ? (code as SubTierCode) : 'VISITOR';
+}
+
+/** Live billingStatus is UPPERCASE (`ACTIVE`); map to the UI `BillingStatus`, defaulting to active. */
+export function mapBillingStatus(raw: string | undefined): BillingStatus {
+    switch (raw?.toUpperCase()) {
+        case 'PAST_DUE':
+            return 'past_due';
+        case 'CANCELED':
+        case 'CANCELLED':
+            return 'canceled';
+        default:
+            return 'active';
+    }
+}
+
+/** Cycle is a flat 28 days from the payment anchor — used to derive the next renewal when the API omits it. */
+export function cycleEndFrom(activatedAtIso: string): string {
+    return addDays(new Date(activatedAtIso), 28).toISOString();
+}
 
 export function getSubTierMeta(code: SubTierCode) {
     return SUB_TIERS[code];

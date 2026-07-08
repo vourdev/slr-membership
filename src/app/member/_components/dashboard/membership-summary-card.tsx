@@ -67,13 +67,15 @@ export function MembershipSummaryCard({ summary, className }: { summary: Members
                 <Row icon={<Ticket className='size-4' />} label='Entries per draw'>
                     <span className='tabular-nums'>{meta.tokens}</span>
                 </Row>
-                <Row icon={<Sparkles className='size-4' />} label='BENY add-on'>
-                    {summary.beny_addon ? (
-                        <span className='text-slr-gold-label'>Active</span>
-                    ) : (
-                        <span className='text-slr-dim'>Not added</span>
-                    )}
-                </Row>
+                {summary.beny_addon !== null && (
+                    <Row icon={<Sparkles className='size-4' />} label='BENY add-on'>
+                        {summary.beny_addon ? (
+                            <span className='text-slr-gold-label'>Active</span>
+                        ) : (
+                            <span className='text-slr-dim'>Not added</span>
+                        )}
+                    </Row>
+                )}
             </div>
         </div>
     );

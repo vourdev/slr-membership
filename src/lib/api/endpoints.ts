@@ -40,6 +40,8 @@ export const API = {
         remove: (id: string) => `/api/v1/ebooks/${id}`
     },
     giveaways: {
+        list: '/api/v1/giveaways/',
+        detail: (id: string) => `/api/v1/giveaways/${id}`,
         winners: '/api/v1/giveaways/winners'
     },
     entries: {

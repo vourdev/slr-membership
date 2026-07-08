@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 26 / 75 endpoints integrated (called from the app).**
+**Ratio: 29 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -90,16 +90,20 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. ⚠️ does **not** change `state` (no endpoint found that does). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored |
 | `GET /api/v1/memberships/stats` | `dashboard/(routes)/members` | member counts per **sub-tier**, rendered as a `SubTierStats` card above the list. ⚠️ **shape drift**: OpenAPI said "grouped by tier+state" but live returns Prisma-raw `[{ _count:{_all}, subTierId }]` grouped by **sub-tier only** (no state). Normalized → `{subTierId, count}`, present-only, canonical sort. Fetched via `Promise.allSettled` alongside `admin/members` so the list's 400 no longer blanks the card |
 | `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
-| `GET /api/v1/entries/` | `member/entry-history/page.tsx` | user entry history + empty states |
+| `GET /api/v1/entries/` | `member/entry-history/page.tsx` · `member/page.tsx` | entry history + **member dashboard cycle card** (current_cycle → entry_status, total_token, renewal countdown) |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
+| `GET /api/v1/memberships/me` | `member/page.tsx` | dashboard summary card. Live shape == `MembershipRecord` (subTierId, billingStatus UPPERCASE, activatedAt, subTier). ⚠️ carries **no `state`** (session), no next-payment, no BENY |
+| `GET /api/v1/giveaways/` | `member/page.tsx` · `member/giveaways` | upcoming + list board. ⚠️ **backend 500 INTERNAL_ERROR (all tiers)** → degrades to EmptyState; `ApiGiveaway` DTO **unverified** |
+| `GET /api/v1/giveaways/{id}` | `member/giveaways/[id]` | giveaway detail (via cached `loadGiveaway`). Unverifiable while list 500s → `notFound` on failure |
 
-**Mapped in `endpoints.ts`, not called:** `POST /auth/refresh`, `POST /auth/logout`, `GET /memberships/me`.
+**Mapped in `endpoints.ts`, not called:** `POST /auth/refresh`, `POST /auth/logout`.
 
 ### Known gaps / deferred
 - **Token refresh not implemented** — access token expires → 401 → forced logout. Wire `POST /auth/refresh` into NextAuth `jwt` callback (refresh_token in session) to auto-rotate.
 - **Discounts API** lacks `value_label` / promo `code` / `terms` (list + detail).
-- **Dummy leftovers:** `data/discounts.ts` (`getDiscounts`, `DISCOUNTS`) orphaned; `data/member-dashboard.ts` mock; member dashboard "Featured Discounts", giveaways, entry-history, referral, billing, spin, ebooks still mock.
-- `getCurrentMember()` (discounts gate) reads dummy — should use session tier.
+- **Dummy leftovers:** `data/discounts.ts` (`getBenyStatus`, `BENY_CATEGORIES`) still mock; member **referral, billing, spin, prizes** still mock. `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember` (no more mock dashboard payload); `data/giveaways.ts` **deleted**.
+- ✅ **SP1 done** — member dashboard (`/member`) + giveaways list/detail now live off `memberships/me` + `entries/` + `discounts/` + `giveaways/`. Draw-cycle surface (entry_status, tokens, renewal) sourced from `entries/` current_cycle (never `draw_pass`).
+- `getCurrentMember()` now reads the session (name/sub_tier/state) with safe defaults — no longer dummy.
 - **Paid registration deferred** — register wizard only wires the Visitor path (register → OTP → sign-in). RED/BLUE still flow into the mock spin/checkout screens; `requires_payment`/`spin_available` flags + Stripe checkout land in the next task.
 - **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
 - **🐞 BACKEND: `GET /admin/members` 400s** — returns `{code:"BAD_REQUEST","Unable to process your request"}` for every param combo (OpenAPI says no params). Generic error (not `VALIDATION_ERROR`) = server-side crash. Members page (`dashboard/(routes)/members`) degrades to EmptyState; needs a backend fix, not FE.
@@ -108,6 +112,9 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **Ebooks admin CRUD works** (list + create + edit + delete, all live-verified). Two gaps: (1) `GET /ebooks/{id}` is **403 for admin** (tier-gated) and the list omits `tierAccess`, so **edit re-selects the tier** (other fields prefill from the row); (2) `PATCH` resets unsent numeric fields → the FE sends the full object. Chapters CRUD deferred. Same snake (list) vs camel (mutation) mismatch as discounts.
 
 - **Admin can't change a member's `state`** — neither `PUT /admin/members/{id}/tier` (base tier only) nor `POST /memberships/change-tier` (`{userId, subTierId}` only) accepts state; an extra `state` field is silently ignored. Draw-pool `state+tier` state moves need a backend endpoint. Member-detail admin actions cover status + tier/sub-tier only.
+
+- **🐞 BACKEND: `GET /giveaways/` 500s for every tier** — returns `{code:"INTERNAL_ERROR"}` for red/blue/visitor (`/giveaways/winners` works, so the list/detail handlers specifically are broken). The member dashboard's upcoming-giveaways + both `/member/giveaways` pages degrade to EmptyState/`notFound`. The `ApiGiveaway`/`ApiGiveawayDetail` DTOs + `toGiveaway`/`toGiveawayDetail` mappers are **unverified** against a real body (modelled off the winners `giveaway` hint) — a fix likely needs only field-name tweaks in `resources/giveaways.ts`. Needs a backend fix.
+- **`memberships/me` shape gaps** — no `state` (session-sourced), no next-payment (derived `activatedAt + 28d` / `entries.current_cycle.end_at`), no BENY (row hidden until SP4). Also `entries.current_cycle.total_token` = 7 for the seed R4 vs PRD R4 = 4 tokens → confirm canonical token allocation.
 
 ### Suggested next
 `memberships/me` + `giveaways/` (member dashboard) · `ebooks/` (reader) · `auth/refresh` (stop forced logouts) · admin member detail/status/tier.
@@ -162,13 +169,13 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked (403 for admin — tier-gated) |
 | ✅ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
 | ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
-| ❌ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier |
+| ✅ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier (⚠️ backend 500 → EmptyState) |
 | ✅ | GET | `/api/v1/giveaways/winners` | giveaways | List past giveaway winners |
-| ❌ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information |
+| ✅ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information (⚠️ unverifiable while list 500s → notFound) |
 | ❌ | GET | `/api/v1/health/livez` | health | Liveness probe |
 | ❌ | GET | `/api/v1/health/readyz` | health | Readiness probe (DB + Redis) |
 | ✅ | POST | `/api/v1/memberships/change-tier` | membership | Admin: change user's tier/sub-tier (state NOT changed) |
-| 🟡 | GET | `/api/v1/memberships/me` | membership | My membership |
+| ✅ | GET | `/api/v1/memberships/me` | membership | My membership → `member/page.tsx` summary (shape == `MembershipRecord`; no state/next-payment/BENY) |
 | ✅ | GET | `/api/v1/memberships/stats` | membership | Member counts grouped by **sub-tier** (NOT tier+state — OpenAPI drift) → `dashboard/(routes)/members` |
 | ✅ | GET | `/api/v1/memberships/tiers` | membership | Active membership tiers |
 | ❌ | DELETE | `/api/v1/memberships/upgrade` | membership | Cancel scheduled pending upgrade/downgrade |
