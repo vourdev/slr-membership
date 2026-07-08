@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 29 / 75 endpoints integrated (called from the app).**
+**Ratio: 30 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -90,6 +90,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. ⚠️ does **not** change `state` (no endpoint found that does). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored |
 | `GET /api/v1/memberships/stats` | `dashboard/(routes)/members` | member counts per **sub-tier**, rendered as a `SubTierStats` card above the list. ⚠️ **shape drift**: OpenAPI said "grouped by tier+state" but live returns Prisma-raw `[{ _count:{_all}, subTierId }]` grouped by **sub-tier only** (no state). Normalized → `{subTierId, count}`, present-only, canonical sort. Fetched via `Promise.allSettled` alongside `admin/members` so the list's 400 no longer blanks the card |
 | `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
+| `GET /api/v1/ebooks/` | `member/ebooks/page.tsx` | member library grid; server-computed `is_locked` per tier → lock badge + upgrade CTA on locked cards |
+| `GET /api/v1/ebooks/{id}` | `member/ebooks/[id]` | **long-form reader (halaman baca)** — chapters → shared `<EbookReader>`. 403 (tier-locked) → in-page upgrade gate |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` · `member/page.tsx` | entry history + **member dashboard cycle card** (current_cycle → entry_status, total_token, renewal countdown) |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
 | `GET /api/v1/memberships/me` | `member/page.tsx` | dashboard summary card. Live shape == `MembershipRecord` (subTierId, billingStatus UPPERCASE, activatedAt, subTier). ⚠️ carries **no `state`** (session), no next-payment, no BENY |
@@ -103,6 +105,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **Discounts API** lacks `value_label` / promo `code` / `terms` (list + detail).
 - **Dummy leftovers:** `data/discounts.ts` (`getBenyStatus`, `BENY_CATEGORIES`) still mock; member **referral, billing, spin, prizes** still mock. `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember` (no more mock dashboard payload); `data/giveaways.ts` **deleted**.
 - ✅ **SP1 done** — member dashboard (`/member`) + giveaways list/detail now live off `memberships/me` + `entries/` + `discounts/` + `giveaways/`. Draw-cycle surface (entry_status, tokens, renewal) sourced from `entries/` current_cycle (never `draw_pass`).
+- ✅ **SP2 done** — member e-books: list (`member/ebooks`) off `GET /ebooks/` with per-tier lock badge/upgrade CTA, and the long-form reader (`member/ebooks/[id]`) off `GET /ebooks/{id}` → shared `<EbookReader>` (extracted from the public `(home)/ebooks` page; both now share it). Locked (403) → in-page upgrade gate. Chapter body split on blank lines; CMS cover images render `unoptimized` (host allowlist unknown — add to `next.config` `images.remotePatterns` if optimization wanted). `GET /ebooks/{id}` chapters CRUD (admin) still deferred.
 - `getCurrentMember()` now reads the session (name/sub_tier/state) with safe defaults — no longer dummy.
 - **Paid registration deferred** — register wizard only wires the Visitor path (register → OTP → sign-in). RED/BLUE still flow into the mock spin/checkout screens; `requires_payment`/`spin_available` flags + Stripe checkout land in the next task.
 - **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
@@ -166,7 +169,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | PATCH | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: update chapter |
 | ❌ | POST | `/api/v1/ebooks/{id}/chapters` | ebooks | Admin: create chapter |
 | ✅ | DELETE | `/api/v1/ebooks/{id}` | ebooks | Admin: delete ebook |
-| ❌ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked (403 for admin — tier-gated) |
+| ✅ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked → `member/ebooks/[id]` reader (403 → upgrade gate; still 403 for admin) |
 | ✅ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
 | ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
 | ✅ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier (⚠️ backend 500 → EmptyState) |

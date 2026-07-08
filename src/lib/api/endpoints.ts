@@ -35,6 +35,7 @@ export const API = {
     },
     ebooks: {
         list: '/api/v1/ebooks/',
+        detail: (id: string) => `/api/v1/ebooks/${id}`,
         create: '/api/v1/ebooks/',
         update: (id: string) => `/api/v1/ebooks/${id}`,
         remove: (id: string) => `/api/v1/ebooks/${id}`
