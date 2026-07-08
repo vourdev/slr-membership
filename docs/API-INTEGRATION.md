@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 31 / 75 endpoints integrated (called from the app).**
+**Ratio: 34 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -95,6 +95,9 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/ebooks/{id}` | `member/ebooks/[id]` | **long-form reader (halaman baca)** — chapters → shared `<EbookReader>`. 403 (tier-locked) → in-page upgrade gate |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` · `member/page.tsx` | entry history + **member dashboard cycle card** (current_cycle → entry_status, total_token, renewal countdown) |
 | `GET /api/v1/notifications/` | `member/layout.tsx` | member bell panel |
+| `GET /api/v1/beny/status` | `member/discounts/page.tsx` | member BENY add-on status → `BenySection`. Enum: inactive/pending_activation/active/canceled |
+| `POST /api/v1/beny/subscribe` | `member/discounts` (beny-actions) | subscribe (body `{name,email,phone}`). ⚠️ **Stripe block** — see below |
+| `DELETE /api/v1/beny/subscribe` | `member/discounts` (beny-actions) | cancel. Only cancels an **active** sub — returns NOT_FOUND on `pending_activation` |
 | `GET /api/v1/memberships/me` | `member/page.tsx` | dashboard summary card. Live shape == `MembershipRecord` (subTierId, billingStatus UPPERCASE, activatedAt, subTier). ⚠️ carries **no `state`** (session), no next-payment, no BENY |
 | `GET /api/v1/giveaways/` | `member/page.tsx` · `member/giveaways` | upcoming + list board. ⚠️ **backend 500 INTERNAL_ERROR (all tiers)** → degrades to EmptyState; `ApiGiveaway` DTO **unverified** |
 | `GET /api/v1/giveaways/{id}` | `member/giveaways/[id]` | giveaway detail (via cached `loadGiveaway`). Unverifiable while list 500s → `notFound` on failure |
@@ -105,7 +108,12 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **Token refresh not implemented** — access token expires → 401 → forced logout. Wire `POST /auth/refresh` into NextAuth `jwt` callback (refresh_token in session) to auto-rotate.
 - **Discounts member DTO** (`GET /discounts/` + `/{id}`) lacks `value_label` / promo `code` / `terms` — `code`/`terms` exist only on the admin create/PATCH camelCase response. `GET /discounts/{id}` returns the same thin shape as the list, so a member detail view adds nothing (not built). Backend should expose `code`/`terms`/`value_label` on the member endpoints.
 - ✅ **SP3 done** — admin discount **edit** (`PATCH /discounts/{id}`, partial merge) wired into `dashboard/(routes)/discounts` (reuses the create dialog; prefills from session records since admin can't GET a row). Added the missing `action` column, which also revives the previously-unreachable **delete**. Still gated by the `GET /discounts/` 403 → edit/delete only reach session-created rows until the backend opens the admin list.
-- **Dummy leftovers:** `data/discounts.ts` (`getBenyStatus`, `BENY_CATEGORIES`) still mock; member **referral, billing, spin, prizes** still mock. `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember` (no more mock dashboard payload); `data/giveaways.ts` **deleted**.
+- ✅ **SP4 done (partial by design — Stripe-blocked)** — member BENY add-on flow: live `GET /beny/status` drives `BenySection`; `POST /beny/subscribe` (subscribe) + `DELETE /beny/subscribe` (cancel) wired via `member/discounts/beny-actions.ts`. `data/discounts.ts` trimmed to `BENY_CATEGORIES` (dead mock removed).
+  - **🐞 BACKEND: BENY subscribe skips Stripe** — PRD §1 requires subscribe to redirect to Stripe Checkout ($4/mo) BEFORE creating the pending record. Live `POST /beny/subscribe` creates `pending_activation` **immediately, no charge, no checkout URL**. Integrated as-is; a `⚠️ BACKEND BLOCK — remove once Stripe is wired` comment marks both [beny-actions.ts](<src/app/member/discounts/beny-actions.ts>) (add the redirect here) and [beny-section.tsx](<src/app/member/discounts/_components/beny-section.tsx>) (the "redirected to secure checkout" copy). **Delete these comments once the backend returns a checkout session.**
+  - **🐞 BACKEND: `DELETE /beny/subscribe` NOT_FOUND on pending** — cancel only works on an `active` sub; a `pending_activation` member can't cancel. FE hides the cancel button for pending. Confirm whether pending should be cancelable.
+  - Field name is `name` (not `full_name`). Subscribe returns only `{ beny_status }` (no record id).
+  - Test side effect: `red@` dev account is now `pending_activation` (subscribe worked, DELETE can't clear pending) — admin activation or a backend reset needed to restore it to `inactive`.
+- **Dummy leftovers:** member **referral, billing, spin, prizes** still mock. `data/discounts.ts` trimmed to `BENY_CATEGORIES` (static marketing; `getBenyStatus`/`getDiscounts`/`DISCOUNTS` mock removed); `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember`; `data/giveaways.ts` **deleted**.
 - ✅ **SP1 done** — member dashboard (`/member`) + giveaways list/detail now live off `memberships/me` + `entries/` + `discounts/` + `giveaways/`. Draw-cycle surface (entry_status, tokens, renewal) sourced from `entries/` current_cycle (never `draw_pass`).
 - ✅ **SP2 done** — member e-books: list (`member/ebooks`) off `GET /ebooks/` with per-tier lock badge/upgrade CTA, and the long-form reader (`member/ebooks/[id]`) off `GET /ebooks/{id}` → shared `<EbookReader>` (extracted from the public `(home)/ebooks` page; both now share it). Locked (403) → in-page upgrade gate. Chapter body split on blank lines; CMS cover images render `unoptimized` (host allowlist unknown — add to `next.config` `images.remotePatterns` if optimization wanted). `GET /ebooks/{id}` chapters CRUD (admin) still deferred.
 - `getCurrentMember()` now reads the session (name/sub_tier/state) with safe defaults — no longer dummy.
@@ -154,9 +162,9 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | POST | `/api/v1/auth/resend-otp` | auth | Resend OTP code |
 | ✅ | POST | `/api/v1/auth/reset-password` | auth | Confirm password reset with token |
 | ✅ | POST | `/api/v1/auth/verify-otp` | auth | Verify OTP code |
-| ❌ | GET | `/api/v1/beny/status` | beny | Get current user BENY status |
-| ❌ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription |
-| ❌ | POST | `/api/v1/beny/subscribe` | beny | Subscribe to BENY add-on |
+| ✅ | GET | `/api/v1/beny/status` | beny | Get current user BENY status → `member/discounts` BenySection |
+| ✅ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription (active only; NOT_FOUND on pending) |
+| ✅ | POST | `/api/v1/beny/subscribe` | beny | Subscribe to BENY add-on (⚠️ no Stripe charge — see blockers) |
 | ❌ | GET | `/api/v1/billing/invoices` | billing | Get billing invoice list |
 | ❌ | POST | `/api/v1/billing/pay-manual` | billing | Pay manual for grace period invoice |
 | ❌ | GET | `/api/v1/billing/status` | billing | Get current billing status |

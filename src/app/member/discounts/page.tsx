@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import EmptyState from '@/components/common/empty-state';
-import { getBenyStatus } from '@/data/discounts';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
+import { type BenyStatusValue, getBenyStatus } from '@/lib/api/resources/beny';
 import { type Discount, getDiscounts } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
 import { tierGroupOf } from '@/lib/member';
@@ -25,20 +25,30 @@ export default async function DiscountsPage() {
 
     let discounts: Discount[] = [];
     let failed = false;
+    let benyStatus: BenyStatusValue = 'inactive';
 
     if (canAccess) {
         const token = await getAccessToken();
-        try {
-            const list = token ? await getDiscounts(token) : [];
-            // Only show discounts that actually carry data.
-            discounts = list.filter((d) => d.title?.trim() || d.partner_name?.trim());
-        } catch (error) {
-            handleApiAuthError(error); // expired session → force logout
-            failed = true;
+        if (token) {
+            // Independent reads — allSettled so a discounts failure can't blank BENY (and vice versa).
+            const [discountsRes, benyRes] = await Promise.allSettled([getDiscounts(token), getBenyStatus(token)]);
+
+            if (discountsRes.status === 'fulfilled') {
+                // Only show discounts that actually carry data.
+                discounts = discountsRes.value.filter((d) => d.title?.trim() || d.partner_name?.trim());
+            } else {
+                handleApiAuthError(discountsRes.reason); // expired session → force logout
+                failed = true;
+            }
+
+            if (benyRes.status === 'fulfilled') {
+                benyStatus = benyRes.value.beny_status ?? 'inactive';
+            } else {
+                handleApiAuthError(benyRes.reason);
+            }
         }
     }
 
-    const beny = canAccess ? await getBenyStatus() : null;
     const categories = Array.from(new Set(discounts.map((d) => d.category))).sort();
 
     return (
@@ -67,7 +77,7 @@ export default async function DiscountsPage() {
                             description='New partner offers are on the way — check back soon.'
                         />
                     )}
-                    <BenySection active={beny?.active ?? false} />
+                    <BenySection status={benyStatus} />
                 </>
             ) : (
                 <div className='bg-card-dark-navy border-slr-navy-border flex flex-col items-center rounded-2xl border px-6 py-14 text-center'>

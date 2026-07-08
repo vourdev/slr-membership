@@ -35,6 +35,10 @@ export const API = {
         update: (id: string) => `/api/v1/discounts/${id}`,
         remove: (id: string) => `/api/v1/discounts/${id}`
     },
+    beny: {
+        status: '/api/v1/beny/status',
+        subscribe: '/api/v1/beny/subscribe'
+    },
     ebooks: {
         list: '/api/v1/ebooks/',
         detail: (id: string) => `/api/v1/ebooks/${id}`,

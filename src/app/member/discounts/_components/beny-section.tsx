@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { BENY_CATEGORIES } from '@/data/discounts';
+import type { BenyStatusValue } from '@/lib/api/resources/beny';
 import { goldButtonStyle, inputClassName } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 
-import { Check, Clock, Fuel, Heart, type LucideIcon, ShoppingBag, Sparkles } from 'lucide-react';
+import { cancelBenyAction, subscribeBenyAction } from '../beny-actions';
+import { Check, Clock, Fuel, Heart, Loader2Icon, type LucideIcon, ShoppingBag, Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 const CATEGORY_ICON: Record<string, LucideIcon> = {
     'Petrol Saving': Fuel,
@@ -16,20 +19,39 @@ const CATEGORY_ICON: Record<string, LucideIcon> = {
     'Health & Wellbeing': Heart
 };
 
-type Status = 'active' | 'inactive' | 'pending' | 'canceled';
-
-export function BenySection({ active }: { active: boolean }) {
-    const [status, setStatus] = useState<Status>(active ? 'active' : 'inactive');
+export function BenySection({ status: initialStatus }: { status: BenyStatusValue }) {
+    const [status, setStatus] = useState<BenyStatusValue>(initialStatus);
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState({ name: '', email: '', phone: '' });
+    const [isPending, startTransition] = useTransition();
+
+    const canSubscribe = status === 'inactive' || status === 'canceled';
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Mock: real flow collects these details then redirects to Stripe Checkout
-        // ($4/mo). After payment the member lands on the admin "pending activation"
-        // list; BENY is activated manually off-platform.
-        setStatus('pending');
-        setShowForm(false);
+        startTransition(async () => {
+            const res = await subscribeBenyAction(form);
+            if (res.ok) {
+                setStatus(res.status);
+                setShowForm(false);
+                setForm({ name: '', email: '', phone: '' });
+                toast.success('BENY requested — pending admin activation.');
+            } else {
+                toast.error(res.code ? `${res.message} (${res.code})` : res.message);
+            }
+        });
+    };
+
+    const cancel = () => {
+        startTransition(async () => {
+            const res = await cancelBenyAction();
+            if (res.ok) {
+                setStatus(res.status);
+                toast.success(res.message);
+            } else {
+                toast.error(res.code ? `${res.message} (${res.code})` : res.message);
+            }
+        });
     };
 
     return (
@@ -74,20 +96,16 @@ export function BenySection({ active }: { active: boolean }) {
                         </span>
                         <button
                             type='button'
-                            onClick={() => setStatus('canceled')}
-                            className='rounded-lg border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 hover:text-white'>
+                            onClick={cancel}
+                            disabled={isPending}
+                            className='inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60'>
+                            {isPending ? <Loader2Icon className='size-4 animate-spin' /> : null}
                             Cancel BENY
                         </button>
                     </div>
                 )}
 
-                {status === 'canceled' && (
-                    <p className='text-slr-muted text-sm'>
-                        BENY has been canceled. Your access continues until the end of the current billing period.
-                    </p>
-                )}
-
-                {status === 'pending' && (
+                {status === 'pending_activation' && (
                     <p className='inline-flex items-start gap-2 text-sm text-white/90'>
                         <Clock className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
                         Pending activation — you&apos;ll receive access details by email shortly, then download the BENY
@@ -95,9 +113,12 @@ export function BenySection({ active }: { active: boolean }) {
                     </p>
                 )}
 
-                {status === 'inactive' &&
+                {canSubscribe &&
                     (showForm ? (
                         <form onSubmit={submit} className='space-y-3'>
+                            {/* ⚠️ BACKEND BLOCK — remove once Stripe is wired: this copy promises a
+                                checkout redirect, but POST /beny/subscribe currently creates the pending
+                                record without charging (no Stripe session). See beny-actions.ts. */}
                             <p className='text-slr-muted text-sm'>
                                 Enter your details to add BENY. You&apos;ll be redirected to secure checkout for the
                                 $4/month subscription.
@@ -130,8 +151,10 @@ export function BenySection({ active }: { active: boolean }) {
                             <div className='flex items-center gap-2'>
                                 <button
                                     type='submit'
-                                    className='inline-flex h-10 items-center justify-center rounded-xl px-5 text-sm font-bold uppercase'
+                                    disabled={isPending}
+                                    className='inline-flex h-10 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold uppercase disabled:opacity-60'
                                     style={goldButtonStyle}>
+                                    {isPending ? <Loader2Icon className='size-4 animate-spin' /> : null}
                                     Continue to checkout
                                 </button>
                                 <button
@@ -144,7 +167,11 @@ export function BenySection({ active }: { active: boolean }) {
                         </form>
                     ) : (
                         <div className='flex flex-wrap items-center justify-between gap-3'>
-                            <span className='text-slr-muted text-sm'>Not subscribed yet.</span>
+                            <span className='text-slr-muted text-sm'>
+                                {status === 'canceled'
+                                    ? 'BENY canceled — you can re-add it anytime.'
+                                    : 'Not subscribed yet.'}
+                            </span>
                             <button
                                 type='button'
                                 onClick={() => setShowForm(true)}
