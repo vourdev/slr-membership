@@ -5,5 +5,6 @@ export const discountsColumns: Column[] = [
     { key: 'partner', label: 'Partner' },
     { key: 'category', label: 'Category' },
     { key: 'featured', label: 'Featured' },
-    { key: 'active', label: 'Active' }
+    { key: 'active', label: 'Active' },
+    { key: 'action', label: 'Actions' }
 ];

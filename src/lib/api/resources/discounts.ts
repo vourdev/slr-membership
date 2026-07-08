@@ -38,6 +38,9 @@ export interface CreateDiscountPayload {
     isActive?: boolean;
 }
 
+// PATCH is a partial merge (verified: sending only { isFeatured } keeps description/terms).
+export type UpdateDiscountPayload = Partial<CreateDiscountPayload>;
+
 // ─── Resource functions ──────────────────────────────────────────────────────
 
 /** Partner discounts (RED/BLUE only — API enforces tier gating; admin gets 403). */
@@ -45,9 +48,18 @@ export const getDiscounts = cache((token: string) =>
     apiFetch<Discount[]>(API.discounts.list, { token, cache: 'no-store' })
 );
 
+/** One discount's detail. ⚠️ tier-gated like the list (admin gets 403); member DTO omits code/terms. */
+export const getDiscount = cache((id: string, token: string) =>
+    apiFetch<Discount>(API.discounts.detail(id), { token, cache: 'no-store' })
+);
+
 /** Admin: create a discount. */
 export const createDiscount = (token: string, body: CreateDiscountPayload) =>
     apiFetch<DiscountAdmin>(API.discounts.create, { method: 'POST', token, body });
+
+/** Admin: update a discount (partial merge). Returns the full camelCase record. */
+export const updateDiscount = (token: string, id: string, body: UpdateDiscountPayload) =>
+    apiFetch<DiscountAdmin>(API.discounts.update(id), { method: 'PATCH', token, body });
 
 /** Admin: delete a discount by id. */
 export const deleteDiscount = (token: string, id: string) =>

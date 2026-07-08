@@ -67,7 +67,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 30 / 75 endpoints integrated (called from the app).**
+**Ratio: 31 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -85,6 +85,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/discounts/` | `member/discounts/page.tsx` | card reduced to API fields |
 | `POST /api/v1/discounts/` | `dashboard/(routes)/discounts` | admin create (server action, camelCase body); returns `{id, partnerName, isFeatured, isActive, …}` |
 | `DELETE /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin delete (server action) |
+| `PATCH /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin edit (server action; partial merge — verified omitting `description` keeps it). Reuses the create dialog; added the missing `action` column so Edit + Delete now render |
 | `GET /api/v1/admin/members/{userId}` | `dashboard/(routes)/members/[userId]` | member detail (profile/membership/subscription/cycles/wins); renders `entry_status`, never `draw_pass` |
 | `PUT /api/v1/admin/members/{userId}/status` | `dashboard/(routes)/members/[userId]` | admin status update (server action). Body `{status:'ACTIVE'\|'SUSPENDED'\|'DEACTIVATED'}` (uppercase enum); returns `{user_id, status}` (lowercase). Live round-trip verified |
 | `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. ⚠️ does **not** change `state` (no endpoint found that does). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored |
@@ -102,7 +103,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ### Known gaps / deferred
 - **Token refresh not implemented** — access token expires → 401 → forced logout. Wire `POST /auth/refresh` into NextAuth `jwt` callback (refresh_token in session) to auto-rotate.
-- **Discounts API** lacks `value_label` / promo `code` / `terms` (list + detail).
+- **Discounts member DTO** (`GET /discounts/` + `/{id}`) lacks `value_label` / promo `code` / `terms` — `code`/`terms` exist only on the admin create/PATCH camelCase response. `GET /discounts/{id}` returns the same thin shape as the list, so a member detail view adds nothing (not built). Backend should expose `code`/`terms`/`value_label` on the member endpoints.
+- ✅ **SP3 done** — admin discount **edit** (`PATCH /discounts/{id}`, partial merge) wired into `dashboard/(routes)/discounts` (reuses the create dialog; prefills from session records since admin can't GET a row). Added the missing `action` column, which also revives the previously-unreachable **delete**. Still gated by the `GET /discounts/` 403 → edit/delete only reach session-created rows until the backend opens the admin list.
 - **Dummy leftovers:** `data/discounts.ts` (`getBenyStatus`, `BENY_CATEGORIES`) still mock; member **referral, billing, spin, prizes** still mock. `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember` (no more mock dashboard payload); `data/giveaways.ts` **deleted**.
 - ✅ **SP1 done** — member dashboard (`/member`) + giveaways list/detail now live off `memberships/me` + `entries/` + `discounts/` + `giveaways/`. Draw-cycle surface (entry_status, tokens, renewal) sourced from `entries/` current_cycle (never `draw_pass`).
 - ✅ **SP2 done** — member e-books: list (`member/ebooks`) off `GET /ebooks/` with per-tier lock badge/upgrade CTA, and the long-form reader (`member/ebooks/[id]`) off `GET /ebooks/{id}` → shared `<EbookReader>` (extracted from the public `(home)/ebooks` page; both now share it). Locked (403) → in-page upgrade gate. Chapter body split on blank lines; CMS cover images render `unoptimized` (host allowlist unknown — add to `next.config` `images.remotePatterns` if optimization wanted). `GET /ebooks/{id}` chapters CRUD (admin) still deferred.
@@ -161,8 +163,8 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | GET | `/api/v1/discounts/` | discounts | List partner discounts (RED/BLUE only) |
 | ✅ | POST | `/api/v1/discounts/` | discounts | Admin: create discount |
 | ✅ | DELETE | `/api/v1/discounts/{id}` | discounts | Admin: delete discount |
-| ❌ | GET | `/api/v1/discounts/{id}` | discounts | Get discount details |
-| ❌ | PATCH | `/api/v1/discounts/{id}` | discounts | Admin: update discount |
+| 🟡 | GET | `/api/v1/discounts/{id}` | discounts | Get discount details (`getDiscount` mapped; not called — member DTO is thin, admin gets 403) |
+| ✅ | PATCH | `/api/v1/discounts/{id}` | discounts | Admin: update discount → `dashboard/(routes)/discounts` edit (partial merge) |
 | ✅ | GET | `/api/v1/ebooks/` | ebooks | List published ebooks with is_locked properties |
 | ✅ | POST | `/api/v1/ebooks/` | ebooks | Admin: create ebook |
 | ❌ | DELETE | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: delete chapter |

@@ -31,6 +31,8 @@ export const API = {
     discounts: {
         list: '/api/v1/discounts/',
         create: '/api/v1/discounts/',
+        detail: (id: string) => `/api/v1/discounts/${id}`,
+        update: (id: string) => `/api/v1/discounts/${id}`,
         remove: (id: string) => `/api/v1/discounts/${id}`
     },
     ebooks: {

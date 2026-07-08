@@ -3,8 +3,10 @@
 import {
     type CreateDiscountPayload,
     type DiscountAdmin,
+    type UpdateDiscountPayload,
     createDiscount,
-    deleteDiscount
+    deleteDiscount,
+    updateDiscount
 } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError } from '@/lib/api/types';
@@ -37,6 +39,22 @@ export async function createDiscountAction(payload: CreateDiscountPayload): Prom
         const data = await createDiscount(token, payload);
 
         return { ok: true, data, message: 'Discount created.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function updateDiscountAction(
+    id: string,
+    payload: UpdateDiscountPayload
+): Promise<ActionResult<DiscountAdmin>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await updateDiscount(token, id, payload);
+
+        return { ok: true, data, message: 'Discount updated.' };
     } catch (error) {
         return toActionError(error);
     }

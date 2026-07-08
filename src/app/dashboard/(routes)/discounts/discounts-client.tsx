@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 
-import { AlertModal } from '@/components/alert-modal';
 import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,11 +17,11 @@ import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import type { DiscountAdmin } from '@/lib/api/resources/discounts';
+import type { DiscountAdmin, UpdateDiscountPayload } from '@/lib/api/resources/discounts';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { discountsColumns } from './_components/columns';
-import { createDiscountAction, deleteDiscountAction } from './actions';
+import { createDiscountAction, deleteDiscountAction, updateDiscountAction } from './actions';
 import { Loader2Icon, Plus, TriangleAlert } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -102,8 +101,11 @@ export function DiscountsClient({
     listError: ListError | null;
 }) {
     const [rows, setRows] = useState<DiscountRow[]>(initialRows);
+    // Full records for session create/edit — used to prefill the edit form (admin
+    // can't GET a discount: the detail endpoint is 403, like the list).
+    const [fullById, setFullById] = useState<Record<string, DiscountAdmin>>({});
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState<DiscountRow | null>(null);
+    const [editing, setEditing] = useState<DiscountRow | null>(null);
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<FormValues>({
@@ -111,40 +113,93 @@ export function DiscountsClient({
         defaultValues: { title: '', partnerName: '', category: '', description: '', isFeatured: false, isActive: true }
     });
 
+    const openCreate = () => {
+        setEditing(null);
+        form.reset({ title: '', partnerName: '', category: '', description: '', isFeatured: false, isActive: true });
+        setDialogOpen(true);
+    };
+
+    const openEdit = (row: DiscountRow) => {
+        const full = fullById[row.id];
+        setEditing(row);
+        form.reset({
+            title: row.title === '-' ? '' : row.title,
+            partnerName: row.partner === '-' ? '' : row.partner,
+            category: row.category === '-' ? '' : row.category,
+            description: full?.description ?? '',
+            isFeatured: row.featured === 'Yes',
+            isActive: row.active === 'Yes'
+        });
+        setDialogOpen(true);
+    };
+
+    const closeDialog = () => {
+        setDialogOpen(false);
+        setEditing(null);
+    };
+
     const onSubmit = (values: FormValues) => {
         startTransition(async () => {
+            if (editing) {
+                // PATCH merges — omit an empty description so an existing one we
+                // couldn't prefill (backend-listed rows) isn't clobbered.
+                const payload: UpdateDiscountPayload = {
+                    title: values.title,
+                    partnerName: values.partnerName,
+                    category: values.category,
+                    isFeatured: values.isFeatured,
+                    isActive: values.isActive,
+                    ...(values.description?.trim() ? { description: values.description } : {})
+                };
+                const res = await updateDiscountAction(editing.id, payload);
+                if (res.ok) {
+                    setRows((prev) => prev.map((r) => (r.id === res.data.id ? adminToRow(res.data) : r)));
+                    setFullById((prev) => ({ ...prev, [res.data.id]: res.data }));
+                    toast.success(res.message);
+                    closeDialog();
+                } else {
+                    toast.error(res.code ? `${res.message} (${res.code})` : res.message);
+                }
+
+                return;
+            }
+
             const res = await createDiscountAction(values);
             if (res.ok) {
                 setRows((prev) => [adminToRow(res.data), ...prev]);
+                setFullById((prev) => ({ ...prev, [res.data.id]: res.data }));
                 toast.success(res.message);
-                form.reset();
-                setDialogOpen(false);
+                closeDialog();
             } else {
                 toast.error(res.code ? `${res.message} (${res.code})` : res.message);
             }
         });
     };
 
-    const confirmDelete = () => {
-        if (!deleteTarget) return;
-        const { id } = deleteTarget;
+    // DataTable's action column shows its own confirm dialog before calling this.
+    const handleDelete = (row: DiscountRow) => {
         startTransition(async () => {
-            const res = await deleteDiscountAction(id);
+            const res = await deleteDiscountAction(row.id);
             if (res.ok) {
-                setRows((prev) => prev.filter((r) => r.id !== id));
+                setRows((prev) => prev.filter((r) => r.id !== row.id));
+                setFullById((prev) => {
+                    const next = { ...prev };
+                    delete next[row.id];
+
+                    return next;
+                });
                 toast.success(res.message);
             } else {
                 toast.error(res.message);
             }
-            setDeleteTarget(null);
         });
     };
 
     return (
         <div className='mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 overflow-x-auto px-4 py-6'>
             <div className='flex items-center justify-between'>
-                <Heading title='Discounts' description='Create and remove partner discounts' />
-                <Button onClick={() => setDialogOpen(true)}>
+                <Heading title='Discounts' description='Create, edit and remove partner discounts' />
+                <Button onClick={openCreate}>
                     <Plus className='mr-2 h-4 w-4' />
                     New Discount
                 </Button>
@@ -156,14 +211,17 @@ export function DiscountsClient({
                 searchKey='title'
                 columns={discountsColumns}
                 data={rows}
-                onDelete={(row) => setDeleteTarget(row as DiscountRow)}
+                onEdit={(row) => openEdit(row as DiscountRow)}
+                onDelete={(row) => handleDelete(row as DiscountRow)}
             />
 
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Dialog open={dialogOpen} onOpenChange={(open) => (open ? setDialogOpen(true) : closeDialog())}>
                 <DialogContent className='dashboard-theme dark sm:max-w-lg'>
                     <DialogHeader>
-                        <DialogTitle>New discount</DialogTitle>
-                        <DialogDescription>Add a partner discount to the platform.</DialogDescription>
+                        <DialogTitle>{editing ? 'Edit discount' : 'New discount'}</DialogTitle>
+                        <DialogDescription>
+                            {editing ? 'Update this partner discount.' : 'Add a partner discount to the platform.'}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <Form {...form}>
@@ -248,26 +306,18 @@ export function DiscountsClient({
                             </div>
 
                             <DialogFooter>
-                                <Button type='button' variant='outline' onClick={() => setDialogOpen(false)}>
+                                <Button type='button' variant='outline' onClick={closeDialog}>
                                     Cancel
                                 </Button>
                                 <Button type='submit' disabled={isPending}>
                                     {isPending ? <Loader2Icon className='mr-2 h-4 w-4 animate-spin' /> : null}
-                                    Create
+                                    {editing ? 'Save changes' : 'Create'}
                                 </Button>
                             </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>
             </Dialog>
-
-            <AlertModal
-                isOpen={!!deleteTarget}
-                onClose={() => setDeleteTarget(null)}
-                onConfirm={confirmDelete}
-                loading={isPending}
-                className='slr-admin dark'
-            />
         </div>
     );
 }
