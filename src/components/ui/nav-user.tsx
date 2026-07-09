@@ -13,6 +13,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/c
 import useDialogState from '@/hooks/use-dialog-state';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+import { SignOutDialog } from '../sign-out-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { UserInfo } from './user-info';
 import { UserMenuContent } from './user-menu-content';
@@ -54,13 +55,7 @@ export function NavUser({ user }) {
                                     </div>
                                 </div>
                             </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem>
-                                    <Sparkles />
-                                    Upgrade to Pro
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
+
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
                                 <DropdownMenuItem asChild>
@@ -69,12 +64,7 @@ export function NavUser({ user }) {
                                         Account
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link href='/settings'>
-                                        <CreditCard />
-                                        Billing
-                                    </Link>
-                                </DropdownMenuItem>
+
                                 <DropdownMenuItem asChild>
                                     <Link href='/settings/notifications'>
                                         <Bell />
@@ -91,6 +81,7 @@ export function NavUser({ user }) {
                     </DropdownMenu>
                 </SidebarMenuItem>
             </SidebarMenu>
+            <SignOutDialog open={!!open} onOpenChange={setOpen} />
         </>
     );
 }

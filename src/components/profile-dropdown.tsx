@@ -48,19 +48,13 @@ export function ProfileDropdown({ user }: { user: any }) {
                                 <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href='/settings'>
-                                Billing
-                                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                            </Link>
-                        </DropdownMenuItem>
+
                         <DropdownMenuItem asChild>
                             <Link href='/settings'>
                                 Settings
                                 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>New Team</DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant='destructive' onClick={() => setOpen(true)}>
