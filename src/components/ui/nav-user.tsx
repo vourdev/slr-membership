@@ -16,11 +16,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { SignOutDialog } from '../sign-out-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { UserInfo } from './user-info';
-import { UserMenuContent } from './user-menu-content';
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react';
 
 export function NavUser({ user }) {
-    const { state } = useSidebar();
     const isMobile = useIsMobile();
     const [open, setOpen] = useDialogState();
 
