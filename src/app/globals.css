@@ -315,15 +315,26 @@
         }
     }
 
+    --animate-caret-blink: caret-blink 1s ease-out infinite;
     --animate-marquee: marquee 60s linear infinite;
+}
 
-    @keyframes marquee {
-        from {
-            transform: translateX(0);
-        }
-        to {
-            transform: translateX(-50%);
-        }
+@keyframes caret-blink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
     }
 }
 

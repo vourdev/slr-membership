@@ -92,15 +92,33 @@ const StepOtp = ({ email, userId, onNext, onBack }: StepOtpProps) => {
                             if (error) setError(null);
                         }}>
                         <InputOTPGroup>
-                            <InputOTPSlot index={0} className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white' />
-                            <InputOTPSlot index={1} className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white' />
-                            <InputOTPSlot index={2} className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white' />
+                            <InputOTPSlot
+                                index={0}
+                                className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white'
+                            />
+                            <InputOTPSlot
+                                index={1}
+                                className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white'
+                            />
+                            <InputOTPSlot
+                                index={2}
+                                className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white'
+                            />
                         </InputOTPGroup>
                         <InputOTPSeparator className='text-white/30' />
                         <InputOTPGroup>
-                            <InputOTPSlot index={3} className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white' />
-                            <InputOTPSlot index={4} className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white' />
-                            <InputOTPSlot index={5} className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white' />
+                            <InputOTPSlot
+                                index={3}
+                                className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white'
+                            />
+                            <InputOTPSlot
+                                index={4}
+                                className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white'
+                            />
+                            <InputOTPSlot
+                                index={5}
+                                className='h-12 w-10 border-white/10 bg-white/5 text-white caret-white'
+                            />
                         </InputOTPGroup>
                     </InputOTP>
                 </div>
