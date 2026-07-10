@@ -101,8 +101,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/beny/subscribe` | `member/discounts` (beny-actions) | subscribe (body `{name,email,phone}`). ⚠️ **Stripe block** — see below |
 | `DELETE /api/v1/beny/subscribe` | `member/discounts` (beny-actions) | cancel. Only cancels an **active** sub — returns NOT_FOUND on `pending_activation` |
 | `GET /api/v1/memberships/me` | `member/page.tsx` | dashboard summary card. Live shape == `MembershipRecord` (subTierId, billingStatus UPPERCASE, activatedAt, subTier). ⚠️ carries **no `state`** (session), no next-payment, no BENY |
-| `GET /api/v1/giveaways/` | `member/page.tsx` · `member/giveaways` | upcoming + list board. ⚠️ **backend 500 INTERNAL_ERROR (all tiers)** → degrades to EmptyState; `ApiGiveaway` DTO **unverified** |
-| `GET /api/v1/giveaways/{id}` | `member/giveaways/[id]` | giveaway detail (via cached `loadGiveaway`). Unverifiable while list 500s → `notFound` on failure |
+| `GET /api/v1/giveaways/` | `member/page.tsx` · `member/giveaways` | upcoming + list board. ✅ **now 200** (was 500; fixed 2026-07-09). DTO verified: `{giveaway_id,name,tier,type,prize,opens_at,closes_at,draws_at,is_entered,entry_status}`. Entries-per-giveaway = member cycle tokens (API has no per-giveaway count) |
+| `GET /api/v1/giveaways/{id}` | `member/giveaways/[id]` | detail (meta + `winners[]`). ⚠️ omits entry status → merged from the list item; rules/TPAL copy static (API/PRD don't supply it) |
 
 **Mapped in `endpoints.ts`, not called:** `POST /auth/refresh`, `POST /auth/logout`.
 
@@ -128,7 +128,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 - **Admin can't change a member's `state`** — neither `PUT /admin/members/{id}/tier` (base tier only) nor `POST /memberships/change-tier` (`{userId, subTierId}` only) accepts state; an extra `state` field is silently ignored. Draw-pool `state+tier` state moves need a backend endpoint. Member-detail admin actions cover status + tier/sub-tier only.
 
-- **🐞 BACKEND: `GET /giveaways/` 500s for every tier** — returns `{code:"INTERNAL_ERROR"}` for red/blue/visitor (`/giveaways/winners` works, so the list/detail handlers specifically are broken). The member dashboard's upcoming-giveaways + both `/member/giveaways` pages degrade to EmptyState/`notFound`. The `ApiGiveaway`/`ApiGiveawayDetail` DTOs + `toGiveaway`/`toGiveawayDetail` mappers are **unverified** against a real body (modelled off the winners `giveaway` hint) — a fix likely needs only field-name tweaks in `resources/giveaways.ts`. Needs a backend fix.
+- ✅ **RESOLVED: `GET /giveaways/`** now returns 200 (was 500; fixed 2026-07-09). DTOs + mappers in `resources/giveaways.ts` refit to the verified shape; dashboard upcoming + `/member/giveaways` list/detail render live. **Remaining giveaway gaps** (not blockers): payload has **no per-giveaway entry/pool counts** (FE shows the member's cycle tokens as entries; "in pool" hidden), and **no rules/description/TPAL copy** on `/{id}` (FE uses static copy from CLAUDE.md §1 — move to payload/CMS when available). Detail also omits `entry_status`, so the FE merges it from the list item.
 - **`memberships/me` shape gaps** — no `state` (session-sourced), no next-payment (derived `activatedAt + 28d` / `entries.current_cycle.end_at`), no BENY (row hidden until SP4). Also `entries.current_cycle.total_token` = 7 for the seed R4 vs PRD R4 = 4 tokens → confirm canonical token allocation.
 
 ### Suggested next
@@ -184,9 +184,9 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked → `member/ebooks/[id]` reader (403 → upgrade gate; still 403 for admin) |
 | ✅ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
 | ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
-| ✅ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier (⚠️ backend 500 → EmptyState) |
+| ✅ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier (✅ 200; DTO verified 2026-07-09) |
 | ✅ | GET | `/api/v1/giveaways/winners` | giveaways | List past giveaway winners |
-| ✅ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information (⚠️ unverifiable while list 500s → notFound) |
+| ✅ | GET | `/api/v1/giveaways/{id}` | giveaways | Get detailed giveaway information (meta + winners; entry status merged from list) |
 | ❌ | GET | `/api/v1/health/livez` | health | Liveness probe |
 | ❌ | GET | `/api/v1/health/readyz` | health | Readiness probe (DB + Redis) |
 | ✅ | POST | `/api/v1/memberships/change-tier` | membership | Admin: change user's tier/sub-tier (state NOT changed) |

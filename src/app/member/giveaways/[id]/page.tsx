@@ -10,7 +10,8 @@ import { TierGroupBadge } from '@/components/common/tier-badge';
 import { TIER_VISUALS } from '@/constant/tiers';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
-import { getGiveaway, toGiveawayDetail } from '@/lib/api/resources/giveaways';
+import { getEntryHistory } from '@/lib/api/resources/entries';
+import { type ApiGiveaway, getGiveaway, getGiveaways, toGiveawayDetail } from '@/lib/api/resources/giveaways';
 import { getAccessToken } from '@/lib/api/server';
 import { formatDrawDateTime, formatShortDate, tierGroupOf } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
@@ -38,9 +39,17 @@ async function loadGiveaway(id: string): Promise<GiveawayDetail | null> {
     if (!token) return null;
 
     try {
-        const detail = await getGiveaway(id, token);
+        // Detail lacks entry status + token count → pull the list item (entry status)
+        // and the cycle tokens (entries-per-giveaway) alongside; both non-fatal.
+        const [detail, list, entries] = await Promise.all([
+            getGiveaway(id, token),
+            getGiveaways(token).catch(() => [] as ApiGiveaway[]),
+            getEntryHistory(token).catch(() => null)
+        ]);
+        const listItem = list.find((g) => g.giveaway_id === id);
+        const tokens = entries?.current_cycle?.total_token ?? 0;
 
-        return toGiveawayDetail(detail, tierGroupOf(member.sub_tier), member.state);
+        return toGiveawayDetail(detail, listItem, tierGroupOf(member.sub_tier), member.state, tokens);
     } catch (error) {
         handleApiAuthError(error); // expired session → force logout
 
@@ -116,9 +125,12 @@ export default async function GiveawayDetailPage({ params }: { params: Promise<{
                             <span className='tabular-nums'>{giveaway.total_entries}</span> entries
                         </span>
                     )}
-                    <span className='inline-flex items-center gap-1.5'>
-                        <span className='tabular-nums'>{giveaway.pool_entries.toLocaleString('en-AU')}</span> in pool
-                    </span>
+                    {giveaway.pool_entries > 0 && (
+                        <span className='inline-flex items-center gap-1.5'>
+                            <span className='tabular-nums'>{giveaway.pool_entries.toLocaleString('en-AU')}</span> in
+                            pool
+                        </span>
+                    )}
                 </div>
 
                 <div className='mt-5'>

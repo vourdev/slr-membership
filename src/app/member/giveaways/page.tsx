@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import EmptyState from '@/components/common/empty-state';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
+import { getEntryHistory } from '@/lib/api/resources/entries';
 import { getGiveaways, toGiveaway } from '@/lib/api/resources/giveaways';
 import { getAccessToken } from '@/lib/api/server';
 import { tierGroupOf } from '@/lib/member';
@@ -24,11 +25,15 @@ export default async function GiveawaysPage() {
     let failed = false;
 
     if (token) {
-        try {
-            const list = await getGiveaways(token);
-            giveaways = list.map((g) => toGiveaway(g, memberGroup, member.state));
-        } catch (error) {
-            handleApiAuthError(error); // expired session → force logout
+        // Giveaways + entries in parallel — entries gives the cycle token count, which
+        // is the member's entries-per-giveaway (the API has no per-giveaway count).
+        const [giveawaysRes, entriesRes] = await Promise.allSettled([getGiveaways(token), getEntryHistory(token)]);
+
+        if (giveawaysRes.status === 'fulfilled') {
+            const tokens = entriesRes.status === 'fulfilled' ? (entriesRes.value.current_cycle?.total_token ?? 0) : 0;
+            giveaways = giveawaysRes.value.map((g) => toGiveaway(g, memberGroup, member.state, tokens));
+        } else {
+            handleApiAuthError(giveawaysRes.reason); // expired session → force logout
             failed = true;
         }
     }

@@ -1,7 +1,7 @@
 import { cache } from 'react';
 
 import { formatDrawPool, isGiveawayLocked } from '@/lib/member';
-import type { EntryStatus, Giveaway, GiveawayDetail, TierGroup } from '@/types/member';
+import type { EntryStatus, Giveaway, GiveawayDetail, PastWinner, TierGroup } from '@/types/member';
 
 import { API } from '../endpoints';
 import { apiFetch } from '../http';
@@ -31,36 +31,54 @@ export const getGiveawayWinners = cache((token: string) =>
     apiFetch<GiveawayWinner[]>(API.giveaways.winners, { token, cache: 'no-store' })
 );
 
-// ─── Active giveaways (list + detail) ────────────────────────────────────────
-//
-// ⚠️ UNVERIFIED SHAPE: GET /giveaways/ currently returns 500 INTERNAL_ERROR for
-// every tier (winners works, list/detail don't), so these DTOs can't be checked
-// against a real body. Modelled off the OpenAPI summary + the winners `giveaway`
-// hint ({ giveaway_id, name, tier, type }). Mappers below default every display
-// field so a backend fix is a field-name tweak, not a rewrite. See the SP1 spec
-// + docs/API-INTEGRATION.md blockers. Pages degrade to EmptyState meanwhile.
+// ─── Active giveaways (list + detail) — verified against the live shape 2026-07-09 ──
 
 export interface ApiGiveaway {
     giveaway_id: string;
     name: string;
-    tier: string; // 'VISITOR' | 'RED' | 'BLUE'
-    type?: string;
-    state?: string | null;
-    prize?: string | null;
-    entered?: boolean | null;
-    entry_status?: EntryStatus | null;
-    total_entries?: number | null;
-    pool_entries?: number | null;
-    draws_at?: string | null;
-    draw_at?: string | null;
+    tier: string; // 'visitor' | 'red' | 'blue'
+    type: string; // 'weekly' | 'monthly'
+    prize: string | null;
+    opens_at: string | null;
+    closes_at: string | null;
+    draws_at: string | null;
+    is_entered: boolean;
+    entry_status: EntryStatus | null;
 }
 
-export interface ApiGiveawayDetail extends ApiGiveaway {
-    prize_description?: string | null;
-    description?: string | null;
-    rules?: string[] | null;
-    tpal_note?: string | null;
+// Embedded winner rows on the detail (same fields as GET /giveaways/winners; empty until a draw is recorded).
+export interface ApiGiveawayWinnerRow {
+    full_name?: string | null;
+    state?: string | null;
+    prize?: string | null;
+    recorded_at?: string | null;
 }
+
+// GET /giveaways/{id} — meta + winners only. NO entry status / rules / description /
+// pool counts (the list carries entry status; the rest isn't exposed → see below).
+export interface ApiGiveawayDetail {
+    giveaway_id: string;
+    name: string;
+    tier: string;
+    type: string;
+    prize: string | null;
+    opens_at: string | null;
+    closes_at: string | null;
+    draws_at: string | null;
+    winners: ApiGiveawayWinnerRow[];
+}
+
+// Static copy — the API exposes no per-giveaway rules/TPAL text and Notion (PRD)
+// was unreachable this session. Sourced from CLAUDE.md §1 domain rules; move to
+// the giveaway payload or CMS when the backend/PRD provides real copy.
+const GIVEAWAY_RULES = [
+    'Entries are allocated automatically each 28-day cycle — no manual entry needed.',
+    'Your number of entries equals your active tokens for the cycle.',
+    'Winners are drawn externally and certified via TPAL (randomdraws.com.au).',
+    'Entries reset every cycle and do not carry over.'
+];
+const TPAL_NOTE =
+    'Draws are conducted externally and certified via TPAL (randomdraws.com.au). Entry lists are exported per tier each cycle.';
 
 function tierGroupFromApi(tier: string | undefined): TierGroup {
     const t = tier?.toUpperCase();
@@ -70,45 +88,85 @@ function tierGroupFromApi(tier: string | undefined): TierGroup {
     return 'visitor';
 }
 
-/** Map an API giveaway → the UI `Giveaway`, resolving lock/pool against the member. */
-export function toGiveaway(g: ApiGiveaway, memberGroup: TierGroup, memberState: string): Giveaway {
+function toPastWinner(w: ApiGiveawayWinnerRow): PastWinner {
+    return {
+        name: w.full_name?.trim() || '-',
+        state: w.state?.trim() || '-',
+        prize: w.prize?.trim() || '-',
+        drawn_at: w.recorded_at ?? ''
+    };
+}
+
+/**
+ * Map an API giveaway → the UI `Giveaway`. The API exposes no `state` or per-giveaway
+ * entry/pool counts, so pool = the member's `state + tier`, and (per CLAUDE.md §1)
+ * a member's entries = their active token count for the cycle (`memberTokens`).
+ */
+export function toGiveaway(g: ApiGiveaway, memberGroup: TierGroup, memberState: string, memberTokens = 0): Giveaway {
     const group = tierGroupFromApi(g.tier);
     const locked = isGiveawayLocked(group, memberGroup);
-    const entryStatus: EntryStatus = g.entry_status ?? 'inactive';
 
     return {
         id: g.giveaway_id || '-',
         title: g.name?.trim() || '-',
         tier_group: group,
-        draw_pool: formatDrawPool(group, g.state?.trim() || memberState || '-'),
+        draw_pool: formatDrawPool(group, memberState || '-'),
         prize_label: g.prize?.trim() || '-',
-        entered: g.entered ?? (!locked && entryStatus === 'active'),
-        entry_status: entryStatus,
-        total_entries: g.total_entries ?? 0,
-        pool_entries: g.pool_entries ?? 0,
+        entered: g.is_entered ?? false,
+        entry_status: g.entry_status ?? 'inactive',
+        total_entries: g.is_entered ? memberTokens : 0,
+        pool_entries: 0, // community pool count not exposed by the API
         locked,
-        draws_at: g.draws_at ?? g.draw_at ?? ''
+        draws_at: g.draws_at ?? ''
     };
 }
 
-/** Map an API giveaway detail → the UI `GiveawayDetail` (entry history / winners come from other endpoints → empty). */
-export function toGiveawayDetail(g: ApiGiveawayDetail, memberGroup: TierGroup, memberState: string): GiveawayDetail {
+/**
+ * Map an API giveaway detail → the UI `GiveawayDetail`. The detail endpoint omits
+ * entry status, so the matching `listItem` (from GET /giveaways/) fills it. Rules/
+ * TPAL copy are static (see above); `winners[]` → past winners.
+ */
+export function toGiveawayDetail(
+    d: ApiGiveawayDetail,
+    listItem: ApiGiveaway | undefined,
+    memberGroup: TierGroup,
+    memberState: string,
+    memberTokens = 0
+): GiveawayDetail {
+    const base = toGiveaway(
+        {
+            giveaway_id: d.giveaway_id,
+            name: d.name,
+            tier: d.tier,
+            type: d.type,
+            prize: d.prize,
+            opens_at: d.opens_at,
+            closes_at: d.closes_at,
+            draws_at: d.draws_at,
+            is_entered: listItem?.is_entered ?? false,
+            entry_status: listItem?.entry_status ?? 'inactive'
+        },
+        memberGroup,
+        memberState,
+        memberTokens
+    );
+
     return {
-        ...toGiveaway(g, memberGroup, memberState),
-        prize_description: g.prize_description?.trim() || g.description?.trim() || '-',
-        rules: g.rules?.filter(Boolean) ?? [],
-        tpal_note: g.tpal_note?.trim() || 'Draws are conducted externally and certified via TPAL (randomdraws.com.au).',
+        ...base,
+        prize_description: d.prize?.trim() || '-',
+        rules: GIVEAWAY_RULES,
+        tpal_note: TPAL_NOTE,
         entry_history: [],
-        past_winners: []
+        past_winners: (d.winners ?? []).map(toPastWinner)
     };
 }
 
-/** Active giveaways for the member's tier. ⚠️ backend 500 → callers must try/catch → EmptyState. */
+/** Active giveaways for the member's tier (live). */
 export const getGiveaways = cache((token: string) =>
     apiFetch<ApiGiveaway[]>(API.giveaways.list, { token, cache: 'no-store' })
 );
 
-/** One giveaway's detail. ⚠️ unverifiable while the list 500s → callers try/catch → notFound. */
+/** One giveaway's detail (meta + winners). Merge with the list item for entry status. */
 export const getGiveaway = cache((id: string, token: string) =>
     apiFetch<ApiGiveawayDetail>(API.giveaways.detail(id), { token, cache: 'no-store' })
 );

@@ -35,26 +35,15 @@ Then send `Authorization: Bearer <access_token>` on each request.
 
 ---
 
-## 🔴 Blocking bug
+## ✅ `GET /api/v1/giveaways/` — RESOLVED (was a 500 blocker)
 
-### `GET /api/v1/giveaways/` — List active giveaways based on member tier
-Returns **500 for every tier**. `GET /api/v1/giveaways/winners` works, so only this list handler is broken. It blocks the member dashboard "upcoming giveaways", the `/member/giveaways` list, and (transitively) the detail page — the frontend degrades all of them to an empty state.
+Previously 500 `INTERNAL_ERROR` for every tier; **now returns 200** (fixed 2026-07-09). The frontend DTO + mappers were refit to the verified shape and the giveaway UI (dashboard upcoming + `/member/giveaways` list/detail) renders live.
 
-**Account:** `red@smartliferewards.com.au` (also reproduced with `blue@`, `visitor@`)
-```http
-GET /api/v1/giveaways/
-Authorization: Bearer <red@ token>
-```
-```json
-→ 500
-{
-  "success": false,
-  "message": "Something went wrong on our end. Please try again shortly.",
-  "code": "INTERNAL_ERROR",
-  "requestId": "019f410c-5b62-74af-afaa-68649187fe45"
-}
-```
-**Impact:** all giveaway UI is empty until fixed. Also blocks verifying the `ApiGiveaway` response shape (the frontend DTO is currently a best-guess).
+Verified list shape: `{ giveaway_id, name, tier, type, prize, opens_at, closes_at, draws_at, is_entered, entry_status }`. Detail (`/{id}`) = the same meta + `winners[]`.
+
+**Remaining giveaway gaps** (minor, not blocking):
+- No **per-giveaway entry/pool counts** — FE shows the member's cycle token count as "entries" and hides the community "in pool" figure. Add counts to the payload if you want them shown.
+- `GET /giveaways/{id}` has **no `entry_status`** (FE merges it from the list), and **no rules / description / TPAL copy** (FE uses static copy from CLAUDE.md §1). Add these to the payload or CMS to make them editable.
 
 ---
 
