@@ -42,8 +42,10 @@ Previously 500 `INTERNAL_ERROR` for every tier; **now returns 200** (fixed 2026-
 Verified list shape: `{ giveaway_id, name, tier, type, prize, opens_at, closes_at, draws_at, is_entered, entry_status }`. Detail (`/{id}`) = the same meta + `winners[]`.
 
 **Remaining giveaway gaps** (minor, not blocking):
-- No **per-giveaway entry/pool counts** — FE shows the member's cycle token count as "entries" and hides the community "in pool" figure. Add counts to the payload if you want them shown.
-- `GET /giveaways/{id}` has **no `entry_status`** (FE merges it from the list), and **no rules / description / TPAL copy** (FE uses static copy from CLAUDE.md §1). Add these to the payload or CMS to make them editable.
+- `GET /giveaways/{id}` is **incomplete vs the Notion API Contract v1.0** — the contract specifies detail returns "hadiah, **aturan (rules), TPAL cert note, entry history, past winners**", but the live response only returns meta + `winners[]`. FE fills rules/TPAL from static copy (CLAUDE.md §1) and merges `entry_status` from the list item. Implement the contract fields to make them real/editable.
+- No **per-giveaway entry/pool counts** in either the list or detail payload — FE shows the member's cycle token count as "entries" and hides the community "in pool" figure. Add counts if you want them shown.
+
+The list DTO (`GET /giveaways`) **matches the contract exactly** — no issue there.
 
 ---
 

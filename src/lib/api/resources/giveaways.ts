@@ -31,7 +31,9 @@ export const getGiveawayWinners = cache((token: string) =>
     apiFetch<GiveawayWinner[]>(API.giveaways.winners, { token, cache: 'no-store' })
 );
 
-// ─── Active giveaways (list + detail) — verified against the live shape 2026-07-09 ──
+// ─── Active giveaways (list + detail) ────────────────────────────────────────
+// DTO confirmed against the live response (2026-07-09) AND the Notion API Contract
+// v1.0 (GET /giveaways) — they match field-for-field.
 
 export interface ApiGiveaway {
     giveaway_id: string;
@@ -68,9 +70,10 @@ export interface ApiGiveawayDetail {
     winners: ApiGiveawayWinnerRow[];
 }
 
-// Static copy — the API exposes no per-giveaway rules/TPAL text and Notion (PRD)
-// was unreachable this session. Sourced from CLAUDE.md §1 domain rules; move to
-// the giveaway payload or CMS when the backend/PRD provides real copy.
+// Static copy stopgap. The Notion API Contract v1.0 says GET /giveaways/{id} SHOULD
+// return rules ("aturan") + a TPAL cert note + entry history + past winners, but the
+// LIVE detail only returns meta + winners[]. Until the backend implements the rest,
+// rules/TPAL are filled from CLAUDE.md §1. See docs/BACKEND-ISSUES.md.
 const GIVEAWAY_RULES = [
     'Entries are allocated automatically each 28-day cycle — no manual entry needed.',
     'Your number of entries equals your active tokens for the cycle.',
