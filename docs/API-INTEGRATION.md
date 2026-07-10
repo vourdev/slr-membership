@@ -109,7 +109,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 ### Known gaps / deferred
 - **Token refresh not implemented** — access token expires → 401 → forced logout. Wire `POST /auth/refresh` into NextAuth `jwt` callback (refresh_token in session) to auto-rotate.
 - **Discounts member DTO** (`GET /discounts/` + `/{id}`) lacks `value_label` / promo `code` / `terms` — `code`/`terms` exist only on the admin create/PATCH camelCase response. `GET /discounts/{id}` returns the same thin shape as the list, so a member detail view adds nothing (not built). Backend should expose `code`/`terms`/`value_label` on the member endpoints.
-- ✅ **SP3 done** — admin discount **edit** (`PATCH /discounts/{id}`, partial merge) wired into `dashboard/(routes)/discounts` (reuses the create dialog; prefills from session records since admin can't GET a row). Added the missing `action` column, which also revives the previously-unreachable **delete**. Still gated by the `GET /discounts/` 403 → edit/delete only reach session-created rows until the backend opens the admin list.
+- ✅ **SP3 done** — admin discount **edit** (`PATCH /discounts/{id}`, partial merge) wired into `dashboard/(routes)/discounts` (reuses the create dialog; added the missing `action` column, which also revives the previously-unreachable **delete**). **Update 2026-07-09:** `GET /discounts/` + `/{id}` now return **200 for admin** (403 lifted) → the dashboard table now populates from the live list, and edit prefill can use a real `getDiscount(id)` instead of session records (FE follow-up).
 - ✅ **SP4 done (partial by design — Stripe-blocked)** — member BENY add-on flow: live `GET /beny/status` drives `BenySection`; `POST /beny/subscribe` (subscribe) + `DELETE /beny/subscribe` (cancel) wired via `member/discounts/beny-actions.ts`. `data/discounts.ts` trimmed to `BENY_CATEGORIES` (dead mock removed).
   - **🐞 BACKEND: BENY subscribe skips Stripe** — PRD §1 requires subscribe to redirect to Stripe Checkout ($4/mo) BEFORE creating the pending record. Live `POST /beny/subscribe` creates `pending_activation` **immediately, no charge, no checkout URL**. Integrated as-is; a `⚠️ BACKEND BLOCK — remove once Stripe is wired` comment marks both [beny-actions.ts](<src/app/member/discounts/beny-actions.ts>) (add the redirect here) and [beny-section.tsx](<src/app/member/discounts/_components/beny-section.tsx>) (the "redirected to secure checkout" copy). **Delete these comments once the backend returns a checkout session.**
   - **🐞 BACKEND: `DELETE /beny/subscribe` NOT_FOUND on pending** — cancel only works on an `active` sub; a `pending_activation` member can't cancel. FE hides the cancel button for pending. Confirm whether pending should be cancelable.
@@ -123,8 +123,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
 - ✅ **RESOLVED: `GET /admin/members`** now returns 200 with the member list + `meta` pagination (was 400 `BAD_REQUEST`; backend fixed 2026-07-08). Members page + sub-tier stats no longer degrade. See [BACKEND-ISSUES.md](BACKEND-ISSUES.md).
 - **Dashboard theme** — `.slr-admin` now uses the member navy palette (`#131619` base) so the dashboard matches the member area; dashboard keeps its own sidebar/shell.
-- **🐞 BACKEND: `GET /discounts/` 403 for admin** — the list is tier-gated to RED/BLUE members, so admin gets `FORBIDDEN` ("Upgrade membership to unlock this benefit"). No admin-list variant exists → the dashboard Discounts page can create + delete but **can't list** existing rows (it surfaces the 403 for reporting). Backend should exempt admin/super_admin from the tier gate or add an admin list. Note field-name mismatch: list = snake_case, create/patch = camelCase (`id`, `partnerName`, `isFeatured`, `isActive`).
-- **Ebooks admin CRUD works** (list + create + edit + delete, all live-verified). Two gaps: (1) `GET /ebooks/{id}` is **403 for admin** (tier-gated) and the list omits `tierAccess`, so **edit re-selects the tier** (other fields prefill from the row); (2) `PATCH` resets unsent numeric fields → the FE sends the full object. Chapters CRUD deferred. Same snake (list) vs camel (mutation) mismatch as discounts.
+- ✅ **RESOLVED 2026-07-09: admin tier-gate lifted** — `GET /discounts/`, `GET /discounts/{id}`, and `GET /ebooks/{id}` now return **200 for admin** (were all 403). The dashboard Discounts table populates from the live list; admin can GET a discount/ebook to prefill edits (FE follow-up to switch off session records). Remaining: member discount DTO still omits `code`/`terms`/`value_label` (only on the admin create/PATCH camelCase response); field-name mismatch stands (list snake_case, mutation camelCase). Ebooks: `PATCH` resets unsent numeric fields → FE sends the full object; chapters CRUD still deferred.
 
 - **Admin can't change a member's `state`** — neither `PUT /admin/members/{id}/tier` (base tier only) nor `POST /memberships/change-tier` (`{userId, subTierId}` only) accepts state; an extra `state` field is silently ignored. Draw-pool `state+tier` state moves need a backend endpoint. Member-detail admin actions cover status + tier/sub-tier only.
 
@@ -170,10 +169,10 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/api/v1/billing/invoices` | billing | Get billing invoice list |
 | ❌ | POST | `/api/v1/billing/pay-manual` | billing | Pay manual for grace period invoice |
 | ❌ | GET | `/api/v1/billing/status` | billing | Get current billing status |
-| ✅ | GET | `/api/v1/discounts/` | discounts | List partner discounts (RED/BLUE only) |
+| ✅ | GET | `/api/v1/discounts/` | discounts | List partner discounts (RED/BLUE + **admin now 200**, was 403) |
 | ✅ | POST | `/api/v1/discounts/` | discounts | Admin: create discount |
 | ✅ | DELETE | `/api/v1/discounts/{id}` | discounts | Admin: delete discount |
-| 🟡 | GET | `/api/v1/discounts/{id}` | discounts | Get discount details (`getDiscount` mapped; not called — member DTO is thin, admin gets 403) |
+| 🟡 | GET | `/api/v1/discounts/{id}` | discounts | Get discount details (`getDiscount` mapped; not called — member DTO thin. **admin now 200**, was 403) |
 | ✅ | PATCH | `/api/v1/discounts/{id}` | discounts | Admin: update discount → `dashboard/(routes)/discounts` edit (partial merge) |
 | ✅ | GET | `/api/v1/ebooks/` | ebooks | List published ebooks with is_locked properties |
 | ✅ | POST | `/api/v1/ebooks/` | ebooks | Admin: create ebook |
@@ -181,7 +180,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | PATCH | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: update chapter |
 | ❌ | POST | `/api/v1/ebooks/{id}/chapters` | ebooks | Admin: create chapter |
 | ✅ | DELETE | `/api/v1/ebooks/{id}` | ebooks | Admin: delete ebook |
-| ✅ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked → `member/ebooks/[id]` reader (403 → upgrade gate; still 403 for admin) |
+| ✅ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked → `member/ebooks/[id]` reader. Below-tier member → 403 gate; **admin now 200** (was 403; fixed 2026-07-09) |
 | ✅ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
 | ✅ | GET | `/api/v1/entries/` | entries | Get my entry history grouped by billing cycles |
 | ✅ | GET | `/api/v1/giveaways/` | giveaways | List active giveaways based on member tier (✅ 200; DTO verified 2026-07-09) |

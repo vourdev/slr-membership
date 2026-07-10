@@ -4,7 +4,7 @@ Endpoints that return errors or behave against the PRD, found while integrating 
 
 - **Base URL:** `https://api.smartliferewards.com.au/api/v1`
 - **Swagger:** `https://api.smartliferewards.com.au/docsx-2s3crt3-199`
-- **Captured:** 2026-07-08
+- **Captured:** 2026-07-08 · **Re-verified:** 2026-07-09
 - **Envelope:** every response is `{ success, message, data, meta }`.
 
 ## Authentication
@@ -49,85 +49,29 @@ The list DTO (`GET /giveaways`) **matches the contract exactly** — no issue th
 
 ---
 
-## 🟠 Admin blocked by member-only tier gate
+## ✅ Admin tier-gate — RESOLVED (2026-07-09)
 
-These are tier-gated to RED/BLUE members, so **admin/super_admin get 403** and can't use the admin tooling. Ask: exempt admin/super_admin from the tier gate, or add admin-list / admin-read variants.
+`GET /discounts/`, `GET /discounts/{id}`, and `GET /ebooks/{id}` previously returned **403 FORBIDDEN** for admin (they were tier-gated to RED/BLUE members). **All now return 200 for admin:**
+- `GET /api/v1/discounts/` (admin) → **200**, lists discounts
+- `GET /api/v1/discounts/{id}` (admin, real id) → **200**
+- `GET /api/v1/ebooks/{id}` (admin) → **200 with `chapters`** — admin can preview content
 
-### `GET /api/v1/discounts/` — List partner discounts (RED/BLUE only)
-Admin dashboard can't list existing discounts (create/edit/delete by id still work, but no rows show).
+FE benefit: the admin discounts page now populates its table (no more 403 error card), and admin edit forms can prefill from a real GET (discount + ebook).
 
-**Account:** `admin@smartliferewards.com.au`
-```http
-GET /api/v1/discounts/
-Authorization: Bearer <admin@ token>
-```
-```json
-→ 403
-{
-  "success": false,
-  "message": "Upgrade membership to unlock this benefit.",
-  "code": "FORBIDDEN",
-  "requestId": "019f410c-617b-71c8-b8d6-c41f454a9f01"
-}
-```
-
-### `GET /api/v1/discounts/{id}` — Get discount details
-Same gate → admin can't fetch a single discount to prefill the edit form.
-
-**Account:** `admin@smartliferewards.com.au`
-```http
-GET /api/v1/discounts/019f2145-6f0d-7018-89d8-a00bc182246d
-Authorization: Bearer <admin@ token>
-```
-```json
-→ 403
-{
-  "success": false,
-  "message": "Upgrade membership to unlock this benefit.",
-  "code": "FORBIDDEN",
-  "requestId": "019f410c-62e6-71d1-9e53-cd3e22bf891c"
-}
-```
-Also note: the member response for this route is thin (`{ discount_id, title, partner_name, description, category, is_featured }`) — it omits `code` / `terms` / `value_label`, which exist only on the admin create/PATCH response. The member endpoints should expose those.
-
-### `GET /api/v1/ebooks/{id}` — Get ebook content and chapters if unlocked
-Admin can't preview ebook content.
-
-**Account:** `admin@smartliferewards.com.au`
-```http
-GET /api/v1/ebooks/019f2145-7c8d-7354-b8d0-63fd3213e56f
-Authorization: Bearer <admin@ token>
-```
-```json
-→ 403
-{
-  "success": false,
-  "message": "Upgrade membership to unlock this ebook.",
-  "code": "FORBIDDEN",
-  "requestId": "019f410d-2758-7563-8f1b-1339f4dbcf3b"
-}
-```
+**Still open — member discount DTO is thin:** `GET /discounts/` and `GET /discounts/{id}` return `{ discount_id, title, partner_name, description, category, is_featured }` — no `code` / `terms` / `value_label` (those live only on the admin create/PATCH camelCase response). Expose them on the member endpoints so the discount card can show promo codes + terms.
 
 ---
 
 ## 🟡 Behavior question
 
 ### `DELETE /api/v1/beny/subscribe` — Cancel BENY subscription
-Only cancels an **active** subscription. A member in `pending_activation` gets 404, so they can't cancel a request that hasn't been activated yet (the frontend hides the cancel button for pending as a workaround).
+Cancels an **active** subscription (verified **200** on an active member → `{ beny_status: "cancelled" }`). But a member in `pending_activation` gets **404**, so they can't cancel a request that hasn't been activated yet (the frontend hides the cancel button for pending as a workaround).
 
-**Account:** `red@smartliferewards.com.au` (currently `pending_activation`)
-```http
-DELETE /api/v1/beny/subscribe
-Authorization: Bearer <red@ token>
-```
+**Account:** `red@smartliferewards.com.au`
 ```json
-→ 404
-{
-  "success": false,
-  "message": "No active BENY subscription found.",
-  "code": "NOT_FOUND",
-  "requestId": "019f410d-2c88-772a-a2bc-b82f766f33a8"
-}
+active member    → 200 { "success": true, "data": { "beny_status": "cancelled" } }
+pending member   → 404 { "success": false, "code": "NOT_FOUND",
+                         "message": "No active BENY subscription found." }
 ```
 **Ask:** should a `pending_activation` subscription be cancelable?
 
@@ -164,16 +108,12 @@ Accepts `{ userId, subTierId }` and silently **ignores a `state` field**. There'
 ## ✅ Correct behavior (not bugs — documented so they aren't re-reported)
 
 ### `GET /api/v1/giveaways/{id}` — Get detailed giveaway information
-Returns a correct 404 for an unknown id — the endpoint itself works; it's only unusable right now because the list (above) 500s and yields no valid id.
+Returns a correct 404 for an unknown id — the endpoint works and the list now yields valid ids. (Its payload is still **incomplete vs the contract** — meta + `winners[]` only; see the giveaways section above.)
 
 **Account:** `red@smartliferewards.com.au`
-```http
-GET /api/v1/giveaways/00000000-0000-0000-0000-000000000000
-Authorization: Bearer <red@ token>
-```
 ```json
-→ 404 { "success": false, "message": "Giveaway not found.", "code": "NOT_FOUND",
-        "requestId": "019f410c-5cc7-727a-938b-ef8ee367f81f" }
+GET /api/v1/giveaways/00000000-0000-0000-0000-000000000000
+→ 404 { "success": false, "message": "Giveaway not found.", "code": "NOT_FOUND" }
 ```
 
 ### `GET /api/v1/ebooks/{id}` — Get ebook content and chapters if unlocked
