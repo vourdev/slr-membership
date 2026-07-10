@@ -2,10 +2,12 @@
 
 import {
     type CreateDiscountPayload,
+    type Discount,
     type DiscountAdmin,
     type UpdateDiscountPayload,
     createDiscount,
     deleteDiscount,
+    getDiscount,
     updateDiscount
 } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
@@ -39,6 +41,20 @@ export async function createDiscountAction(payload: CreateDiscountPayload): Prom
         const data = await createDiscount(token, payload);
 
         return { ok: true, data, message: 'Discount created.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+/** Fetch one discount to prefill the edit form. Admin GET works since 2026-07-09 (was 403). */
+export async function getDiscountAction(id: string): Promise<ActionResult<Discount>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await getDiscount(id, token);
+
+        return { ok: true, data, message: 'OK' };
     } catch (error) {
         return toActionError(error);
     }

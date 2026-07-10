@@ -1,8 +1,38 @@
+'use client';
+
+import { useState } from 'react';
+
 import type { Discount } from '@/lib/api/resources/discounts';
 
-import { Star, Tag } from 'lucide-react';
+import { Check, Copy, Star, Tag } from 'lucide-react';
+import { toast } from 'sonner';
+
+// Placeholder text shown until the member API exposes these fields. When the
+// backend adds value_label / code / terms to GET /discounts/, the real value
+// flows through via `?? PLACEHOLDER` and these disappear on their own.
+// See docs/BACKEND-ISSUES.md ("member discount DTO is thin").
+const PLACEHOLDER_VALUE = 'Member offer';
+const PLACEHOLDER_CODE = 'SLR-XXXXXX';
+const PLACEHOLDER_TERMS = 'Terms & conditions apply — see partner for full details.';
 
 export function DiscountCard({ discount }: { discount: Discount }) {
+    const [copied, setCopied] = useState(false);
+
+    const valueLabel = discount.value_label?.trim() || PLACEHOLDER_VALUE;
+    const code = discount.code?.trim() || PLACEHOLDER_CODE;
+    const terms = discount.terms?.trim() || PLACEHOLDER_TERMS;
+
+    const copyCode = async () => {
+        try {
+            await navigator.clipboard.writeText(code);
+            setCopied(true);
+            toast.success('Code copied');
+            setTimeout(() => setCopied(false), 1500);
+        } catch {
+            toast.error('Could not copy code');
+        }
+    };
+
     return (
         <article className='bg-card-dark-navy border-slr-navy-border flex flex-col rounded-2xl border p-4'>
             <div className='flex items-start justify-between gap-2'>
@@ -24,8 +54,27 @@ export function DiscountCard({ discount }: { discount: Discount }) {
                 )}
             </div>
 
-            <p className='mt-3 font-medium text-white'>{discount.title || '-'}</p>
+            <div className='mt-3 flex items-start justify-between gap-2'>
+                <p className='font-medium text-white'>{discount.title || '-'}</p>
+                <span className='bg-gradient-gold shrink-0 rounded-md px-2 py-0.5 text-xs font-bold text-[#1a1408]'>
+                    {valueLabel}
+                </span>
+            </div>
             <p className='text-slr-muted mt-1 text-xs leading-relaxed'>{discount.description || '-'}</p>
+
+            <button
+                type='button'
+                onClick={copyCode}
+                className='border-slr-navy-border mt-3 flex items-center justify-between gap-2 rounded-lg border border-dashed bg-black/20 px-3 py-2 transition-colors hover:border-[#D4AF3759]'>
+                <span className='font-mono text-sm tracking-wider text-white/90'>{code}</span>
+                {copied ? (
+                    <Check className='size-4 shrink-0 text-emerald-400' />
+                ) : (
+                    <Copy className='text-slr-dim size-4 shrink-0' />
+                )}
+            </button>
+
+            <p className='text-slr-dim mt-2 text-[10px] leading-relaxed'>{terms}</p>
         </article>
     );
 }

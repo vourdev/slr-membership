@@ -12,6 +12,13 @@ export interface Discount {
     description: string | null;
     category: string;
     is_featured: boolean;
+    // ⚠️ Not yet returned by the member API (only on the admin create/PATCH response).
+    // Optional so the real value flows through automatically once the backend exposes
+    // them on GET /discounts/ + /{id}; until then the card shows placeholders.
+    // See docs/BACKEND-ISSUES.md ("member discount DTO is thin").
+    value_label?: string | null;
+    code?: string | null;
+    terms?: string | null;
 }
 
 // Admin create/patch responses are camelCase and richer than the member list DTO.

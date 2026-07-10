@@ -21,7 +21,7 @@ import type { DiscountAdmin, UpdateDiscountPayload } from '@/lib/api/resources/d
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { discountsColumns } from './_components/columns';
-import { createDiscountAction, deleteDiscountAction, updateDiscountAction } from './actions';
+import { createDiscountAction, deleteDiscountAction, getDiscountAction, updateDiscountAction } from './actions';
 import { Loader2Icon, Plus, TriangleAlert } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -106,6 +106,10 @@ export function DiscountsClient({
     const [fullById, setFullById] = useState<Record<string, DiscountAdmin>>({});
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editing, setEditing] = useState<DiscountRow | null>(null);
+    // Whether the edited row's isActive is authoritatively known (session record).
+    // The list + GET detail omit isActive, so for backend-listed rows we only send
+    // isActive when the admin actually toggles it (avoids clobbering the real value).
+    const [activeKnown, setActiveKnown] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<FormValues>({
@@ -122,15 +126,35 @@ export function DiscountsClient({
     const openEdit = (row: DiscountRow) => {
         const full = fullById[row.id];
         setEditing(row);
+        setActiveKnown(Boolean(full));
+        // Immediate prefill from what we already have (session record or the row).
         form.reset({
             title: row.title === '-' ? '' : row.title,
             partnerName: row.partner === '-' ? '' : row.partner,
             category: row.category === '-' ? '' : row.category,
             description: full?.description ?? '',
             isFeatured: row.featured === 'Yes',
-            isActive: row.active === 'Yes'
+            isActive: full ? full.isActive : true
         });
         setDialogOpen(true);
+
+        // For rows we didn't create this session, pull authoritative fields (esp.
+        // description, which the list row lacks) — GET /discounts/{id} works for admin now.
+        if (!full) {
+            startTransition(async () => {
+                const res = await getDiscountAction(row.id);
+                if (res.ok) {
+                    form.reset({
+                        title: res.data.title || '',
+                        partnerName: res.data.partner_name || '',
+                        category: res.data.category || '',
+                        description: res.data.description ?? '',
+                        isFeatured: res.data.is_featured,
+                        isActive: form.getValues('isActive')
+                    });
+                }
+            });
+        }
     };
 
     const closeDialog = () => {
@@ -141,15 +165,17 @@ export function DiscountsClient({
     const onSubmit = (values: FormValues) => {
         startTransition(async () => {
             if (editing) {
-                // PATCH merges — omit an empty description so an existing one we
-                // couldn't prefill (backend-listed rows) isn't clobbered.
+                // Description now comes from GET /discounts/{id} (or a session record) → send it.
+                // isActive isn't exposed by the list/GET, so only send it when authoritative
+                // or the admin actually toggled it — otherwise PATCH's merge keeps the real value.
+                const sendActive = activeKnown || form.formState.dirtyFields.isActive;
                 const payload: UpdateDiscountPayload = {
                     title: values.title,
                     partnerName: values.partnerName,
                     category: values.category,
                     isFeatured: values.isFeatured,
-                    isActive: values.isActive,
-                    ...(values.description?.trim() ? { description: values.description } : {})
+                    description: values.description ?? '',
+                    ...(sendActive ? { isActive: values.isActive } : {})
                 };
                 const res = await updateDiscountAction(editing.id, payload);
                 if (res.ok) {
