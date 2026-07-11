@@ -8,10 +8,13 @@
 
 # testing
 /coverage
-
+/tests/
 # next.js
 /.next/
 /out/
+/playwright-report/
+/test-results/
+playwright.config.ts
 
 # production
 /build
