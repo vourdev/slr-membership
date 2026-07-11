@@ -25,6 +25,7 @@ import { Greeting } from './_components/dashboard/greeting';
 import { MembershipSummaryCard } from './_components/dashboard/membership-summary-card';
 import { QuickActions } from './_components/dashboard/quick-actions';
 import { UpcomingGiveaways } from './_components/dashboard/upcoming-giveaways';
+import { VisitorUpgradeBanner } from './_components/dashboard/visitor-upgrade-banner';
 import { CircleAlert, Gift } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -58,6 +59,9 @@ export default async function MemberDashboardPage() {
 
     const subTier = membership ? subTierCodeOf(membership.subTierId) : member.sub_tier;
     const memberGroup = tierGroupOf(subTier);
+    // Visitor is free with no billing/renewal and only the Visitor weekly draw (PRD §2.1).
+    const isVisitor = memberGroup === 'visitor';
+    const memberTokens = cycle?.total_token ?? 0;
 
     // Summary (memberships/me + session state + cycle end for next-payment).
     const nextPayment = cycle?.end_at ?? (membership?.activatedAt ? cycleEndFrom(membership.activatedAt) : '');
@@ -83,6 +87,26 @@ export default async function MemberDashboardPage() {
           }
         : null;
 
+    // Visitor: surface the real Visitor Weekly Draw (their only giveaway) as the
+    // "Current Draw"; paid tiers keep the cycle framing above.
+    const visitorGiveaway = isVisitor ? giveaways[0] : undefined;
+    const visitorMapped = visitorGiveaway && toGiveaway(visitorGiveaway, memberGroup, member.state, memberTokens);
+    const visitorDraw: DrawStatus | null = visitorMapped
+        ? {
+              giveaway_id: visitorMapped.id,
+              title: visitorMapped.title,
+              draw_pool: visitorMapped.draw_pool,
+              prize_label: visitorMapped.prize_label,
+              entry_status: visitorMapped.entry_status,
+              total_entries: visitorMapped.total_entries,
+              draws_at: visitorMapped.draws_at
+          }
+        : null;
+
+    const draw = visitorDraw ?? cycleDraw;
+    const drawEyebrow = visitorDraw ? 'Current Draw' : 'Current Cycle';
+    const drawDateWord = visitorDraw ? 'Draws' : 'Renews';
+
     // Featured partner offers — is_featured first, capped. Visitor (403) → empty → hidden.
     const featuredDiscounts: FeaturedDiscount[] = discounts
         .filter((d) => d.title?.trim() || d.partner_name?.trim())
@@ -95,27 +119,32 @@ export default async function MemberDashboardPage() {
             value_label: d.title?.trim() || '-'
         }));
 
-    // Upcoming giveaways — giveaways/ 500 → empty → EmptyState.
-    const upcomingGiveaways: UpcomingGiveaway[] = giveaways.slice(0, 6).map((g) => {
-        const mapped = toGiveaway(g, memberGroup, member.state);
+    // Upcoming giveaways — exclude the one already shown as the visitor's Current Draw.
+    const upcomingGiveaways: UpcomingGiveaway[] = giveaways
+        .filter((g) => g.giveaway_id !== visitorGiveaway?.giveaway_id)
+        .slice(0, 6)
+        .map((g) => {
+            const mapped = toGiveaway(g, memberGroup, member.state);
 
-        return {
-            id: mapped.id,
-            title: mapped.title,
-            tier_group: mapped.tier_group,
-            prize_label: mapped.prize_label,
-            draws_at: mapped.draws_at,
-            locked: mapped.locked
-        };
-    });
+            return {
+                id: mapped.id,
+                title: mapped.title,
+                tier_group: mapped.tier_group,
+                prize_label: mapped.prize_label,
+                draws_at: mapped.draws_at,
+                locked: mapped.locked
+            };
+        });
 
     return (
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
             <Greeting member={member} />
 
+            {isVisitor ? <VisitorUpgradeBanner /> : null}
+
             <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                 {membership || cycle ? (
-                    <MembershipSummaryCard summary={summary} className='lg:col-span-1' />
+                    <MembershipSummaryCard summary={summary} isVisitor={isVisitor} className='lg:col-span-1' />
                 ) : (
                     <EmptyState
                         icon={CircleAlert}
@@ -124,19 +153,19 @@ export default async function MemberDashboardPage() {
                         className='lg:col-span-1'
                     />
                 )}
-                {cycleDraw ? (
+                {draw ? (
                     <DrawStatusCard
-                        draw={cycleDraw}
-                        drawsAtLabel={formatDrawDateTime(cycleDraw.draws_at)}
-                        eyebrow='Current Cycle'
-                        dateWord='Renews'
+                        draw={draw}
+                        drawsAtLabel={formatDrawDateTime(draw.draws_at)}
+                        eyebrow={drawEyebrow}
+                        dateWord={drawDateWord}
                         className='lg:col-span-2'
                     />
                 ) : (
                     <EmptyState
                         icon={Gift}
-                        title='No Active Cycle'
-                        description='Your draw cycle will appear here once your membership is active.'
+                        title='No Active Draw'
+                        description='Your draw will appear here once your membership is active.'
                         className='lg:col-span-2'
                     />
                 )}
@@ -148,7 +177,7 @@ export default async function MemberDashboardPage() {
 
             {upcomingGiveaways.length > 0 ? (
                 <UpcomingGiveaways giveaways={upcomingGiveaways} />
-            ) : (
+            ) : isVisitor ? null : (
                 <EmptyState
                     icon={Gift}
                     title='No Upcoming Giveaways'

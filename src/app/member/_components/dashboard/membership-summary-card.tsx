@@ -26,7 +26,16 @@ function Row({ icon, label, children }: { icon: ReactNode; label: string; childr
     );
 }
 
-export function MembershipSummaryCard({ summary, className }: { summary: MembershipSummary; className?: string }) {
+export function MembershipSummaryCard({
+    summary,
+    isVisitor = false,
+    className
+}: {
+    summary: MembershipSummary;
+    /** Visitor is free with no billing/renewal — hide the billing + next-payment rows. */
+    isVisitor?: boolean;
+    className?: string;
+}) {
     const meta = SUB_TIERS[summary.sub_tier];
     const visual = TIER_VISUALS[meta.group];
     const billing = BILLING[summary.billing_status];
@@ -52,15 +61,19 @@ export function MembershipSummaryCard({ summary, className }: { summary: Members
             </p>
 
             <div className='mt-4 divide-y divide-white/5 border-t border-white/5'>
-                <Row icon={<CreditCard className='size-4' />} label='Billing'>
-                    <span className={cn('inline-flex items-center gap-1.5', billing.text)}>
-                        <span className={cn('size-1.5 rounded-full', billing.dot)} />
-                        {billing.label}
-                    </span>
-                </Row>
-                <Row icon={<CalendarClock className='size-4' />} label='Next payment'>
-                    {formatShortDate(summary.next_payment_date)}
-                </Row>
+                {!isVisitor && (
+                    <>
+                        <Row icon={<CreditCard className='size-4' />} label='Billing'>
+                            <span className={cn('inline-flex items-center gap-1.5', billing.text)}>
+                                <span className={cn('size-1.5 rounded-full', billing.dot)} />
+                                {billing.label}
+                            </span>
+                        </Row>
+                        <Row icon={<CalendarClock className='size-4' />} label='Next payment'>
+                            {formatShortDate(summary.next_payment_date)}
+                        </Row>
+                    </>
+                )}
                 {/* Entries per draw = tokens (PRD: "token = entri/tiket per giveaway").
                     Per-draw, NOT token × draw_pass — that would leak the internal-only
                     draw_pass and mismatch the Current Draw card's entry count. */}
