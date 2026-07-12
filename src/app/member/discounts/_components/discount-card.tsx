@@ -7,18 +7,14 @@ import type { Discount } from '@/lib/api/resources/discounts';
 import { Check, Copy, Star, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Placeholder text shown until the member API exposes these fields. When the
-// backend adds value_label / code / terms to GET /discounts/, the real value
-// flows through via `?? PLACEHOLDER` and these disappear on their own.
-// See docs/BACKEND-ISSUES.md ("member discount DTO is thin").
-const PLACEHOLDER_VALUE = 'Member offer';
+// Fallbacks for the copy-code + terms slots (both returned by the member API;
+// placeholders only kick in for a discount that happens to omit them).
 const PLACEHOLDER_CODE = 'SLR-XXXXXX';
 const PLACEHOLDER_TERMS = 'Terms & conditions apply — see partner for full details.';
 
 export function DiscountCard({ discount }: { discount: Discount }) {
     const [copied, setCopied] = useState(false);
 
-    const valueLabel = discount.value_label?.trim() || PLACEHOLDER_VALUE;
     const code = discount.code?.trim() || PLACEHOLDER_CODE;
     const terms = discount.terms?.trim() || PLACEHOLDER_TERMS;
 
@@ -54,12 +50,7 @@ export function DiscountCard({ discount }: { discount: Discount }) {
                 )}
             </div>
 
-            <div className='mt-3 flex items-start justify-between gap-2'>
-                <p className='font-medium text-white'>{discount.title || '-'}</p>
-                <span className='bg-gradient-gold shrink-0 rounded-md px-2 py-0.5 text-xs font-bold text-[#1a1408]'>
-                    {valueLabel}
-                </span>
-            </div>
+            <p className='mt-3 font-medium text-white'>{discount.title || '-'}</p>
             <p className='text-slr-muted mt-1 text-xs leading-relaxed'>{discount.description || '-'}</p>
 
             <button

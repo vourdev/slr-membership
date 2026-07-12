@@ -12,11 +12,8 @@ export interface Discount {
     description: string | null;
     category: string;
     is_featured: boolean;
-    // ⚠️ Not yet returned by the member API (only on the admin create/PATCH response).
-    // Optional so the real value flows through automatically once the backend exposes
-    // them on GET /discounts/ + /{id}; until then the card shows placeholders.
-    // See docs/BACKEND-ISSUES.md ("member discount DTO is thin").
-    value_label?: string | null;
+    // `title` already carries the offer text (e.g. "15% off weekend getaways"), so
+    // there is no separate value_label. `code` + `terms` are returned by the member API.
     code?: string | null;
     terms?: string | null;
 }
