@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import type { AuStateCode } from '@/constant/au-states';
 import {
     type AdminMemberStatusUpdate,
     type AdminMemberStatusValue,
@@ -9,6 +10,7 @@ import {
     updateAdminMemberStatus
 } from '@/lib/api/resources/admin';
 import { type MemberSubTierId, type MembershipRecord, changeMemberTier } from '@/lib/api/resources/memberships';
+import { type AdminUserRecord, updateUser } from '@/lib/api/resources/users';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError } from '@/lib/api/types';
 
@@ -77,6 +79,25 @@ export async function changeMemberTierAction(
         revalidatePath('/dashboard/members');
 
         return { ok: true, data, message: 'Member tier updated.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+// Moves the draw-pool `state` half via PATCH /users/{id} (tier is separate).
+export async function changeMemberStateAction(
+    userId: string,
+    state: AuStateCode
+): Promise<ActionResult<AdminUserRecord>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await updateUser(userId, { state }, token);
+        revalidatePath(`/dashboard/members/${userId}`);
+        revalidatePath('/dashboard/members');
+
+        return { ok: true, data, message: 'Member state updated.' };
     } catch (error) {
         return toActionError(error);
     }

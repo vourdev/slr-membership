@@ -57,5 +57,8 @@ export const API = {
     notifications: {
         list: '/api/v1/notifications/',
         read: (id: string) => `/api/v1/notifications/${id}/read`
+    },
+    users: {
+        update: (id: string) => `/api/v1/users/${id}`
     }
 } as const;

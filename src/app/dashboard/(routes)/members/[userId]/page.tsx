@@ -101,6 +101,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                 userId={member.user_id}
                 currentStatus={member.status}
                 currentTierCode={membership?.tier_code ?? ''}
+                currentState={member.state ?? ''}
             />
 
             <InfoCard title='Subscription'>
