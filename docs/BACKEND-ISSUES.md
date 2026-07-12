@@ -58,7 +58,7 @@ The list DTO (`GET /giveaways`) **matches the contract exactly** — no issue th
 
 FE benefit: the admin discounts page now populates its table (no more 403 error card), and admin edit forms can prefill from a real GET (discount + ebook).
 
-**Still open — member discount DTO is thin:** `GET /discounts/` and `GET /discounts/{id}` return `{ discount_id, title, partner_name, description, category, is_featured }` — no `code` / `terms` / `value_label` (those live only on the admin create/PATCH camelCase response). Expose them on the member endpoints so the discount card can show promo codes + terms. **FE is ready:** the member `Discount` DTO has optional `value_label`/`code`/`terms` and the card renders placeholders (`Member offer`, `SLR-XXXXXX`, generic terms) that **auto-swap to the real values** the moment the API returns them — no FE change needed then.
+**✅ Mostly resolved — member discount DTO:** `GET /discounts/` and `GET /discounts/{id}` now return `code` + `terms` (verified: `code: "TRAVEL15"`, real `terms`). The member card auto-swapped its placeholders → the copy-code chip shows the **real promo code** and the real terms, no FE change. **Still missing: `value_label`** (the short offer badge, e.g. "15% off") — the card still shows the `Member offer` placeholder for it. Add `value_label` to the member GET responses to finish this.
 
 ---
 
