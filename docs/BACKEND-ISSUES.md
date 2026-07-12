@@ -101,7 +101,7 @@ Content-Type: application/json
 Notes: field is `name` (not `full_name`); response carries no record id. **Ask:** return a Stripe Checkout session so the $4/mo can be collected before pending.
 
 ### `POST /api/v1/memberships/change-tier` — Admin: change user's tier/sub-tier
-Accepts `{ userId, subTierId }` and silently **ignores a `state` field**. There's no endpoint that moves a member's draw-pool `state`, so admins can't reassign the `state + tier` pool. **Ask:** add state support here or a dedicated endpoint.
+Accepts `{ userId, subTierId }` and silently **ignores a `state` field** — but that's by design. ✅ **RESOLVED:** the draw-pool halves use two endpoints — `POST /memberships/change-tier` changes **tier/sub-tier**, and **`PATCH /users/{id}`** with `{ "state": "NSW" }` changes the **geographic state** (verified: 200 "User updated.", state persists, restored). FE can now build the admin state-change control off `PATCH /users/{id}`.
 
 ---
 
