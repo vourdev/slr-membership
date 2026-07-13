@@ -5,14 +5,14 @@ import { email, literal, object, string, union, enum as zEnum } from 'zod';
 export const SignInSchema = object({
     // `SLRAdmin` is a dev-only bypass login while the auth API is under development.
     email: union([email('Invalid Email'), literal('SLRadmin')]),
-    password: string().min(8, 'Password must be more than 8 characters')
+    password: string().min(10, 'Password must be more than 10 characters')
 });
 
 export const SignUpSchema = object({
     name: string().min(1, 'Name is required'),
     email: email('Invalid Email'),
     password: string()
-        .min(8, 'Password must be at least 8 characters')
+        .min(10, 'Password must be at least 10 characters')
         .max(32, 'Password must be less than 32 characters')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
