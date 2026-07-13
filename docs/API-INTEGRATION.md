@@ -69,7 +69,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 35 / 75 endpoints integrated (called from the app).**
+**Ratio: 38 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -101,6 +101,9 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/beny/status` | `member/discounts/page.tsx` | member BENY add-on status → `BenySection`. Enum: inactive/pending_activation/active/canceled |
 | `POST /api/v1/beny/subscribe` | `member/discounts` (beny-actions) | subscribe (body `{name,email,phone}`). ⚠️ **Stripe block** — see below |
 | `DELETE /api/v1/beny/subscribe` | `member/discounts` (beny-actions) | cancel. Only cancels an **active** sub — returns NOT_FOUND on `pending_activation` |
+| `GET /api/v1/billing/status` | `account/page.tsx` · `payment/success` | billing status card + success-page activation poll (`billing_status`, `next_renewal_at`, `grace_period`) |
+| `GET /api/v1/billing/invoices` | `account/page.tsx` | payment-history table (`data` = invoice array + `meta`). Seed empty → "No payments yet" |
+| `POST /api/v1/stripe/portal` | `account` (Manage Billing) | hosted Billing Portal; server action → redirect to `url`. 400 on seed customers; real members get a URL |
 | `GET /api/v1/memberships/me` | `member/page.tsx` | dashboard summary card. Live shape == `MembershipRecord` (subTierId, billingStatus UPPERCASE, activatedAt, subTier). ⚠️ carries **no `state`** (session), no next-payment, no BENY |
 | `GET /api/v1/giveaways/` | `member/page.tsx` · `member/giveaways` | upcoming + list board. ✅ **now 200** (was 500; fixed 2026-07-09). DTO verified: `{giveaway_id,name,tier,type,prize,opens_at,closes_at,draws_at,is_entered,entry_status}`. Entries-per-giveaway = member cycle tokens (API has no per-giveaway count) |
 | `GET /api/v1/giveaways/{id}` | `member/giveaways/[id]` | detail (meta + `winners[]`). ⚠️ omits entry status → merged from the list item; rules/TPAL copy static (API/PRD don't supply it) |
@@ -167,9 +170,9 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | GET | `/api/v1/beny/status` | beny | Get current user BENY status → `member/discounts` BenySection |
 | ✅ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription (active only; NOT_FOUND on pending) |
 | ✅ | POST | `/api/v1/beny/subscribe` | beny | Subscribe to BENY add-on (⚠️ no Stripe charge — see blockers) |
-| ❌ | GET | `/api/v1/billing/invoices` | billing | Get billing invoice list |
+| ✅ | GET | `/api/v1/billing/invoices` | billing | Get billing invoice list → `/account` payment history (`data` = invoice array + `meta`) |
 | ❌ | POST | `/api/v1/billing/pay-manual` | billing | Pay manual for grace period invoice |
-| ❌ | GET | `/api/v1/billing/status` | billing | Get current billing status |
+| ✅ | GET | `/api/v1/billing/status` | billing | Get current billing status → `/account` + `/payment/success` activation poll (`billing_status`/`next_renewal_at`) |
 | ✅ | GET | `/api/v1/discounts/` | discounts | List partner discounts (RED/BLUE + **admin now 200**, was 403) |
 | ✅ | POST | `/api/v1/discounts/` | discounts | Admin: create discount |
 | ✅ | DELETE | `/api/v1/discounts/{id}` | discounts | Admin: delete discount |
@@ -206,8 +209,8 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | POST | `/api/v1/referral/validate` | referral | Validate referral code before submission |
 | ❌ | POST | `/api/v1/spin/execute` | spin | Spin the wheel (one-time or pre-renewal) |
 | ❌ | GET | `/api/v1/spin/status` | spin | Check spin wheel status and availability |
-| ❌ | POST | `/api/v1/stripe/checkout` | stripe | Create Stripe Checkout session for a tier |
-| ❌ | POST | `/api/v1/stripe/portal` | stripe | Create Stripe Billing Portal session |
+| 🟡 | POST | `/api/v1/stripe/checkout` | stripe | Create Stripe Checkout session for a tier (`createCheckoutSession` mapped; register-flow wiring pending) |
+| ✅ | POST | `/api/v1/stripe/portal` | stripe | Create Stripe Billing Portal session → `/account` Manage Billing (400 on seed customers; real members get a URL) |
 | ❌ | POST | `/api/v1/webhooks/stripe/` | stripe | Stripe webhook (signature-verified, raw body) |
 | ❌ | GET | `/api/v1/subscriptions/` | subscriptions | Admin: list subscriptions |
 | ❌ | POST | `/api/v1/subscriptions/me/cancel` | subscriptions | Cancel my subscription at period end |
