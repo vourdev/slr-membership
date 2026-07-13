@@ -18,7 +18,8 @@ export const authConfig = {
             const home = isAdmin ? '/dashboard' : '/member';
 
             const isDashboard = pathname.startsWith('/dashboard');
-            const isMemberArea = pathname.startsWith('/member') || pathname.startsWith('/ebooks');
+            const isMemberArea =
+                pathname.startsWith('/member') || pathname.startsWith('/ebooks') || pathname.startsWith('/account');
             const isAuthPage = pathname.startsWith('/sign-in');
 
             // Not logged in → any protected route → sign-in.

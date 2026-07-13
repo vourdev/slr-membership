@@ -60,5 +60,13 @@ export const API = {
     },
     users: {
         update: (id: string) => `/api/v1/users/${id}`
+    },
+    billing: {
+        status: '/api/v1/billing/status',
+        invoices: '/api/v1/billing/invoices'
+    },
+    stripe: {
+        checkout: '/api/v1/stripe/checkout',
+        portal: '/api/v1/stripe/portal'
     }
 } as const;
