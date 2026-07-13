@@ -80,7 +80,7 @@ pending member   → 404 { "success": false, "code": "NOT_FOUND",
 ## ⚠️ Business-logic gaps (return 200, but off-spec per PRD)
 
 ### `POST /api/v1/beny/subscribe` — Subscribe to BENY add-on
-Creates `pending_activation` **immediately, with no Stripe charge and no checkout URL** in the response. PRD §1 requires the flow to redirect to Stripe Checkout ($4/mo) **before** the pending record is created. The frontend calls it directly for now and marks the gap with a removable `BACKEND BLOCK` comment.
+**⏭️ Scheduled for the next sprint (Stripe billing).** Creates `pending_activation` **immediately, with no Stripe charge and no checkout URL** in the response. PRD §1 requires the flow to redirect to Stripe Checkout ($4/mo) **before** the pending record is created. The frontend calls it directly for now and marks the gap with a removable `BACKEND BLOCK` comment — remove it once the backend returns a checkout session.
 
 **Account:** `visitor@smartliferewards.com.au` (any RED/BLUE/visitor)
 ```http
