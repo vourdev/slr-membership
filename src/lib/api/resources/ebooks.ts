@@ -92,3 +92,17 @@ export const updateEbook = (token: string, id: string, body: EbookPayload) =>
 
 export const deleteEbook = (token: string, id: string) =>
     apiFetch<null>(API.ebooks.remove(id), { method: 'DELETE', token });
+
+export interface PresignedUrlPayload {
+    filename: string;
+    contentType: string;
+}
+
+export interface PresignedUrlResponse {
+    upload_url: string;
+    download_url: string;
+    object_key: string;
+}
+
+export const getEbookPresignedUrl = (token: string, body: PresignedUrlPayload) =>
+    apiFetch<PresignedUrlResponse>(API.ebooks.presignedUrl, { method: 'POST', token, body });

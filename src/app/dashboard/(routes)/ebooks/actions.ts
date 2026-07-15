@@ -2,7 +2,15 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { type EbookAdmin, type EbookPayload, createEbook, deleteEbook, updateEbook } from '@/lib/api/resources/ebooks';
+import {
+    type EbookAdmin,
+    type EbookPayload,
+    type PresignedUrlResponse,
+    createEbook,
+    deleteEbook,
+    getEbookPresignedUrl,
+    updateEbook
+} from '@/lib/api/resources/ebooks';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError } from '@/lib/api/types';
 
@@ -69,6 +77,21 @@ export async function deleteEbookAction(id: string): Promise<ActionResult<null>>
         revalidatePath('/dashboard/ebooks');
 
         return { ok: true, data: null, message: 'Ebook deleted.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function getEbookPresignedUrlAction(
+    filename: string,
+    contentType: string
+): Promise<ActionResult<PresignedUrlResponse>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await getEbookPresignedUrl(token, { filename, contentType });
+        return { ok: true, data, message: 'Upload URL generated.' };
     } catch (error) {
         return toActionError(error);
     }
