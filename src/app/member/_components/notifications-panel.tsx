@@ -5,10 +5,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { markNotificationRead } from '@/lib/api/resources/notifications';
 import { cn } from '@/lib/utils';
 import type { MemberNotification, NotificationType } from '@/types/member';
-import { markNotificationRead } from '@/lib/api/resources/notifications';
-import { toast } from 'sonner';
 
 import {
     Bell,
@@ -23,6 +22,7 @@ import {
     Trophy,
     Users
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ICON: Record<NotificationType, LucideIcon> = {
     draw_win: Trophy,

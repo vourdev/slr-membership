@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 import EmptyState from '@/components/common/empty-state';
-import { getAccessToken } from '@/lib/api/server';
 import { handleApiAuthError } from '@/lib/api/guard';
-import { getEntryHistory, type EntryCycle, type EntryHistoryResponse } from '@/lib/api/resources/entries';
+import { type EntryCycle, type EntryHistoryResponse, getEntryHistory } from '@/lib/api/resources/entries';
+import { getAccessToken } from '@/lib/api/server';
 
 import { EntryHistoryTable } from './_components/entry-history-table';
-import { History, CircleAlert } from 'lucide-react';
+import { CircleAlert, History } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Entry History · SLR Member'
@@ -35,7 +35,8 @@ export default async function EntryHistoryPage() {
             <header className='space-y-1'>
                 <h1 className='font-bebas-neue text-3xl tracking-wide uppercase sm:text-4xl'>Entry History</h1>
                 <p className='text-slr-muted text-sm md:text-base'>
-                    Your entry status and tokens grouped by billing cycle. Tokens are allocated to all eligible draws within that cycle.
+                    Your entry status and tokens grouped by billing cycle. Tokens are allocated to all eligible draws
+                    within that cycle.
                 </p>
             </header>
 

@@ -30,6 +30,7 @@ const initialData: SignUpFormData = {
     password: '',
     state: '',
     phone: '',
+    dob: '',
     tier: null,
     sub_tier: null,
     beny: false
@@ -84,6 +85,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                 password: data.password,
                 state: data.state as Exclude<SignUpFormData['state'], ''>,
                 phone: data.phone,
+                dob: data.dob,
                 tier: 'visitor'
             });
             setUserId(res.user_id);

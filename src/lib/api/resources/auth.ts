@@ -11,6 +11,7 @@ export interface RegisterPayload {
     password: string;
     state: AuStateCode;
     phone: string;
+    dob: string;
     tier?: 'visitor' | 'red' | 'blue';
     sub_tier?: string | null;
     referral_code?: string;

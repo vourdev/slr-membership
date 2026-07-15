@@ -29,7 +29,9 @@ const ResetPasswordPage = async ({ searchParams }: { searchParams: Promise<{ tok
                             className='h-16 w-auto md:h-20'
                         />
                     </Link>
-                    <p className='text-slr-muted text-xs font-medium tracking-[0.3em] uppercase'>Choose a new password</p>
+                    <p className='text-slr-muted text-xs font-medium tracking-[0.3em] uppercase'>
+                        Choose a new password
+                    </p>
                 </div>
 
                 <ResetPasswordForm token={token ?? ''} />

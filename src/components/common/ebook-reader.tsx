@@ -247,7 +247,9 @@ export function EbookReader({
                                         </blockquote>
                                     )}
                                     {chapter.body.slice(1).map((paragraph) => (
-                                        <p key={paragraph} className='text-slr-muted text-sm leading-relaxed md:text-base'>
+                                        <p
+                                            key={paragraph}
+                                            className='text-slr-muted text-sm leading-relaxed md:text-base'>
                                             {paragraph}
                                         </p>
                                     ))}

@@ -13,8 +13,8 @@ function formatDateRange(startStr: string, endStr: string): string {
     const start = new Date(startStr);
     const end = new Date(endStr);
     const fmt = new Intl.DateTimeFormat('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
-    
-return `${fmt.format(start)} – ${fmt.format(end)}`;
+
+    return `${fmt.format(start)} – ${fmt.format(end)}`;
 }
 
 export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
@@ -39,12 +39,17 @@ export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
                         {entries.map((e, index) => (
                             <tr key={e.cycle_id} className='border-slr-navy-border/50 border-b last:border-0'>
                                 <td className='px-4 py-3'>
-                                    <p className='font-medium text-white'>{index === 0 ? 'Current Cycle' : 'Past Cycle'}</p>
+                                    <p className='font-medium text-white'>
+                                        {index === 0 ? 'Current Cycle' : 'Past Cycle'}
+                                    </p>
                                     <p className='text-slr-dim text-xs'>{formatDateRange(e.start_at, e.end_at)}</p>
                                 </td>
                                 <td className='px-4 py-3'>
                                     <div className='flex items-center gap-2'>
-                                        <TierBadge subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'} size='sm' />
+                                        <TierBadge
+                                            subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'}
+                                            size='sm'
+                                        />
                                     </div>
                                 </td>
                                 <td className='px-4 py-3 text-right text-white/90 tabular-nums'>
@@ -78,7 +83,10 @@ export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
                         </div>
 
                         <div className='mt-3 flex flex-wrap items-center gap-2'>
-                            <TierBadge subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'} size='sm' />
+                            <TierBadge
+                                subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'}
+                                size='sm'
+                            />
                         </div>
 
                         <div className='mt-3 grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-center'>

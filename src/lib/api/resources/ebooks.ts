@@ -15,6 +15,7 @@ export interface EbookListItem {
     cover_url: string | null;
     description: string | null;
     category: string | null;
+    footnote: string | null;
     reading_time_minutes: number;
     chapter_count: number;
     is_locked: boolean;
@@ -28,6 +29,7 @@ export interface EbookAdmin {
     coverUrl: string | null;
     description: string | null;
     category: string | null;
+    footnote: string | null;
     tierAccess: EbookTier;
     readingTimeMinutes: number;
     chapterCount: number;
@@ -43,6 +45,7 @@ export interface EbookPayload {
     coverUrl?: string;
     description?: string;
     category?: string;
+    footnote?: string;
     tierAccess: EbookTier;
     readingTimeMinutes: number;
 }
@@ -62,6 +65,7 @@ export interface EbookDetail {
     title: string;
     subtitle: string | null;
     cover_url: string | null;
+    footnote: string | null;
     reading_time_minutes: number;
     chapter_count: number;
     published_at: string | null;
@@ -70,7 +74,9 @@ export interface EbookDetail {
 
 // ─── Resource functions ──────────────────────────────────────────────────────
 
-export const getEbooks = cache((token: string) => apiFetch<EbookListItem[]>(API.ebooks.list, { token, cache: 'no-store' }));
+export const getEbooks = cache((token: string) =>
+    apiFetch<EbookListItem[]>(API.ebooks.list, { token, cache: 'no-store' })
+);
 
 /** One ebook's full content + chapters. Throws ApiError(403) when the member's tier is too low. */
 export const getEbook = cache((id: string, token: string) =>

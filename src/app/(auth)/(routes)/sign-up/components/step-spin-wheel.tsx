@@ -48,8 +48,14 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleDeg: number) =
 };
 
 const pickSegmentIndex = (segments: Segment[]): number => {
-    const winners = segments.map((s, i) => ({ s, i })).filter(({ s }) => s.isWin).map(({ i }) => i);
-    const losers = segments.map((s, i) => ({ s, i })).filter(({ s }) => !s.isWin).map(({ i }) => i);
+    const winners = segments
+        .map((s, i) => ({ s, i }))
+        .filter(({ s }) => s.isWin)
+        .map(({ i }) => i);
+    const losers = segments
+        .map((s, i) => ({ s, i }))
+        .filter(({ s }) => !s.isWin)
+        .map(({ i }) => i);
 
     // 1/4 chance of winning per PRD flow.
     if (Math.random() < 0.25) {
@@ -192,7 +198,9 @@ const StepSpinWheel = ({ winDiscount, onNext, onBack }: StepSpinWheelProps) => {
                                 <p className='font-bebas-neue mt-2 text-2xl tracking-wider text-white uppercase'>
                                     You won {result.segment.label}!
                                 </p>
-                                <p className='text-slr-muted mt-1 text-xs'>Your discount will be applied at checkout.</p>
+                                <p className='text-slr-muted mt-1 text-xs'>
+                                    Your discount will be applied at checkout.
+                                </p>
                             </>
                         ) : (
                             <>

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
-import AppSidebarLayout from './app/app-sidebar-layout';
 import { DashboardThemeClass } from './_components/theme-class';
+import AppSidebarLayout from './app/app-sidebar-layout';
 import { Toaster } from 'react-hot-toast';
 
 interface AppLayoutProps {

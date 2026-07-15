@@ -130,6 +130,11 @@ export default async function EbookReaderPage({ params }: { params: Promise<{ id
                             </span>
                         )}
                     </div>
+                    {ebook.footnote && (
+                        <p className='text-slr-dim mt-5 max-w-2xl border-l border-white/10 pl-3 text-xs leading-relaxed italic'>
+                            * {ebook.footnote}
+                        </p>
+                    )}
                 </div>
             </div>
 

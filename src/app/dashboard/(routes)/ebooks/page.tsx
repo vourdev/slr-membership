@@ -3,7 +3,7 @@ import { getEbooks } from '@/lib/api/resources/ebooks';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError } from '@/lib/api/types';
 
-import { EbooksClient, type EbookRow, type ListError } from './ebooks-client';
+import { type EbookRow, EbooksClient, type ListError } from './ebooks-client';
 
 export default async function EbooksPage() {
     const token = await getAccessToken();
@@ -20,6 +20,7 @@ export default async function EbooksPage() {
             description: e.description ?? '',
             coverUrl: e.cover_url ?? '',
             category: e.category || '-',
+            footnote: e.footnote ?? '',
             reading: e.reading_time_minutes ?? 0,
             chapters: e.chapter_count ?? 0,
             locked: e.is_locked ? 'Yes' : 'No'

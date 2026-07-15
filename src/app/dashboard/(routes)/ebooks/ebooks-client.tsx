@@ -35,6 +35,7 @@ export type EbookRow = {
     description: string;
     coverUrl: string;
     category: string;
+    footnote: string;
     tier?: EbookTier;
     reading: number;
     chapters: number;
@@ -56,6 +57,7 @@ const formSchema = z.object({
     coverUrl: z.string().optional(),
     description: z.string().optional(),
     category: z.string().optional(),
+    footnote: z.string().optional(),
     tierAccess: z.enum(['VISITOR', 'RED', 'BLUE']),
     readingTimeMinutes: z.number().min(0, 'Must be 0 or more')
 });
@@ -68,6 +70,7 @@ const EMPTY: FormValues = {
     coverUrl: '',
     description: '',
     category: '',
+    footnote: '',
     tierAccess: 'RED',
     readingTimeMinutes: 0
 };
@@ -79,6 +82,7 @@ const adminToRow = (e: EbookAdmin): EbookRow => ({
     description: e.description ?? '',
     coverUrl: e.coverUrl ?? '',
     category: e.category || '-',
+    footnote: e.footnote ?? '',
     tier: e.tierAccess,
     reading: e.readingTimeMinutes ?? 0,
     chapters: e.chapterCount ?? 0,
@@ -138,6 +142,7 @@ export function EbooksClient({ initialRows, listError }: { initialRows: EbookRow
             coverUrl: row.coverUrl,
             description: row.description,
             category: row.category === '-' ? '' : row.category,
+            footnote: row.footnote,
             tierAccess: row.tier ?? 'RED',
             readingTimeMinutes: row.reading
         });
@@ -254,6 +259,19 @@ export function EbooksClient({ initialRows, listError }: { initialRows: EbookRow
                                         <FormLabel>Cover URL</FormLabel>
                                         <FormControl>
                                             <Input placeholder='https://…' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='footnote'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Footnote</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder='Optional footnote' {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

@@ -14,10 +14,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useInitials } from '@/hooks/use-initials';
-import { logoutAction } from '@/lib/logout-action';
-import type { CurrentMember, MemberNotification } from '@/types/member';
 import type { NotificationDto } from '@/lib/api/resources/notifications';
 import { notificationDtoToMemberNotification } from '@/lib/api/resources/notifications';
+import { logoutAction } from '@/lib/logout-action';
+import type { CurrentMember, MemberNotification } from '@/types/member';
 
 import { NotificationsPanel } from './notifications-panel';
 import { ChevronDown, LogOut, UserCircle } from 'lucide-react';
@@ -46,14 +46,16 @@ export function MemberHeader({ user, member, notifications, token }: MemberHeade
                     <DropdownMenuTrigger asChild>
                         <button
                             type='button'
-                            className='flex items-center gap-2 rounded-lg border border-sidebar-border bg-sidebar-accent/10 py-1 pr-2 pl-1 transition-colors hover:bg-sidebar-accent/20'>
+                            className='border-sidebar-border bg-sidebar-accent/10 hover:bg-sidebar-accent/20 flex items-center gap-2 rounded-lg border py-1 pr-2 pl-1 transition-colors'>
                             <Avatar className='size-7'>
                                 <AvatarImage src={user?.image ?? ''} alt={member.name} />
-                                <AvatarFallback className='bg-slr-navy-card text-xs font-semibold text-sidebar-foreground'>
+                                <AvatarFallback className='bg-slr-navy-card text-sidebar-foreground text-xs font-semibold'>
                                     {getInitials(member.name)}
                                 </AvatarFallback>
                             </Avatar>
-                            <span className='hidden text-sm font-medium text-sidebar-foreground sm:inline'>{firstName}</span>
+                            <span className='text-sidebar-foreground hidden text-sm font-medium sm:inline'>
+                                {firstName}
+                            </span>
                             <TierBadge
                                 subTier={member.sub_tier}
                                 size='sm'

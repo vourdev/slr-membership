@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { goldButtonStyle } from '@/lib/styles';
 import { requestPasswordReset } from '@/lib/api/resources/auth';
-import { toast } from 'sonner';
+import { goldButtonStyle } from '@/lib/styles';
 
 import { Loader2Icon, MailCheck } from 'lucide-react';
+import { toast } from 'sonner';
 
 const glassStyle: React.CSSProperties = {
     background: 'linear-gradient(117.58deg, rgba(215, 237, 237, 0.16) -47.79%, rgba(204, 235, 235, 0) 100%)',

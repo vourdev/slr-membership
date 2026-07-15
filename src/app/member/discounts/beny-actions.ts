@@ -1,11 +1,6 @@
 'use server';
 
-import {
-    type BenyStatusValue,
-    type BenySubscribePayload,
-    cancelBeny,
-    subscribeBeny
-} from '@/lib/api/resources/beny';
+import { type BenyStatusValue, type BenySubscribePayload, cancelBeny, subscribeBeny } from '@/lib/api/resources/beny';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError } from '@/lib/api/types';
 

@@ -10,6 +10,7 @@ export type SignUpFormData = {
     password: string;
     state: AuStateCode | '';
     phone: string;
+    dob: string;
     tier: TierKey | null;
     sub_tier: SubTierCode | null; // R1/R4/R7/B1/B4/B7/B10 (or VISITOR)
     beny: boolean;

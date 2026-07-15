@@ -20,7 +20,13 @@ function toActionError(error: unknown): ActionError {
     if (error instanceof ApiError) {
         const payload = error.payload as { code?: string; requestId?: string } | undefined;
 
-        return { ok: false, message: error.message, status: error.status, code: payload?.code ?? null, requestId: payload?.requestId ?? null };
+        return {
+            ok: false,
+            message: error.message,
+            status: error.status,
+            code: payload?.code ?? null,
+            requestId: payload?.requestId ?? null
+        };
     }
 
     return { ok: false, message: 'Something went wrong. Please try again.' };

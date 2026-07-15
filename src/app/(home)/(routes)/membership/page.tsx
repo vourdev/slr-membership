@@ -41,8 +41,7 @@ const toDisplayMap = (options: TierOption[]): Record<string, TierDisplay> =>
     }, {});
 
 // Cheapest price in a group — for the hero "Start From" figure.
-const startFrom = (options: TierOption[]): string =>
-    formatPrice(Math.min(...options.map((t) => t.price_cents)));
+const startFrom = (options: TierOption[]): string => formatPrice(Math.min(...options.map((t) => t.price_cents)));
 
 const MembershipPage = async () => {
     let tiers: MembershipTiers | null = null;

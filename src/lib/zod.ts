@@ -21,5 +21,22 @@ export const SignUpSchema = object({
     state: zEnum(AU_STATE_CODES, { message: 'Select your state or territory' }),
     phone: string()
         .min(8, 'Enter a valid Australian phone number')
-        .regex(/^[0-9 +()-]+$/, 'Only digits, spaces, +, -, () allowed')
+        .regex(/^[0-9 +()-]+$/, 'Only digits, spaces, +, -, () allowed'),
+    dob: string()
+        .min(1, 'Date of birth is required')
+        .refine(
+            (val) => {
+                const date = new Date(val);
+                if (isNaN(date.getTime())) return false;
+                const today = new Date();
+                let age = today.getFullYear() - date.getFullYear();
+                const monthDiff = today.getMonth() - date.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
+                    age--;
+                }
+
+                return age >= 18;
+            },
+            { message: 'You must be at least 18 years old' }
+        )
 });

@@ -30,7 +30,9 @@ const DashboardEmptyState: FC<DashboardEmptyStateProps> = ({ icon: Icon, title, 
             </div>
         ) : null}
         <h3 className='text-foreground text-base font-semibold'>{title}</h3>
-        {description ? <p className='text-muted-foreground mt-1.5 max-w-sm text-sm leading-relaxed'>{description}</p> : null}
+        {description ? (
+            <p className='text-muted-foreground mt-1.5 max-w-sm text-sm leading-relaxed'>{description}</p>
+        ) : null}
         {action ? <div className='mt-5'>{action}</div> : null}
     </div>
 );

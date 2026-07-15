@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import type { MemberNotification } from '@/types/member';
+
 import { API } from '../endpoints';
 import { apiFetch } from '../http';
 
@@ -19,9 +20,9 @@ export const getNotifications = cache((token: string) => {
 });
 
 export async function markNotificationRead(id: string, token: string) {
-    return apiFetch<null>(API.notifications.read(id), { 
+    return apiFetch<null>(API.notifications.read(id), {
         method: 'PUT',
-        token 
+        token
     });
 }
 

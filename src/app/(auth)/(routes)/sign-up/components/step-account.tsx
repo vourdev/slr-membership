@@ -3,22 +3,26 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AU_STATES, AuStateCode } from '@/constant/au-states';
 import { goldButtonStyle } from '@/lib/styles';
+import { cn } from '@/lib/utils';
 import { SignUpSchema } from '@/lib/zod';
 
 import { SignUpFormData } from './types';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { CalendarIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 type StepAccountProps = {
     data: SignUpFormData;
     onNext: (patch: Partial<SignUpFormData>) => void;
 };
 
-type FieldErrors = Partial<Record<'name' | 'email' | 'password' | 'state' | 'phone', string>>;
+type FieldErrors = Partial<Record<'name' | 'email' | 'password' | 'state' | 'phone' | 'dob', string>>;
 
 const StepAccount = ({ data, onNext }: StepAccountProps) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -28,12 +32,21 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
         email: data.email,
         password: data.password,
         state: data.state,
-        phone: data.phone
+        phone: data.phone,
+        dob: data.dob
     });
 
     const update = <K extends keyof typeof values>(key: K, value: (typeof values)[K]) => {
         setValues((v) => ({ ...v, [key]: value }));
         if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
+    };
+
+    const handleDateSelect = (date: Date | undefined) => {
+        if (date) {
+            update('dob', format(date, 'yyyy-MM-dd'));
+        } else {
+            update('dob', '');
+        }
     };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -46,7 +59,8 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                 email: fieldErrors.email?.[0],
                 password: fieldErrors.password?.[0],
                 state: fieldErrors.state?.[0],
-                phone: fieldErrors.phone?.[0]
+                phone: fieldErrors.phone?.[0],
+                dob: fieldErrors.dob?.[0]
             });
 
             return;
@@ -163,6 +177,39 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                     />
                     {errors.phone && <span className='text-xs text-red-400'>{errors.phone}</span>}
                 </div>
+            </div>
+
+            <div className='grid gap-2'>
+                <Label htmlFor='dob' className='text-sm font-medium text-white'>
+                    Date of birth
+                </Label>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            id='dob'
+                            type='button'
+                            variant='outline'
+                            className={cn(
+                                'h-11 w-full justify-between rounded-lg border-white/10 bg-white/5 px-3 text-left font-normal text-white hover:bg-white/10 hover:text-white focus:border-[#D4AF37]/60 focus:ring-[#D4AF37]/20 focus-visible:ring-1 focus-visible:ring-[#D4AF37]/60 focus-visible:outline-none',
+                                !values.dob && 'text-white/40'
+                            )}>
+                            {values.dob ? format(new Date(values.dob), 'dd/MM/yyyy') : <span>Select date…</span>}
+                            <CalendarIcon className='h-4 w-4 text-white/50' />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto border-white/10 bg-[#141820] p-0 text-white' align='start'>
+                        <Calendar
+                            mode='single'
+                            captionLayout='dropdown'
+                            selected={values.dob ? new Date(values.dob) : undefined}
+                            onSelect={handleDateSelect}
+                            startMonth={new Date(1900, 0)}
+                            endMonth={new Date()}
+                            className='bg-[#141820] text-white'
+                        />
+                    </PopoverContent>
+                </Popover>
+                {errors.dob && <span className='text-xs text-red-400'>{errors.dob}</span>}
             </div>
 
             <Button

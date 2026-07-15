@@ -3,7 +3,7 @@ import { getDiscounts } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError } from '@/lib/api/types';
 
-import { DiscountsClient, type DiscountRow, type ListError } from './discounts-client';
+import { type DiscountRow, DiscountsClient, type ListError } from './discounts-client';
 
 export default async function DiscountsPage() {
     const token = await getAccessToken();
