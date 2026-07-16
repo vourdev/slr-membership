@@ -73,7 +73,7 @@ export function EbookForm({ initialData }: EbookFormProps) {
     };
 
     const handleDeleteChapter = async (chapter: EbookChapter) => {
-        const chapterId = chapter.id;
+        const chapterId = chapter.chapter_id;
         if (!chapterId) {
             toast.error('Cannot delete: Chapter ID (UUID) is missing in backend data.', {
                 description: 'Please request backend developers to expose the chapter ID.'
@@ -104,25 +104,25 @@ export function EbookForm({ initialData }: EbookFormProps) {
 
     const defaultValues: FormValues = initialData
         ? {
-              title: initialData.title,
-              subtitle: initialData.subtitle,
-              coverUrl: initialData.coverUrl,
-              description: initialData.description,
-              category: initialData.category,
-              footnote: initialData.footnote,
-              tierAccess: initialData.tierAccess,
-              readingTimeMinutes: initialData.readingTimeMinutes
-          }
+            title: initialData.title,
+            subtitle: initialData.subtitle,
+            coverUrl: initialData.coverUrl,
+            description: initialData.description,
+            category: initialData.category,
+            footnote: initialData.footnote,
+            tierAccess: initialData.tierAccess,
+            readingTimeMinutes: initialData.readingTimeMinutes
+        }
         : {
-              title: '',
-              subtitle: '',
-              coverUrl: '',
-              description: '',
-              category: '',
-              footnote: '',
-              tierAccess: 'RED',
-              readingTimeMinutes: 0
-          };
+            title: '',
+            subtitle: '',
+            coverUrl: '',
+            description: '',
+            category: '',
+            footnote: '',
+            tierAccess: 'RED',
+            readingTimeMinutes: 0
+        };
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema) as Resolver<FormValues>,

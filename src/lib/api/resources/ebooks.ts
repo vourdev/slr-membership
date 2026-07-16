@@ -53,7 +53,7 @@ export interface EbookPayload {
 // GET /ebooks/{id} — unlocked content (403 FORBIDDEN when the member's tier is
 // below the ebook's tierAccess; caller renders an upgrade gate on 403).
 export interface EbookChapter {
-    id?: string;
+    chapter_id?: string;
     chapter_number: number;
     title: string;
     image_url: string | null;

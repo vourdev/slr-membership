@@ -15,10 +15,18 @@ import { ArrowLeft, ArrowRight, BookOpen, Clock, Layers, Lock } from 'lucide-rea
 /** API chapters → the shared reader shape. `body` splits on blank lines into paragraphs. */
 function toReaderChapters(chapters: EbookChapter[]): ReaderChapter[] {
     return chapters.map((chapter) => {
-        const paragraphs = (chapter.body ?? '')
-            .split(/\n{2,}/)
-            .map((paragraph) => paragraph.trim())
-            .filter(Boolean);
+        const bodyContent = chapter.body ?? '';
+        const isHtml = /<[a-z][\s\S]*>/i.test(bodyContent);
+
+        let paragraphs: string[];
+        if (isHtml) {
+            paragraphs = [bodyContent];
+        } else {
+            paragraphs = bodyContent
+                .split(/\n{2,}/)
+                .map((paragraph) => paragraph.trim())
+                .filter(Boolean);
+        }
 
         return {
             num: String(chapter.chapter_number).padStart(2, '0'),

@@ -203,65 +203,130 @@ export function EbookReader({
 
                 {/* Main — chapter content */}
                 <div ref={contentRef} className='mx-auto max-w-2xl pb-16 md:pb-24'>
-                    {chapters.map((chapter, index) => (
-                        <Fragment key={chapter.num}>
-                            {index > 0 && <DiamondSeparator className='py-12 md:py-16' />}
+                    {chapters.map((chapter, index) => {
+                        const isHtml = chapter.body.length === 1 && /<[a-z][\s\S]*>/i.test(chapter.body[0]);
 
-                            <article id={`chapter-${chapter.num}`} data-chapter-index={index} className='scroll-mt-24'>
-                                <div className='flex flex-wrap items-center gap-3'>
-                                    <span className='text-slr-gold-label border-slr-gold-label/50 bg-slr-gold-label/10 rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase'>
-                                        Ch. {chapter.num}
-                                    </span>
-                                    {(chapter.readMinutes !== undefined || chapter.tag) && (
-                                        <p className='text-slr-dim text-[10px] font-semibold tracking-[0.15em] uppercase'>
-                                            {chapter.readMinutes !== undefined && `${chapter.readMinutes} Min Read`}
-                                            {chapter.readMinutes !== undefined && chapter.tag && ' · '}
-                                            {chapter.tag}
-                                        </p>
-                                    )}
-                                </div>
+                        return (
+                            <Fragment key={chapter.num}>
+                                {index > 0 && <DiamondSeparator className='py-12 md:py-16' />}
 
-                                <h3 className='font-bebas-neue mt-3 text-3xl tracking-wide text-white uppercase sm:text-4xl md:text-5xl'>
-                                    {chapter.heading}
-                                </h3>
-
-                                {chapter.image && (
-                                    <div className='relative mx-auto mt-6 aspect-square w-full max-w-180 overflow-hidden rounded-3xl ring-1 ring-white/10'>
-                                        <Image
-                                            src={chapter.image}
-                                            alt=''
-                                            fill
-                                            sizes='(max-width: 768px) 100vw, 720px'
-                                            className='object-contain'
+                                <article id={`chapter-${chapter.num}`} data-chapter-index={index} className='scroll-mt-24'>
+                                    {isHtml && (
+                                        <style
+                                            dangerouslySetInnerHTML={{
+                                                __html: `
+                                                    .tiptap ul {
+                                                        list-style-type: disc !important;
+                                                        padding-left: 1.5rem !important;
+                                                        margin-top: 0.5rem !important;
+                                                        margin-bottom: 0.5rem !important;
+                                                    }
+                                                    .tiptap ol {
+                                                        list-style-type: decimal !important;
+                                                        padding-left: 1.5rem !important;
+                                                        margin-top: 0.5rem !important;
+                                                        margin-bottom: 0.5rem !important;
+                                                    }
+                                                    .tiptap li {
+                                                        display: list-item !important;
+                                                        margin-top: 0.25rem !important;
+                                                        margin-bottom: 0.25rem !important;
+                                                    }
+                                                    .tiptap blockquote {
+                                                        border-left: 3px solid #D4AF37 !important;
+                                                        padding-left: 1rem !important;
+                                                        font-style: italic !important;
+                                                        color: rgba(255, 255, 255, 0.8) !important;
+                                                        margin: 1rem 0 !important;
+                                                    }
+                                                    .tiptap h1 {
+                                                        font-size: 1.5rem !important;
+                                                        font-weight: bold !important;
+                                                        margin-top: 1.5rem !important;
+                                                        margin-bottom: 0.5rem !important;
+                                                    }
+                                                    .tiptap h2 {
+                                                        font-size: 1.25rem !important;
+                                                        font-weight: bold !important;
+                                                        margin-top: 1.25rem !important;
+                                                        margin-bottom: 0.5rem !important;
+                                                    }
+                                                `
+                                            }}
                                         />
-                                    </div>
-                                )}
-
-                                <div className='mt-6 space-y-5'>
-                                    <p className='text-slr-muted text-sm leading-relaxed md:text-base'>
-                                        {chapter.body[0]}
-                                    </p>
-                                    {chapter.quote && (
-                                        <blockquote className='border-slr-gold-label text-slr-gold-label border-l-[3px] py-1 pl-4 text-base font-semibold italic md:text-lg'>
-                                            &ldquo;{chapter.quote}&rdquo;
-                                        </blockquote>
                                     )}
-                                    {chapter.body.slice(1).map((paragraph) => (
-                                        <p
-                                            key={paragraph}
-                                            className='text-slr-muted text-sm leading-relaxed md:text-base'>
-                                            {paragraph}
-                                        </p>
-                                    ))}
-                                </div>
-                            </article>
-                        </Fragment>
-                    ))}
+
+                                    <div className='flex flex-wrap items-center gap-3'>
+                                        <span className='text-slr-gold-label border-slr-gold-label/50 bg-slr-gold-label/10 rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase'>
+                                            Ch. {chapter.num}
+                                        </span>
+                                        {(chapter.readMinutes !== undefined || chapter.tag) && (
+                                            <p className='text-slr-dim text-[10px] font-semibold tracking-[0.15em] uppercase'>
+                                                {chapter.readMinutes !== undefined && `${chapter.readMinutes} Min Read`}
+                                                {chapter.readMinutes !== undefined && chapter.tag && ' · '}
+                                                {chapter.tag}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <h3 className='font-bebas-neue mt-3 text-3xl tracking-wide text-white uppercase sm:text-4xl md:text-5xl'>
+                                        {chapter.heading}
+                                    </h3>
+
+                                    {chapter.image && (
+                                        <div className='relative mx-auto mt-6 aspect-square w-full max-w-180 overflow-hidden rounded-3xl ring-1 ring-white/10'>
+                                            <Image
+                                                src={chapter.image}
+                                                alt=''
+                                                fill
+                                                unoptimized
+                                                sizes='(max-width: 768px) 100vw, 720px'
+                                                className='object-contain'
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className='mt-6 space-y-5'>
+                                        {isHtml ? (
+                                            <div
+                                                className='prose prose-invert max-w-none text-slr-muted text-sm leading-relaxed md:text-base space-y-5 tiptap'
+                                                dangerouslySetInnerHTML={{ __html: chapter.body[0] }}
+                                            />
+                                        ) : (
+                                            <>
+                                                <p className='text-slr-muted text-sm leading-relaxed md:text-base'>
+                                                    {chapter.body[0]}
+                                                </p>
+                                                {chapter.quote && (
+                                                    <blockquote className='border-slr-gold-label text-slr-gold-label border-l-[3px] py-1 pl-4 text-base font-semibold italic md:text-lg'>
+                                                        &ldquo;{chapter.quote}&rdquo;
+                                                    </blockquote>
+                                                )}
+                                                {chapter.body.slice(1).map((paragraph) => (
+                                                    <p
+                                                        key={paragraph}
+                                                        className='text-slr-muted text-sm leading-relaxed md:text-base'>
+                                                        {paragraph}
+                                                    </p>
+                                                ))}
+                                            </>
+                                        )}
+
+                                        {chapter.quote && isHtml && (
+                                            <blockquote className='border-slr-gold-label text-slr-gold-label border-l-[3px] py-1 pl-4 text-base font-semibold italic md:text-lg my-6'>
+                                                &ldquo;{chapter.quote}&rdquo;
+                                            </blockquote>
+                                        )}
+                                    </div>
+                                </article>
+                            </Fragment>
+                        );
+                    })}
 
                     {/* Footer — finish state */}
                     <DiamondSeparator className='mt-12 md:mt-16' />
 
-                    <div className='mt-10 flex flex-col items-center justify-between gap-5 sm:flex-row'>
+                    <div className='mt-10 flex flex-row items-center justify-between gap-4'>
                         <button
                             type='button'
                             onClick={scrollToTop}
@@ -270,7 +335,7 @@ export function EbookReader({
                             Back to Top
                         </button>
 
-                        <p className='text-slr-gold-label order-first flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase sm:order-0'>
+                        <p className='text-slr-gold-label flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase'>
                             <Check className='h-4 w-4' strokeWidth={3} />
                             {finishLabel}
                         </p>

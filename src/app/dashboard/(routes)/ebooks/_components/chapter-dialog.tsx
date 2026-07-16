@@ -92,14 +92,14 @@ export function ChapterDialog({ isOpen, onClose, ebookId, chapter, onSuccess }: 
 
             let res;
             if (isEdit && chapter) {
-                if (!chapter.id) {
+                if (!chapter.chapter_id) {
                     toast.error('Cannot edit: Chapter ID (UUID) is missing in backend data.', {
                         description: 'Please request backend developers to expose the chapter ID.'
                     });
 
                     return;
                 }
-                res = await updateChapterAction(ebookId, chapter.id, payload);
+                res = await updateChapterAction(ebookId, chapter.chapter_id, payload);
             } else {
                 res = await createChapterAction(ebookId, payload);
             }

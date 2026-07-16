@@ -7,11 +7,19 @@ const withBundleAnalyzer = initializeBundleAnalyzer({
     enabled: process.env.BUNDLE_ANALYZER_ENABLED === 'true'
 });
 
-// https://nextjs.org/docs/pages/api-reference/next-config-js
 const nextConfig: NextConfig = {
     output: 'standalone',
     images: {
-        remotePatterns: [new URL('https://apiku.samabitech.com/**')]
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'apiku.samabitech.com'
+            },
+            {
+                protocol: 'https',
+                hostname: 'object.smartliferewards.com.au'
+            }
+        ]
     }
 };
 
