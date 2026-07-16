@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getEbooks } from '@/lib/api/resources/ebooks';
+import { type EbookChapter, getEbook, getEbooks } from '@/lib/api/resources/ebooks';
 import { getAccessToken } from '@/lib/api/server';
 
 import { EbookForm } from '../_components/ebook-form';
@@ -16,20 +16,29 @@ export default async function EditEbookPage({ params }: EditEbookPageProps) {
     if (!token) notFound();
 
     const ebooks = await getEbooks(token);
-    const ebook = ebooks.find((e) => e.ebook_id === id);
+    const ebookListItem = ebooks.find((e) => e.ebook_id === id);
 
-    if (!ebook) notFound();
+    if (!ebookListItem) notFound();
+
+    let chapters: EbookChapter[] = [];
+    try {
+        const fullEbook = await getEbook(id, token);
+        chapters = fullEbook.chapters || [];
+    } catch (e) {
+        console.error('Failed to fetch ebook chapters:', e);
+    }
 
     const initialData = {
-        id: ebook.ebook_id,
-        title: ebook.title || '',
-        subtitle: ebook.subtitle || '',
-        description: ebook.description || '',
-        coverUrl: ebook.cover_url || '',
-        category: ebook.category || '',
-        footnote: ebook.footnote || '',
+        id: ebookListItem.ebook_id,
+        title: ebookListItem.title || '',
+        subtitle: ebookListItem.subtitle || '',
+        description: ebookListItem.description || '',
+        coverUrl: ebookListItem.cover_url || '',
+        category: ebookListItem.category || '',
+        footnote: ebookListItem.footnote || '',
         tierAccess: 'RED' as const, // default since listing doesn't return the tier
-        readingTimeMinutes: ebook.reading_time_minutes || 0
+        readingTimeMinutes: ebookListItem.reading_time_minutes || 0,
+        chapters
     };
 
     return <EbookForm initialData={initialData} />;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -12,10 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { WysiwygEditor } from '@/components/ui/wysiwyg-editor';
-import type { EbookTier } from '@/lib/api/resources/ebooks';
+import type { EbookChapter, EbookTier } from '@/lib/api/resources/ebooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { createEbookAction, updateEbookAction } from '../actions';
+import { createEbookAction, deleteChapterAction, updateEbookAction } from '../actions';
+import { ChapterDialog } from './chapter-dialog';
+import { ImageUploadField } from './image-upload-field';
+import { uploadEbookAsset } from './upload-asset';
 import { ArrowLeft, Info, Loader2Icon } from 'lucide-react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -47,12 +50,54 @@ interface EbookFormProps {
         footnote: string;
         tierAccess: EbookTier;
         readingTimeMinutes: number;
+        chapters: EbookChapter[];
     };
 }
 
 export function EbookForm({ initialData }: EbookFormProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
+
+    const [chapters, setChapters] = useState<EbookChapter[]>(initialData?.chapters || []);
+    const [isChapterDialogOpen, setIsChapterDialogOpen] = useState(false);
+    const [selectedChapter, setSelectedChapter] = useState<EbookChapter | null>(null);
+
+    useEffect(() => {
+        if (initialData?.chapters) {
+            setChapters(initialData.chapters);
+        }
+    }, [initialData?.chapters]);
+
+    const handleRefreshChapters = () => {
+        router.refresh();
+    };
+
+    const handleDeleteChapter = async (chapter: EbookChapter) => {
+        const chapterId = chapter.id;
+        if (!chapterId) {
+            toast.error('Cannot delete: Chapter ID (UUID) is missing in backend data.', {
+                description: 'Please request backend developers to expose the chapter ID.'
+            });
+
+            return;
+        }
+
+        if (!window.confirm(`Are you sure you want to delete Chapter ${chapter.chapter_number}?`)) {
+            return;
+        }
+
+        startTransition(async () => {
+            const res = await deleteChapterAction(initialData!.id, chapterId);
+            if (res.ok) {
+                toast.success('Chapter deleted successfully');
+                handleRefreshChapters();
+            } else {
+                toast.error(res.message);
+            }
+        });
+    };
+
+    const sortedChapters = [...chapters].sort((a, b) => a.chapter_number - b.chapter_number);
 
     const title = initialData ? 'Edit Ebook' : 'New Ebook';
     const description = initialData ? 'Update details of the ebook.' : 'Add a new ebook to the library.';
@@ -150,6 +195,7 @@ export function EbookForm({ initialData }: EbookFormProps) {
                                     <FormControl>
                                         <WysiwygEditor
                                             placeholder='Write the ebook content or description...'
+                                            onImageUpload={uploadEbookAsset}
                                             {...field}
                                         />
                                     </FormControl>
@@ -158,15 +204,15 @@ export function EbookForm({ initialData }: EbookFormProps) {
                             )}
                         />
 
-                        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                        <div className='grid grid-cols-1 items-start gap-6 md:grid-cols-2'>
                             <FormField
                                 control={form.control}
                                 name='coverUrl'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Cover URL</FormLabel>
+                                        <FormLabel>Cover image</FormLabel>
                                         <FormControl>
-                                            <Input placeholder='https://…' {...field} />
+                                            <ImageUploadField value={field.value} onChange={field.onChange} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -187,7 +233,7 @@ export function EbookForm({ initialData }: EbookFormProps) {
                             />
                         </div>
 
-                        <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+                        <div className='grid grid-cols-1 items-start gap-6 md:grid-cols-3'>
                             <FormField
                                 control={form.control}
                                 name='category'
@@ -269,6 +315,100 @@ export function EbookForm({ initialData }: EbookFormProps) {
                     </form>
                 </Form>
             </div>
+
+            {initialData && (
+                <div className='rounded-xl border border-white/10 bg-white/5 p-6'>
+                    <div className='mb-6 flex items-center justify-between border-b border-white/10 pb-4'>
+                        <div>
+                            <h3 className='font-bebas-neue text-2xl tracking-wide text-white uppercase'>
+                                Chapters & Sections
+                            </h3>
+                            <p className='text-xs text-white/50'>Manage the chapters and content of this e-book.</p>
+                        </div>
+                        <Button
+                            type='button'
+                            onClick={() => {
+                                setSelectedChapter(null);
+                                setIsChapterDialogOpen(true);
+                            }}>
+                            + Add Chapter
+                        </Button>
+                    </div>
+
+                    {sortedChapters.length === 0 ? (
+                        <div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 py-12 text-center'>
+                            <p className='mb-2 text-sm text-white/40'>No chapters added yet</p>
+                            <p className='max-w-sm text-xs text-white/30'>
+                                Create chapters to structure the e-book. They will be displayed in the long-form member
+                                reader.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className='overflow-x-auto rounded-lg border border-white/10 bg-white/5 p-2 shadow-sm'>
+                            <table className='w-full table-auto border-collapse text-left text-sm text-white/80'>
+                                <thead>
+                                    <tr className='border-b border-white/10 bg-white/5 text-xs font-semibold text-white/40 uppercase'>
+                                        <th className='w-20 px-3 py-3'>No.</th>
+                                        <th className='px-3 py-3'>Title</th>
+                                        <th className='max-w-xs px-3 py-3'>Pull Quote</th>
+                                        <th className='px-3 py-3'>Body Preview</th>
+                                        <th className='w-36 px-3 py-3 text-right'>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className='divide-y divide-white/5'>
+                                    {sortedChapters.map((ch) => (
+                                        <tr key={ch.chapter_number} className='transition-colors hover:bg-white/5'>
+                                            <td className='px-3 py-4 font-semibold text-[#D4AF37]'>
+                                                Ch. {String(ch.chapter_number).padStart(2, '0')}
+                                            </td>
+                                            <td className='px-3 py-4 font-medium text-white'>{ch.title}</td>
+                                            <td className='max-w-xs truncate px-3 py-4 text-xs text-white/60 italic'>
+                                                {ch.pull_quote ? `“${ch.pull_quote}”` : '-'}
+                                            </td>
+                                            <td className='max-w-md truncate px-3 py-4 text-xs text-white/40'>
+                                                {ch.body
+                                                    ? ch.body.replace(/<[^>]*>/g, '').substring(0, 80) + '...'
+                                                    : '-'}
+                                            </td>
+                                            <td className='px-3 py-4 text-right'>
+                                                <div className='flex items-center justify-end gap-2'>
+                                                    <Button
+                                                        type='button'
+                                                        variant='ghost'
+                                                        size='sm'
+                                                        onClick={() => {
+                                                            setSelectedChapter(ch);
+                                                            setIsChapterDialogOpen(true);
+                                                        }}
+                                                        className='h-8 text-white/70 hover:bg-white/10 hover:text-white'>
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        type='button'
+                                                        variant='ghost'
+                                                        size='sm'
+                                                        onClick={() => handleDeleteChapter(ch)}
+                                                        className='h-8 text-red-400 hover:bg-red-500/10 hover:text-red-300'>
+                                                        Delete
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    <ChapterDialog
+                        isOpen={isChapterDialogOpen}
+                        onClose={() => setIsChapterDialogOpen(false)}
+                        ebookId={initialData.id}
+                        chapter={selectedChapter}
+                        onSuccess={handleRefreshChapters}
+                    />
+                </div>
+            )}
         </div>
     );
 }

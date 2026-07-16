@@ -53,6 +53,7 @@ export interface EbookPayload {
 // GET /ebooks/{id} — unlocked content (403 FORBIDDEN when the member's tier is
 // below the ebook's tierAccess; caller renders an upgrade gate on 403).
 export interface EbookChapter {
+    id?: string;
     chapter_number: number;
     title: string;
     image_url: string | null;
@@ -70,6 +71,28 @@ export interface EbookDetail {
     chapter_count: number;
     published_at: string | null;
     chapters: EbookChapter[];
+}
+
+export interface ChapterPayload {
+    chapterNumber: number;
+    title: string;
+    body: string;
+    imageUrl?: string | null;
+    pullQuote?: string | null;
+    sortOrder?: number;
+}
+
+export interface ChapterAdmin {
+    id: string;
+    ebookId: string;
+    chapterNumber: number;
+    title: string;
+    imageUrl: string | null;
+    body: string;
+    pullQuote: string | null;
+    sortOrder: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // ─── Resource functions ──────────────────────────────────────────────────────
@@ -106,3 +129,12 @@ export interface PresignedUrlResponse {
 
 export const getEbookPresignedUrl = (token: string, body: PresignedUrlPayload) =>
     apiFetch<PresignedUrlResponse>(API.ebooks.presignedUrl, { method: 'POST', token, body });
+
+export const createChapter = (token: string, ebookId: string, body: ChapterPayload) =>
+    apiFetch<ChapterAdmin>(API.ebooks.createChapter(ebookId), { method: 'POST', token, body });
+
+export const updateChapter = (token: string, ebookId: string, chapterId: string, body: ChapterPayload) =>
+    apiFetch<ChapterAdmin>(API.ebooks.updateChapter(ebookId, chapterId), { method: 'PATCH', token, body });
+
+export const deleteChapter = (token: string, ebookId: string, chapterId: string) =>
+    apiFetch<null>(API.ebooks.deleteChapter(ebookId, chapterId), { method: 'DELETE', token });

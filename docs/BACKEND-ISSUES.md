@@ -139,3 +139,32 @@ Previously returned 400 `BAD_REQUEST` for every param combination. **Now returns
                     "status": "active", "tier": "Premium", "billing_status": "active", … } ],
         "meta": { "page": 1, "per_page": 20, "total": 6, "total_pages": 1 } }
 ```
+
+---
+
+## 🐞 `POST /api/v1/ebooks/presigned-url` — presigned PUT returns 403 `SignatureDoesNotMatch` (BLOCKER for image upload)
+
+**Captured:** 2026-07-16 · **Account:** `superadmin@smartliferewards.com.au`
+
+The API endpoint itself is **fine** — it returns 200 with a valid envelope:
+```json
+→ 200 { "success": true, "message": "Presigned upload URL generated.",
+        "data": {
+          "upload_url": "https://object.smartliferewards.com.au/public/ebooks/2026-07-16/<uuid>.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio_admin%2F20260716%2Fap-southeast-2%2Fs3%2Faws4_request&X-Amz-Date=…&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=…",
+          "download_url": "https://object.smartliferewards.com.au/public/ebooks/2026-07-16/<uuid>.png",
+          "object_key": "ebooks/2026-07-16/<uuid>.png" } }
+```
+
+**The bug is in the presign signature.** PUT-ing the file to `upload_url` (MinIO, fronted by Cloudflare) returns:
+```xml
+→ 403 <Error><Code>SignatureDoesNotMatch</Code>
+  <Message>The request signature we calculated does not match the signature you provided.</Message>
+  <BucketName>public</BucketName> …</Error>
+```
+Reproduced with a **bare `curl -X PUT --data-binary @file`** — no auth header, no extra headers, both **with and without** `Content-Type`. So it is **not** the frontend and **not** a Content-Type/CORS problem.
+
+**Root cause:** `X-Amz-SignedHeaders=host` — only the `host` header is signed, yet it still mismatches on the correct public host. The presigner is signing against a **different endpoint host than the one the URL is served on** (typical MinIO-behind-proxy setup: the S3 client signs with the internal MinIO address, then the public host `object.smartliferewards.com.au` is what's presented → signature invalid).
+
+**Backend fix:** make the S3/MinIO client presign against the **public** endpoint. For MinIO set `MINIO_SERVER_URL=https://object.smartliferewards.com.au` (and `MINIO_BROWSER_REDIRECT_URL` if used), or configure the SDK's `endpoint`/`publicEndpoint`/`forcePathStyle` so the signed host equals the public host. Also confirm the signed **region** (`ap-southeast-2`) matches the server. After the fix a plain PUT to `upload_url` must return **200**.
+
+**Frontend status:** upload flow is fully wired (`uploadEbookAsset` → presign → PUT → store `download_url`) and correct; it will work unchanged once the presigned URL validates. Until then, cover/chapter image upload fails at the PUT step with a `Upload failed (403)` toast + console error.

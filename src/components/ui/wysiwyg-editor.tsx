@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import ImageExtension from '@tiptap/extension-image';
@@ -17,6 +17,7 @@ import {
     Italic,
     List,
     ListOrdered,
+    Loader2,
     Quote,
     Redo,
     RemoveFormatting,
@@ -30,15 +31,19 @@ interface WysiwygEditorProps {
     onChange?: (value: string) => void;
     placeholder?: string;
     className?: string;
+    /** Upload the picked image and return its public URL. Each upload resolves to its own URL. */
+    onImageUpload: (file: File) => Promise<string>;
 }
 
 export function WysiwygEditor({
     value = '',
     onChange,
     placeholder = 'Start writing...',
-    className
+    className,
+    onImageUpload
 }: WysiwygEditorProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     const editor = useEditor({
         extensions: [
@@ -84,30 +89,28 @@ export function WysiwygEditor({
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+        if (fileInputRef.current) fileInputRef.current.value = '';
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
             toast.error('File must be an image.');
+
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64 = e.target?.result;
-            if (typeof base64 === 'string') {
-                editor?.chain().focus().setImage({ src: base64 }).run();
-                toast.success('Image inserted.');
-            }
-        };
-        reader.onerror = () => {
-            toast.error('Failed to read image file.');
-        };
-        reader.readAsDataURL(file);
-
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+        setIsUploading(true);
+        const toastId = toast.loading('Uploading image…');
+        try {
+            const url = await onImageUpload(file);
+            editor?.chain().focus().setImage({ src: url }).run();
+            toast.success('Image uploaded.', { id: toastId });
+        } catch (error) {
+            console.error('[wysiwyg] image upload failed', error);
+            toast.error(error instanceof Error ? error.message : 'Upload failed.', { id: toastId });
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -275,9 +278,10 @@ export function WysiwygEditor({
                 <button
                     type='button'
                     onClick={handleImageClick}
-                    className='flex cursor-pointer items-center justify-center rounded-md p-1.5 text-white/70 transition-all hover:bg-white/10 hover:text-white active:bg-white/20'
+                    disabled={isUploading}
+                    className='flex cursor-pointer items-center justify-center rounded-md p-1.5 text-white/70 transition-all hover:bg-white/10 hover:text-white active:bg-white/20 disabled:pointer-events-none disabled:opacity-50'
                     title='Insert Image'>
-                    <ImageIcon className='h-4 w-4' />
+                    {isUploading ? <Loader2 className='h-4 w-4 animate-spin' /> : <ImageIcon className='h-4 w-4' />}
                 </button>
 
                 <div className='mx-1.5 h-4 w-[1px] bg-white/10' />

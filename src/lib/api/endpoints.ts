@@ -45,7 +45,10 @@ export const API = {
         create: '/api/v1/ebooks/',
         update: (id: string) => `/api/v1/ebooks/${id}`,
         remove: (id: string) => `/api/v1/ebooks/${id}`,
-        presignedUrl: '/api/v1/ebooks/presigned-url'
+        presignedUrl: '/api/v1/ebooks/presigned-url',
+        createChapter: (id: string) => `/api/v1/ebooks/${id}/chapters`,
+        updateChapter: (id: string, chapterId: string) => `/api/v1/ebooks/${id}/chapters/${chapterId}`,
+        deleteChapter: (id: string, chapterId: string) => `/api/v1/ebooks/${id}/chapters/${chapterId}`
     },
     giveaways: {
         list: '/api/v1/giveaways/',

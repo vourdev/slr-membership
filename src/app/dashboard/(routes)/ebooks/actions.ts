@@ -2,13 +2,19 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { handleApiAuthError } from '@/lib/api/guard';
 import {
+    type ChapterAdmin,
+    type ChapterPayload,
     type EbookAdmin,
     type EbookPayload,
     type PresignedUrlResponse,
+    createChapter,
     createEbook,
+    deleteChapter,
     deleteEbook,
     getEbookPresignedUrl,
+    updateChapter,
     updateEbook
 } from '@/lib/api/resources/ebooks';
 import { getAccessToken } from '@/lib/api/server';
@@ -25,6 +31,9 @@ export type ActionError = {
 export type ActionResult<T> = { ok: true; data: T; message: string } | ActionError;
 
 function toActionError(error: unknown): ActionError {
+    // 401 (expired/invalid session) → redirect('/api/auth/logout'), never returns.
+    handleApiAuthError(error);
+
     if (error instanceof ApiError) {
         const payload = error.payload as { code?: string; requestId?: string } | undefined;
 
@@ -91,7 +100,63 @@ export async function getEbookPresignedUrlAction(
 
     try {
         const data = await getEbookPresignedUrl(token, { filename, contentType });
+
         return { ok: true, data, message: 'Upload URL generated.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function createChapterAction(
+    ebookId: string,
+    payload: ChapterPayload
+): Promise<ActionResult<ChapterAdmin>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await createChapter(token, ebookId, payload);
+        revalidatePath('/dashboard/ebooks');
+        revalidatePath(`/dashboard/ebooks/${ebookId}`);
+        revalidatePath(`/member/ebooks/${ebookId}`);
+
+        return { ok: true, data, message: 'Chapter created.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function updateChapterAction(
+    ebookId: string,
+    chapterId: string,
+    payload: ChapterPayload
+): Promise<ActionResult<ChapterAdmin>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await updateChapter(token, ebookId, chapterId, payload);
+        revalidatePath('/dashboard/ebooks');
+        revalidatePath(`/dashboard/ebooks/${ebookId}`);
+        revalidatePath(`/member/ebooks/${ebookId}`);
+
+        return { ok: true, data, message: 'Chapter updated.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function deleteChapterAction(ebookId: string, chapterId: string): Promise<ActionResult<null>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        await deleteChapter(token, ebookId, chapterId);
+        revalidatePath('/dashboard/ebooks');
+        revalidatePath(`/dashboard/ebooks/${ebookId}`);
+        revalidatePath(`/member/ebooks/${ebookId}`);
+
+        return { ok: true, data: null, message: 'Chapter deleted.' };
     } catch (error) {
         return toActionError(error);
     }
