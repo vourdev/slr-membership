@@ -4,8 +4,100 @@ Endpoints that return errors or behave against the PRD, found while integrating 
 
 - **Base URL:** `https://api.smartliferewards.com.au/api/v1`
 - **Swagger:** `https://api.smartliferewards.com.au/docsx-2s3crt3-199`
-- **Captured:** 2026-07-08 · **Re-verified:** 2026-07-09
+- **Captured:** 2026-07-08 · **Re-verified:** 2026-07-17
 - **Envelope:** every response is `{ success, message, data, meta }`.
+
+> **Reading order.** Only the section directly below blocks **Sprint 2 (Ronde 2)**. Everything after it belongs to **Ronde 3+** (Stripe, TPAL export, upgrade/downgrade) and is filed early so it isn't rediscovered later — not for action this sprint.
+
+---
+
+# ✅ SPRINT 2 (Ronde 2) — CLEAR, no outstanding backend blockers
+
+## ✅ `DELETE /api/v1/beny/subscribe` — RESOLVED 2026-07-17 (was 404 on `pending_activation`)
+
+**Fixed by backend and re-verified live the same day.** Full round-trip on `red@`:
+
+```
+GET    /beny/status     → 200  { "beny_status": "cancelled" }
+POST   /beny/subscribe  → 201  { "beny_status": "pending_activation" }
+GET    /beny/status     → 200  { "beny_status": "pending_activation" }
+DELETE /beny/subscribe  → 200  { "success": true, "message": "BENY subscription cancelled." }   ← was 404
+GET    /beny/status     → 200  { "beny_status": "cancelled" }
+```
+
+Cancel now accepts `pending_activation`, matching PRD *"user bisa cancel kapan saja"*. **FE follow-up shipped**: the Cancel button is now shown for pending members too ([beny-section.tsx](<src/app/member/discounts/_components/beny-section.tsx>)).
+
+**Still open on this endpoint (minor, non-blocking — please confirm when convenient):**
+- `DELETE` returns `data: { success, message }` (and `null` on repeat) — it still never returns `beny_status`, unlike `GET /beny/status` and `POST /beny/subscribe`. Returning `{ beny_status }` would make the three consistent. FE handles it either way.
+- Enum spelling is **`"cancelled"`** (double L). Please confirm that's canonical; FE accepts both defensively.
+
+<details>
+<summary>Original report (2026-07-17) — kept for history</summary>
+
+**Account:** `red@smartliferewards.com.au` · **Ronde 2 item:** "BENY add-on flow ($4/bulan)"
+**Did NOT depend on Stripe** — pure status logic.
+
+### The bug
+
+```http
+GET /api/v1/beny/status
+Authorization: Bearer <JWT>
+```
+```json
+→ 200 { "success": true, "data": { "beny_status": "pending_activation" } }
+```
+```http
+DELETE /api/v1/beny/subscribe
+Authorization: Bearer <JWT>
+(no request body)
+```
+```json
+→ 404 { "success": false,
+        "message": "No active BENY subscription found to cancel.",
+        "code": "NOT_FOUND",
+        "requestId": "019f6f35-edd2-76d5-aad4-6d989ae05b57" }
+```
+
+### Control case — cancelling an `active` sub works fine
+
+```
+GET    /beny/status     → 200  { "beny_status": "active" }
+DELETE /beny/subscribe  → 200  { "success": true, "message": "BENY subscription cancelled." }
+GET    /beny/status     → 200  { "beny_status": "cancelled" }
+```
+
+⇒ Cancel only matches subs already `active`. A member sitting at `pending_activation` (i.e. **waiting for admin activation**) is **trapped** — they cannot back out.
+
+### Why this is a bug, not a design choice
+
+PRD v3.2 states the opposite, three times, and never restricts cancel to `active`:
+- [370] *"User bisa **cancel BENY kapan saja** dari dashboard"*
+- [669] *"user bisa **cancel kapan saja**"*
+- [204] *"Saat di-cancel, akses BENY berlanjut sampai akhir periode yang sudah dibayar"*
+
+PRD also assumes `pending_activation` means **already paid** ([208] *"Member yang **sudah bayar** masuk ke daftar pending BENY activation"*). So a member who has paid cannot cancel until an admin acts — the worst case for this bug.
+
+### Asks
+
+1. **`DELETE` must accept `pending_activation`**, not only `active`.
+2. Wrong error code — the subscription **exists**, it just isn't `active`. `NOT_FOUND` is misleading; if a cancel is ever legitimately refused, use `409 CONFLICT` with a specific message.
+3. Confirm PRD [204]: after cancel, access continues until the end of the paid period.
+
+### Two side findings on the same endpoint (please also fix/confirm)
+
+- **Response shape is inconsistent.** `DELETE` returns `data: { success, message }` — and on a repeat call, `data: null`. It **never** returns `beny_status`, while `GET /beny/status` and `POST /beny/subscribe` both do. Please make `DELETE` return `{ beny_status }` too.
+- **Enum spelling.** The API returns **`"cancelled"`** (double L). Our docs previously assumed `"canceled"`. Please confirm `cancelled` is canonical and stable — FE now accepts both defensively.
+
+### FE status
+
+- Cancel button was **deliberately hidden** for `pending_activation` so members didn't hit a 404. ✅ Now shown (backend fixed).
+- Two FE bugs this exposed are **already fixed** on our side: the `cancelled`/`canceled` enum mismatch (which silently prevented cancelled members from re-subscribing) and the wrong `cancelBeny` DTO.
+
+> **Note:** `POST /beny/subscribe` requires a real Stripe subscription in billing records (`"No active membership subscription found in our billing records"`), so the full BENY flow can only be exercised end-to-end from Ronde 3. This cancel fix did **not** need that — seed accounts (`sub_seeded_*`) reproduced it.
+
+</details>
+
+---
 
 ## Authentication
 

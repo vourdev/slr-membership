@@ -6,13 +6,14 @@ import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { getDiscounts } from '@/lib/api/resources/discounts';
 import { getEntryHistory } from '@/lib/api/resources/entries';
-import { getGiveaways, toGiveaway } from '@/lib/api/resources/giveaways';
+import { type ApiGiveaway, getGiveaways, tierGroupFromApi, toGiveaway } from '@/lib/api/resources/giveaways';
 import { getMyMembership } from '@/lib/api/resources/memberships';
 import { getAccessToken } from '@/lib/api/server';
 import {
     cycleEndFrom,
     formatDrawDateTime,
     formatDrawPool,
+    isGiveawayEnterable,
     mapBillingStatus,
     subTierCodeOf,
     tierGroupOf
@@ -87,25 +88,37 @@ export default async function MemberDashboardPage() {
           }
         : null;
 
-    // Visitor: surface the real Visitor Weekly Draw (their only giveaway) as the
-    // "Current Draw"; paid tiers keep the cycle framing above.
-    const visitorGiveaway = isVisitor ? giveaways[0] : undefined;
-    const visitorMapped = visitorGiveaway && toGiveaway(visitorGiveaway, memberGroup, member.state, memberTokens);
-    const visitorDraw: DrawStatus | null = visitorMapped
+    // PRD §2.3 "Kartu status undian" — every tier sees their current active
+    // giveaway: one they're actually entered into (§4.3 — BLUE covers RED + BLUE)
+    // and not yet drawn, soonest first. Single pass: filter + earliest, no sort.
+    const nowMs = Date.now();
+    let activeGiveaway: ApiGiveaway | undefined;
+    let activeDrawsAt = Infinity;
+    for (const g of giveaways) {
+        const drawsAt = Date.parse(g.draws_at ?? '');
+        if (drawsAt > nowMs && drawsAt < activeDrawsAt && isGiveawayEnterable(tierGroupFromApi(g.tier), memberGroup)) {
+            activeGiveaway = g;
+            activeDrawsAt = drawsAt;
+        }
+    }
+
+    const activeMapped = activeGiveaway && toGiveaway(activeGiveaway, memberGroup, member.state, memberTokens);
+    // Nothing live (between giveaways, or all already drawn) → cycle framing.
+    const giveawayDraw: DrawStatus | null = activeMapped
         ? {
-              giveaway_id: visitorMapped.id,
-              title: visitorMapped.title,
-              draw_pool: visitorMapped.draw_pool,
-              prize_label: visitorMapped.prize_label,
-              entry_status: visitorMapped.entry_status,
-              total_entries: visitorMapped.total_entries,
-              draws_at: visitorMapped.draws_at
+              giveaway_id: activeMapped.id,
+              title: activeMapped.title,
+              draw_pool: activeMapped.draw_pool,
+              prize_label: activeMapped.prize_label,
+              entry_status: activeMapped.entry_status,
+              total_entries: activeMapped.total_entries,
+              draws_at: activeMapped.draws_at
           }
         : null;
 
-    const draw = visitorDraw ?? cycleDraw;
-    const drawEyebrow = visitorDraw ? 'Current Draw' : 'Current Cycle';
-    const drawDateWord = visitorDraw ? 'Draws' : 'Renews';
+    const draw = giveawayDraw ?? cycleDraw;
+    const drawEyebrow = giveawayDraw ? 'Current Draw' : 'Current Cycle';
+    const drawDateWord = giveawayDraw ? 'Draws' : 'Renews';
 
     // Featured partner offers — is_featured first, capped. Visitor (403) → empty → hidden.
     const featuredDiscounts: FeaturedDiscount[] = discounts
@@ -119,9 +132,9 @@ export default async function MemberDashboardPage() {
             value_label: d.title?.trim() || '-'
         }));
 
-    // Upcoming giveaways — exclude the one already shown as the visitor's Current Draw.
+    // Upcoming giveaways — exclude the one already shown as the Current Draw.
     const upcomingGiveaways: UpcomingGiveaway[] = giveaways
-        .filter((g) => g.giveaway_id !== visitorGiveaway?.giveaway_id)
+        .filter((g) => g.giveaway_id !== activeGiveaway?.giveaway_id)
         .slice(0, 6)
         .map((g) => {
             const mapped = toGiveaway(g, memberGroup, member.state);

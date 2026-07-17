@@ -89,29 +89,31 @@ export function BenySection({ status: initialStatus }: { status: BenyStatusValue
             </div>
 
             <div className='mt-5 border-t border-white/5 pt-4'>
-                {status === 'active' && (
+                {/* PRD §2.3: "user bisa cancel kapan saja" — both active and pending
+                    subscriptions are cancellable (backend accepts pending since 2026-07-17). */}
+                {status === 'active' || status === 'pending_activation' ? (
                     <div className='flex flex-wrap items-center justify-between gap-3'>
-                        <span className='inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400'>
-                            <Check className='size-4' /> BENY is active on your account
-                        </span>
+                        {status === 'active' ? (
+                            <span className='inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400'>
+                                <Check className='size-4' /> BENY is active on your account
+                            </span>
+                        ) : (
+                            <span className='inline-flex items-start gap-2 text-sm text-white/90'>
+                                <Clock className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
+                                Pending activation — you&apos;ll receive access details by email shortly, then download
+                                the BENY app to start saving.
+                            </span>
+                        )}
                         <button
                             type='button'
                             onClick={cancel}
                             disabled={isPending}
-                            className='inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60'>
+                            className='inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60'>
                             {isPending ? <Loader2Icon className='size-4 animate-spin' /> : null}
                             Cancel BENY
                         </button>
                     </div>
-                )}
-
-                {status === 'pending_activation' && (
-                    <p className='inline-flex items-start gap-2 text-sm text-white/90'>
-                        <Clock className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
-                        Pending activation — you&apos;ll receive access details by email shortly, then download the BENY
-                        app to start saving.
-                    </p>
-                )}
+                ) : null}
 
                 {canSubscribe &&
                     (showForm ? (

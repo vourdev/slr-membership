@@ -63,6 +63,18 @@ export function isGiveawayLocked(giveawayTier: TierGroup, memberGroup: TierGroup
     return tierRank(giveawayTier) > tierRank(memberGroup);
 }
 
+/**
+ * Whether the member is actually entered into this giveaway's draw (PRD §4.3).
+ * Visitor → the Visitor weekly draw only. Paid → their own tier plus any below it,
+ * but never the Visitor draw (paid tabs are RED/BLUE only, §4.3). So BLUE enters
+ * RED + BLUE, RED enters RED only.
+ */
+export function isGiveawayEnterable(giveawayTier: TierGroup, memberGroup: TierGroup): boolean {
+    if (memberGroup === 'visitor') return giveawayTier === 'visitor';
+
+    return giveawayTier !== 'visitor' && !isGiveawayLocked(giveawayTier, memberGroup);
+}
+
 const audFormatter = new Intl.NumberFormat('en-AU', {
     style: 'currency',
     currency: 'AUD',

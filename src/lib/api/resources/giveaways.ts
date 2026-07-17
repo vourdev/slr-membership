@@ -83,7 +83,8 @@ const GIVEAWAY_RULES = [
 const TPAL_NOTE =
     'Draws are conducted externally and certified via TPAL (randomdraws.com.au). Entry lists are exported per tier each cycle.';
 
-function tierGroupFromApi(tier: string | undefined): TierGroup {
+/** API `tier` ('visitor' | 'red' | 'blue') → the UI tier group. */
+export function tierGroupFromApi(tier: string | undefined): TierGroup {
     const t = tier?.toUpperCase();
     if (t === 'RED') return 'red';
     if (t === 'BLUE') return 'blue';
