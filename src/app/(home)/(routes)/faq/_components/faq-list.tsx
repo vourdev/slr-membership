@@ -34,7 +34,7 @@ const categories: FaqCategory[] = [
         items: [
             {
                 question: 'What are the membership tiers?',
-                answer: 'There are three tiers: Visitor (free), SLR Red ($10/month) with basic discounts and Red draws, and SLR Premium / Blue ($26/month) with full access to all draws, e-books, and member-only deals. Premium members can also add the BENY discount platform for an extra $5/month.'
+                answer: 'There are three tiers: Visitor (free), SLR Red (from $10/month) with basic discounts and Red draws, and SLR Premium / Blue (from $26/month) with full access to all draws, e-books, and member-only deals. Red and Premium members can also add the BENY discount platform for an extra $4/month.'
             },
             {
                 question: 'How does billing work?',
@@ -84,7 +84,7 @@ const categories: FaqCategory[] = [
             },
             {
                 question: 'What is BENY?',
-                answer: 'BENY is a separate third-party discount platform with thousands of additional offers. It is available as an optional add-on for $5/month — it is not included in any tier by default. You can add BENY during checkout or later from the BENY page. Activation requires a phone number.'
+                answer: 'BENY is a separate third-party discount platform with thousands of additional offers. It is available to Red and Premium members as an optional add-on for $4/month — it is not included in any tier by default. You can add BENY during checkout or later from the BENY page. Activation requires a phone number.'
             }
         ]
     },

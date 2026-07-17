@@ -19,6 +19,7 @@ import {
     Box,
     ChevronDown,
     ClipboardList,
+    FileSpreadsheet,
     LayoutGrid,
     Ticket,
     Trophy,
@@ -40,6 +41,11 @@ export function NavMain({ user }) {
             title: 'Members',
             href: '/dashboard/members',
             icon: ClipboardList
+        },
+        {
+            title: 'Draw Exports',
+            href: '/dashboard/draw-exports',
+            icon: FileSpreadsheet
         },
         {
             title: 'Winners',

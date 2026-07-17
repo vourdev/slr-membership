@@ -180,6 +180,98 @@ Reproduced with a **bare `curl -X PUT --data-binary @file`** — no auth header,
 
 ---
 
+## 🔴 TPAL CSV export — one row per member, tokens are a **column** instead of repeated rows
+
+**Captured:** 2026-07-17 · **Endpoint:** `POST /api/v1/admin/csv/generate` · **Account:** `superadmin@`
+
+The endpoint works and produces 3 files (visitor/red/blue). But the CSV puts `total_token` in a **column**, emitting **one row per member**:
+
+```csv
+id,email,full_name,state,phone,total_token
+019f2145-…,red@smartliferewards.com.au,SLR Red Paid Member,VIC,+61400000004,7
+```
+`row_count` confirms it: **red = 1 row** (1 member, 7 tokens), **blue = 2 rows** (2 members), **visitor = 8 rows** (8 members).
+
+**Why this is critical.** CLAUDE.md §1 / PRD v3.2 define **token** as *"rows/entries in the TPAL CSV per giveaway (chance of winning)"*. The draw runs externally at randomdraws.com/au, which picks a **random row**. With one row per member:
+
+- **Every member has identical odds**, regardless of tokens.
+- An R1 member ($10, 1 token) and a B10 member ($65, 10 tokens) are **equally likely to win**.
+- The entire token/pricing ladder becomes cosmetic — the core monetisation of the product does not function.
+
+**Expected:** a member with `total_token = 7` should appear as **7 separate rows** in that tier's CSV (or the export must document exactly how randomdraws.com is configured to weight the `total_token` column — if it can at all).
+
+**Please confirm one of:**
+1. The CSV should repeat each member `total_token` times → **fix the exporter**.
+2. randomdraws.com/au is configured to read `total_token` as a **weight** → document it, and this becomes a non-issue.
+
+**Also:** the `visitor` CSV includes members whose `draw_pass` is infinite — correct — but please confirm the exporter filters on **`draw_pass > 0`** per the PRD (we can't verify from outside; all current rows have passes).
+
+> **PII note:** these CSVs contain real member emails and phone numbers. Handle the generated files accordingly (the `download_url`s are presigned and short-lived, which is good).
+
+**Frontend status:** ✅ **`/dashboard/draw-exports` built** — Generate button (`POST /admin/csv/generate`) + history table with per-tier download links (`GET /admin/csv/history`). It surfaces `row_count` directly, so once the exporter is fixed the row counts will visibly jump to the token totals.
+
+---
+
+## ⚠️ Admin `change-tier` leaves membership and cycle inconsistent (NOT a PRD upgrade-path finding)
+
+**Captured:** 2026-07-17 · **Endpoint:** `POST /api/v1/memberships/change-tier` · **Repro account:** `019f6f21-04fb-7425-b8eb-022dcbb2783a` (registered fresh — **not** seed)
+
+> **⚠️ SCOPE CORRECTION (read first).** This test used **`POST /memberships/change-tier`**, which the OpenAPI spec labels **"Admin: change user's tier/state"** — an **admin override**, *not* the member upgrade path. The PRD's actual flows are:
+> - **Visitor→Paid** → `POST /stripe/checkout` → pay → **Stripe webhook** creates the new cycle. **← never tested by us**
+> - **Paid→Paid** → `POST /memberships/upgrade` (schedules `pending_upgrade`, applied at renewal). **← never tested by us** (not integrated)
+>
+> Therefore this is **NOT** evidence that "Visitor→Paid upgrade is broken", and our earlier claim to that effect is **retracted**. `change-tier` may legitimately not be responsible for cycle allocation — that may be the webhook's job. What remains below is narrower: an **admin tool can leave a member in an inconsistent state**. Please confirm whether that's intended before treating it as a bug.
+
+### Reproduction (full trace)
+
+1. `POST /auth/register` — tier **visitor**, VIC → `pending_otp`, **0 cycles** (cycle is created at OTP verification, not at register).
+2. `POST /auth/verify-otp` → 200. Engine creates the Visitor cycle — **correctly**:
+   `total_token: 1`, `draw_pass: -1` (infinite), `2026-07-17` → `2026-08-14` (**28 days**). ✅ Matches config exactly.
+3. `POST /memberships/change-tier` `{subTierId: "b4"}` → `200 "Tier updated."`, response confirms `subTier.token = 4`.
+4. **Re-read the cycle → UNCHANGED:**
+
+| Field | After Visitor→b4 | Should be (b4) |
+|---|---|---|
+| `membership.tier` | Plus (blue) ✅ | blue |
+| `membership.billing_status` | **active** (no payment made) | ? |
+| `subscription` | `{}` | ? |
+| `current_cycle.total_token` | **1** ← still Visitor's | **4** |
+| `current_cycle.draw_pass` | **-1** ← still Visitor's "infinite" | **4** |
+| cycle | same row, no new cycle created | new cycle |
+
+**PRD §1 for reference** (describing the *real* upgrade paths, not this admin endpoint): *"Upgrade/downgrade — Visitor→Paid immediate (new cycle now). Paid→Paid scheduled via `pending_upgrade`, applied at next renewal."*
+
+### Same state as the "seed" blue member
+
+Member `019f329d-f1f7-704a-81f8-fff772a0608a` was reported as "just seed data". Its state matches what this repro produces exactly — blue membership + `total_token: 1` + `draw_pass: -1` + `subscription: {}` + `billing_status: active`. That's consistent with it having been created via `change-tier` (seed or manual), rather than being a random bad seed value. It does **not** by itself prove a bug in the PRD upgrade path.
+
+> **Note:** `change-tier` **paid→paid** (verified r4→r1) also leaves the live cycle alone — consistent with the PRD's "applies at next renewal, no proration".
+
+### Impact (IF admin change-tier is expected to be a complete upgrade)
+
+1. Member is on a paid tier but holds **1 token** instead of 4 → fewer draw chances than they paid for.
+2. `draw_pass = -1` (**infinite**) — a Visitor-only privilege. A paid member must have **4**. They can join unlimited giveaways.
+3. The TPAL export puts them in the **blue** pool (from membership tier) but with Visitor token/pass (from the stale cycle) — the CSV mixes two sources that can disagree.
+4. `billing_status` flips to **active with no payment at all** — `change-tier` bypasses Stripe entirely.
+
+### Questions (not asserting a bug — please confirm intent)
+
+1. **Is `change-tier` meant to re-allocate the cycle at all**, or is cycle allocation exclusively the Stripe webhook's job? If the latter, this is working as designed and only the admin UX/expectations need documenting.
+2. If `change-tier` is *not* a complete upgrade, **what is the supported way for an admin to move a Visitor onto a paid tier** without a real payment? Today it produces membership=blue + `billing_status=active` + a Visitor cycle (`1` token, `draw_pass -1`).
+3. Confirm `draw_pass = -1` is the intended "infinite" sentinel, and whether a paid member holding it is possible/acceptable.
+4. Confirm whether admin `change-tier` is *meant* to set `billing_status: active` without a payment (`subscription: {}`).
+
+### Still to be tested by us (the real PRD paths)
+
+- **Visitor→Paid:** `POST /stripe/checkout` (card `4242 4242 4242 4242`) → webhook → assert new cycle has b4's `token: 4` / `draw_pass: 4`. Account `019f6f21-04fb…` is ready for this.
+- **Paid→Paid:** `POST /memberships/upgrade` → assert `pending_upgrade` is scheduled and applied at renewal (not yet integrated on FE).
+
+### Silver lining — the allocator itself is now proven correct (for Visitor)
+
+Step 2 above is the **first time in this environment the allocator has demonstrably run**, and it read the config correctly (1 token / infinite pass / 28-day cycle). That's real evidence the entry engine works; the bug is specifically that **`change-tier` doesn't invoke it** on Visitor→Paid.
+
+---
+
 ## ⚠️ Entry calculation engine — misleading seed data; engine itself **never exercised**
 
 **Captured:** 2026-07-17 · **Resolved as seed data 2026-07-17 (confirmed by backend)** · **Sprint 2, item 4**
@@ -230,9 +322,11 @@ Switched `red@` **r4 → r1** (config token = 1), re-read `/entries/`, then rest
 
 ⇒ The **allocator/webhook never ran** for these accounts. The 7 and 15 are hardcoded seed values.
 
-### Consequence: the entry engine is UNVERIFIED
+### Consequence: the entry engine was UNVERIFIED — now partially proven ✅
 
-No cycle in this environment has ever been created by a real payment webhook (0 invoices across all seed accounts). So we have **no evidence either way** about whether the allocator reads `token` from the member's sub-tier config and resets (rather than increments) on renewal. Sprint 2 item 4 cannot be signed off on current data.
+**Update 2026-07-17:** a fresh Visitor registration + OTP verification (account `019f6f21-04fb…`) showed the allocator **running correctly**: `total_token: 1`, `draw_pass: -1`, 28-day cycle — exactly the Visitor config. So the allocator does read config and does work.
+
+Still unproven: the **paid** allocation path (cycle created by the Stripe payment webhook), since no real payment has occurred here (0 invoices across all accounts). Confirming r4 ⇒ 4 tokens on a real checkout is the remaining gap for item 4.
 
 **Asks:**
 1. **Re-seed `red@` / `blue@` so their cycles read 4 / 4** (match the sub-tier config). Current seed values misrepresent the product in demos/QA and — more importantly — would **mask a real allocator bug** if one exists, since wrong numbers already look "normal".

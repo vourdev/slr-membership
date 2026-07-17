@@ -149,3 +149,37 @@ export const getBenyPending = cache((token: string) => {
 export const activateBeny = (id: string, token: string) => {
     return apiFetch<BenyActivateResult>(API.admin.benyActivate(id), { method: 'POST', token });
 };
+
+// ── TPAL draw exports ─────────────────────────────────────────────────────────
+// DTOs mirrored from the live responses (the OpenAPI schemas are empty).
+// The draw itself runs externally at randomdraws.com/au: admin generates the 3
+// CSVs here, uploads them there, then records the winners back.
+
+export type DrawCsvTier = 'visitor' | 'red' | 'blue';
+
+// POST /admin/csv/generate → `data.files`
+export interface DrawCsvFile {
+    tier: DrawCsvTier;
+    filename: string;
+    row_count: number;
+    /** Presigned, attachment-disposition URL. Short-lived (X-Amz-Expires=3600). */
+    download_url: string;
+}
+
+export interface DrawCsvGenerateResult {
+    files: DrawCsvFile[];
+}
+
+// GET /admin/csv/history → `data` (flat array, one row per tier per run, newest first)
+export interface DrawCsvHistoryItem extends DrawCsvFile {
+    id: string;
+    generated_at: string;
+}
+
+export const getDrawCsvHistory = cache((token: string) => {
+    return apiFetch<DrawCsvHistoryItem[]>(API.admin.csvHistory, { token, cache: 'no-store' });
+});
+
+export const generateDrawCsv = (token: string) => {
+    return apiFetch<DrawCsvGenerateResult>(API.admin.csvGenerate, { method: 'POST', token });
+};

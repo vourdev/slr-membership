@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { BENY_CATEGORIES } from '@/data/discounts';
-import type { BenyStatusValue } from '@/lib/api/resources/beny';
+import { type BenyStatusValue, isBenyCancelled } from '@/lib/api/resources/beny';
 import { goldButtonStyle, inputClassName } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +25,7 @@ export function BenySection({ status: initialStatus }: { status: BenyStatusValue
     const [form, setForm] = useState({ name: '', email: '', phone: '' });
     const [isPending, startTransition] = useTransition();
 
-    const canSubscribe = status === 'inactive' || status === 'canceled';
+    const canSubscribe = status === 'inactive' || isBenyCancelled(status);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -168,7 +168,7 @@ export function BenySection({ status: initialStatus }: { status: BenyStatusValue
                     ) : (
                         <div className='flex flex-wrap items-center justify-between gap-3'>
                             <span className='text-slr-muted text-sm'>
-                                {status === 'canceled'
+                                {isBenyCancelled(status)
                                     ? 'BENY canceled — you can re-add it anytime.'
                                     : 'Not subscribed yet.'}
                             </span>

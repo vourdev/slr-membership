@@ -80,7 +80,7 @@ const groups: Group[] = [
             },
             {
                 feature: 'BENY add-on eligibility',
-                hint: 'Optional +$5/month, requires phone',
+                hint: 'Optional +$4/month, requires phone',
                 visitor: false,
                 red: true,
                 blue: true

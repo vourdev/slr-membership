@@ -69,7 +69,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 43 / 75 endpoints integrated (called from the app).**
+**Ratio: 45 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -83,14 +83,15 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/memberships/tiers` | `membership/page.tsx` | live prices + EmptyState (public) |
 | `GET /api/v1/admin/members` | `dashboard/(routes)/members` | live table. ✅ **now 200** (previously 400 `BAD_REQUEST` — backend fixed 2026-07-08); returns the member list + `meta` pagination. FE row-map hardened (`-` defaults) |
 | `GET /api/v1/admin/dashboard` | `dashboard/page.tsx` | ops metrics. `members_by_tier` can repeat a label (r4+b4 = "Plus") → rows aggregated by label so keys stay unique |
-| `GET /api/v1/giveaways/winners` | `dashboard/(routes)/winners` | admin Winners table; read-only, `-` defaults, EmptyState when none |
+| `GET /api/v1/giveaways/winners` | `dashboard/(routes)/winners` | admin Winners table; read-only, `-` defaults, EmptyState when none. ⚠️ **no write endpoint exists** to record winners back after the external draw |
+| `POST /api/v1/admin/csv/generate` · `GET /api/v1/admin/csv/history` | `dashboard/(routes)/draw-exports` | **TPAL draw exports** — Generate button + audit history table with per-tier download links. DTOs mirrored off live (OpenAPI schemas were empty). 🔴 exporter emits **1 row/member** with `total_token` as a column instead of one row per token — see BACKEND-ISSUES.md |
 | `GET /api/v1/discounts/` | `member/discounts/page.tsx` | card reduced to API fields |
 | `POST /api/v1/discounts/` | `dashboard/(routes)/discounts` | admin create (server action, camelCase body); returns `{id, partnerName, isFeatured, isActive, …}` |
 | `DELETE /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin delete (server action) |
 | `PATCH /api/v1/discounts/{id}` | `dashboard/(routes)/discounts` | admin edit (server action; partial merge — verified omitting `description` keeps it). Reuses the create dialog; added the missing `action` column so Edit + Delete now render |
 | `GET /api/v1/admin/members/{userId}` | `dashboard/(routes)/members/[userId]` | member detail (profile/membership/subscription/cycles/wins); renders `entry_status`, never `draw_pass` |
 | `PUT /api/v1/admin/members/{userId}/status` | `dashboard/(routes)/members/[userId]` | admin status update (server action). Body `{status:'ACTIVE'\|'SUSPENDED'\|'DEACTIVATED'}` (uppercase enum); returns `{user_id, status}` (lowercase). Live round-trip verified |
-| `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. Does **not** change `state` by design — use `PATCH /users/{id}` `{state}` for that (verified). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored |
+| `POST /api/v1/memberships/change-tier` | `dashboard/(routes)/members/[userId]` | admin tier/sub-tier update (server action, on behalf of member). Body `{userId, subTierId}` where `subTierId ∈ visitor,r1,r4,r7,b1,b4,b7,b10`; returns full membership record + nested `subTier`. Bad id → `NOT_FOUND`. Does **not** change `state` by design — use `PATCH /users/{id}` `{state}` for that (verified). Chosen over `PUT /tier` (base-tier-only) for finer control. Live cross-tier switch verified + restored. ⚠️ **admin-only override — NOT the PRD upgrade path.** Spec labels it "Admin: change user's tier/state". PRD Visitor→Paid = `stripe/checkout` → webhook; Paid→Paid = `POST /memberships/upgrade`. `change-tier` does not re-allocate the cycle (visitor→b4 leaves 1 token / `draw_pass -1` + `billing_status active` with no payment) — intent unconfirmed, see BACKEND-ISSUES.md |
 | `PATCH /api/v1/users/{id}` | `dashboard/(routes)/members/[userId]` | admin **Draw-pool state** change (server action). Body `{state}` (AU code); the other draw-pool half. Live PATCH→re-read→restore verified |
 | `GET /api/v1/memberships/stats` | `dashboard/(routes)/members` | member counts per **sub-tier**, rendered as a `SubTierStats` card above the list. ⚠️ **shape drift**: OpenAPI said "grouped by tier+state" but live returns Prisma-raw `[{ _count:{_all}, subTierId }]` grouped by **sub-tier only** (no state). Normalized → `{subTierId, count}`, present-only, canonical sort. Fetched via `Promise.allSettled` alongside `admin/members` so the list's 400 no longer blanks the card |
 | `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
@@ -124,8 +125,20 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 - ✅ **SP3 done** — admin discount **edit** (`PATCH /discounts/{id}`, partial merge) wired into `dashboard/(routes)/discounts` (reuses the create dialog; added the missing `action` column, which also revives the previously-unreachable **delete**). **Update 2026-07-09:** `GET /discounts/` + `/{id}` now return **200 for admin** (403 lifted) → the dashboard table **populates from the live list**, and edit prefill now uses a real **`getDiscount(id)`** for backend-listed rows (authoritative title/partner/category/description). `isActive` isn't exposed by list/GET, so it's sent only when known (session record) or the admin toggles it — PATCH's merge preserves the real value otherwise.
 - ✅ **SP4 done (partial by design — Stripe-blocked)** — member BENY add-on flow: live `GET /beny/status` drives `BenySection`; `POST /beny/subscribe` (subscribe) + `DELETE /beny/subscribe` (cancel) wired via `member/discounts/beny-actions.ts`. `data/discounts.ts` trimmed to `BENY_CATEGORIES` (dead mock removed).
   - **🐞 BACKEND: BENY subscribe skips Stripe** — PRD §1 requires subscribe to redirect to Stripe Checkout ($4/mo) BEFORE creating the pending record. Live `POST /beny/subscribe` creates `pending_activation` **immediately, no charge, no checkout URL**. Integrated as-is; a `⚠️ BACKEND BLOCK — remove once Stripe is wired` comment marks both [beny-actions.ts](<src/app/member/discounts/beny-actions.ts>) (add the redirect here) and [beny-section.tsx](<src/app/member/discounts/_components/beny-section.tsx>) (the "redirected to secure checkout" copy). **Delete these comments once the backend returns a checkout session.**
-  - **🐞 BACKEND: `DELETE /beny/subscribe` NOT_FOUND on pending** — cancel only works on an `active` sub; a `pending_activation` member can't cancel. FE hides the cancel button for pending. Confirm whether pending should be cancelable.
+  - **🐞 BACKEND: `DELETE /beny/subscribe` 404 on pending — VIOLATES PRD** (re-verified live 2026-07-17 with `red@`, which sits at `pending_activation`):
+    ```
+    GET    /beny/status     → 200 { "beny_status": "pending_activation" }
+    DELETE /beny/subscribe  → 404 { "code": "NOT_FOUND",
+                                    "message": "No active BENY subscription found to cancel." }
+    ```
+    Cancel only matches subs already `active`. **PRD v3.2 is explicit that this is wrong** — *"User bisa **cancel BENY kapan saja** dari dashboard"* and *"user bisa **cancel kapan saja**"*; it never restricts cancel to `active`. PRD also defines the post-cancel behaviour: *"Saat di-cancel, akses BENY berlanjut sampai akhir periode yang sudah dibayar"*. A member who subscribes and then changes their mind is **trapped in `pending_activation`** until an admin activates them — they cannot cancel, cannot back out.
+    **Fix:** `DELETE` must accept `pending_activation` (and keep access until the paid period ends). Note the message is also misleading — the subscription **exists**, it just isn't `active` yet, so `NOT_FOUND` is the wrong code.
+    **FE follow-up (1 line, blocked on the above):** [beny-section.tsx](<src/app/member/discounts/_components/beny-section.tsx>) renders "Cancel BENY" only for `status === 'active'`; once the backend accepts pending, drop that condition so pending members get the button. Kept hidden for now so members don't hit a 404. Note the section's own copy already promises *"cancel anytime"*, so FE currently contradicts itself.
+    **This is the only remaining Sprint 2 (Ronde 2) blocker** — everything else outstanding is Ronde 3 (Stripe/TPAL/upgrade-downgrade).
   - Field name is `name` (not `full_name`). Subscribe returns only `{ beny_status }` (no record id).
+  - **🐞 FE bugs found + fixed 2026-07-17** (surfaced once BENY was activated on `red@`, making the first successful cancel possible):
+    - **Enum spelling** — the API returns **`"cancelled"`** (AU/British, double L); our type said `'canceled'`. `canSubscribe = status === 'inactive' || status === 'canceled'` was therefore **always false after a cancel** → a cancelled member **could not re-subscribe**, contradicting the PRD and our own "you can re-add it anytime" copy. Type now accepts both spellings via `isBenyCancelled()`.
+    - **Cancel DTO** — `DELETE /beny/subscribe` returns `data: { success, message }` (or `null`), **never `beny_status`**. `cancelBeny` was typed `BenyStatusResponse`; only a `?? 'canceled'` fallback hid it (and that fallback then wrote the wrong spelling). Retyped; the action now treats any 2xx as cancelled.
   - Test side effect: `red@` dev account is now `pending_activation` (subscribe worked, DELETE can't clear pending) — admin activation or a backend reset needed to restore it to `inactive`.
 - **Dummy leftovers:** member **referral, billing, spin, prizes** still mock. `data/discounts.ts` trimmed to `BENY_CATEGORIES` (static marketing; `getBenyStatus`/`getDiscounts`/`DISCOUNTS` mock removed); `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember`; `data/giveaways.ts` **deleted**.
 - ✅ **SP1 done** — member dashboard (`/member`) + giveaways list/detail now live off `memberships/me` + `entries/` + `discounts/` + `giveaways/`. Draw-cycle surface (entry_status, tokens, renewal) sourced from `entries/` current_cycle (never `draw_pass`).
@@ -159,8 +172,8 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/metrics` | - |  |
 | ✅ | GET | `/api/v1/admin/beny/pending` | admin | List pending BENY subscriptions |
 | ✅ | POST | `/api/v1/admin/beny/{id}/activate` | admin | Activate a pending BENY subscription |
-| ❌ | POST | `/api/v1/admin/csv/generate` | admin | Generate 3 CSV files (visitor, red, blue) for draw entries |
-| ❌ | GET | `/api/v1/admin/csv/history` | admin | Get CSV generation log history |
+| ✅ | POST | `/api/v1/admin/csv/generate` | admin | Generate 3 TPAL CSVs → `dashboard/(routes)/draw-exports`. Returns `data.files[{tier,filename,row_count,download_url}]`. 🔴 **exporter emits 1 row/member with `total_token` as a column** — PRD needs 1 row *per token*; see BACKEND-ISSUES.md |
+| ✅ | GET | `/api/v1/admin/csv/history` | admin | CSV audit history → `dashboard/(routes)/draw-exports` table. Flat array `{id,tier,filename,row_count,generated_at,download_url}`, newest first, no `meta`. `download_url` is **re-signed on every read** (verified) → links always fresh ~1h from page load |
 | ✅ | GET | `/api/v1/admin/dashboard` | admin | Admin dashboard overview and metrics |
 | ❌ | POST | `/api/v1/admin/members/{userId}/adjust-draw-pass` | admin | Adjust active cycle draw passes |
 | ✅ | PUT | `/api/v1/admin/members/{userId}/status` | admin | Update member status (ACTIVE, SUSPENDED, DEACTIVATED) |
@@ -178,7 +191,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | POST | `/api/v1/auth/reset-password` | auth | Confirm password reset with token |
 | ✅ | POST | `/api/v1/auth/verify-otp` | auth | Verify OTP code |
 | ✅ | GET | `/api/v1/beny/status` | beny | Get current user BENY status → `member/discounts` BenySection |
-| ✅ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription (active only; NOT_FOUND on pending) |
+| ✅ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription. 🐞 **404 `NOT_FOUND` on `pending_activation`** — active-only, but PRD says *"cancel kapan saja"* → **PRD violation**, the last Ronde 2 blocker |
 | ✅ | POST | `/api/v1/beny/subscribe` | beny | Subscribe to BENY add-on (⚠️ no Stripe charge — see blockers) |
 | ✅ | GET | `/api/v1/billing/invoices` | billing | Get billing invoice list → `/account` payment history (`data` = invoice array + `meta`) |
 | ❌ | POST | `/api/v1/billing/pay-manual` | billing | Pay manual for grace period invoice |

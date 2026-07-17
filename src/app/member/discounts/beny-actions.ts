@@ -42,9 +42,10 @@ export async function cancelBenyAction(): Promise<BenyActionResult> {
     if (!token) return { ok: false, message: 'Not authenticated.' };
 
     try {
-        const data = await cancelBeny(token);
+        // The cancel response carries no beny_status — a 2xx means it's cancelled.
+        await cancelBeny(token);
 
-        return { ok: true, status: data.beny_status ?? 'canceled', message: 'BENY canceled.' };
+        return { ok: true, status: 'cancelled', message: 'BENY canceled.' };
     } catch (error) {
         return toBenyError(error);
     }

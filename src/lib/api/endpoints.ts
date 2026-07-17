@@ -26,7 +26,9 @@ export const API = {
         deleteMember: (userId: string) => `/api/v1/admin/members/${userId}`,
         updateMemberStatus: (userId: string) => `/api/v1/admin/members/${userId}/status`,
         benyPending: '/api/v1/admin/beny/pending',
-        benyActivate: (id: string) => `/api/v1/admin/beny/${id}/activate`
+        benyActivate: (id: string) => `/api/v1/admin/beny/${id}/activate`,
+        csvGenerate: '/api/v1/admin/csv/generate',
+        csvHistory: '/api/v1/admin/csv/history'
     },
     discounts: {
         list: '/api/v1/discounts/',

@@ -66,7 +66,7 @@ const sections: LegalSection[] = [
         body: (
             <p>
                 Partner discounts are provided by third parties. SLR does not warrant the availability, price, or
-                quality of any partner offer. The BENY discount platform is an optional add-on ($5/month extra) and is
+                quality of any partner offer. The BENY discount platform is an optional add-on ($4/month extra) and is
                 operated by a third party; activation requires a phone number and is subject to BENY&rsquo;s own terms.
             </p>
         )

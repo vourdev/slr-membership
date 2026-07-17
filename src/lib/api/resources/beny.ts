@@ -4,10 +4,18 @@ import { API } from '../endpoints';
 import { apiFetch } from '../http';
 
 // ─── DTOs (mirrored from the live responses) ─────────────────────────────────
-// GET /beny/status → { beny_status }. POST/DELETE /beny/subscribe → { beny_status }.
-// Enum observed live: inactive → pending_activation → active → canceled.
+// GET /beny/status → { beny_status }. POST /beny/subscribe → { beny_status }.
+// DELETE /beny/subscribe carries NO beny_status — see cancelBeny below.
+// Flow: inactive → pending_activation → (admin activates) → active → cancelled.
+//
+// The API spells the terminal state "cancelled" (AU/British). Earlier notes here
+// said "canceled" — that was never observed live (nobody could cancel until BENY
+// was activated on a seed account 2026-07-17). Both are accepted so a backend
+// spelling change can't silently strand members on the cancelled screen.
+export type BenyStatusValue = 'inactive' | 'pending_activation' | 'active' | 'cancelled' | 'canceled';
 
-export type BenyStatusValue = 'inactive' | 'pending_activation' | 'active' | 'canceled';
+/** True for either spelling of the cancelled state. */
+export const isBenyCancelled = (status: BenyStatusValue) => status === 'cancelled' || status === 'canceled';
 
 export interface BenyStatusResponse {
     beny_status: BenyStatusValue;
@@ -31,6 +39,14 @@ export const getBenyStatus = cache((token: string) =>
 export const subscribeBeny = (token: string, body: BenySubscribePayload) =>
     apiFetch<BenyStatusResponse>(API.beny.subscribe, { method: 'POST', token, body });
 
-/** Cancel the BENY add-on. Backend returns NOT_FOUND unless the subscription is active. */
+/**
+ * Cancel the BENY add-on.
+ *
+ * Verified live 2026-07-17: `data` is `{ success, message }` (or `null`) — it does
+ * NOT carry `beny_status`, so callers must assume "cancelled" or re-read
+ * `getBenyStatus`. Returns 404 `NOT_FOUND` unless the subscription is already
+ * `active`; a `pending_activation` member cannot cancel, which contradicts the
+ * PRD ("user bisa cancel kapan saja"). See docs/BACKEND-ISSUES.md.
+ */
 export const cancelBeny = (token: string) =>
-    apiFetch<BenyStatusResponse>(API.beny.subscribe, { method: 'DELETE', token });
+    apiFetch<{ success?: boolean; message?: string } | null>(API.beny.subscribe, { method: 'DELETE', token });
