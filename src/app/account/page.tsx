@@ -15,6 +15,7 @@ import { formatAud, formatShortDate } from '@/lib/member';
 import { cn } from '@/lib/utils';
 
 import { ManageBillingButton } from './_components/manage-billing-button';
+import { UpgradeTierButtons } from './_components/upgrade-tier-buttons';
 import { ArrowLeft, CreditCard, ReceiptText } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -60,6 +61,9 @@ export default async function AccountPage() {
     const tier = membership?.subTier;
     const tierLabel = tier ? `SLR ${tier.tier}${tier.marketingName ? ` · ${tier.marketingName}` : ''}` : '-';
     const status = billing?.billing_status ?? '-';
+    // Checkout opens a NEW subscription — only offer it to Visitors. Paid members
+    // change plans via the Billing Portal / scheduled upgrade instead.
+    const canCheckout = tier?.tier === 'VISITOR';
 
     return (
         <main className='dark slr-member bg-slr-navy-deep min-h-svh'>
@@ -115,8 +119,20 @@ export default async function AccountPage() {
                                         </p>
                                     )}
                                 </div>
-                                <ManageBillingButton />
+                                {canCheckout ? null : <ManageBillingButton />}
                             </div>
+
+                            {canCheckout && (
+                                <div className='mt-5 border-t border-white/10 pt-5'>
+                                    <p className='text-slr-muted text-sm'>
+                                        Upgrade to unlock member draws, partner discounts and e-books. You’ll be taken to
+                                        Stripe’s secure checkout — no charge until you confirm.
+                                    </p>
+                                    <div className='mt-3'>
+                                        <UpgradeTierButtons />
+                                    </div>
+                                </div>
+                            )}
                         </section>
 
                         {/* Payment history */}

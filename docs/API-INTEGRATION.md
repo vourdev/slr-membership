@@ -69,7 +69,7 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 
 ## Progress — integrated
 
-**Ratio: 38 / 75 endpoints integrated (called from the app).**
+**Ratio: 43 / 75 endpoints integrated (called from the app).**
 
 | Endpoint | Where | Notes |
 |---|---|---|
@@ -94,6 +94,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `PATCH /api/v1/users/{id}` | `dashboard/(routes)/members/[userId]` | admin **Draw-pool state** change (server action). Body `{state}` (AU code); the other draw-pool half. Live PATCH→re-read→restore verified |
 | `GET /api/v1/memberships/stats` | `dashboard/(routes)/members` | member counts per **sub-tier**, rendered as a `SubTierStats` card above the list. ⚠️ **shape drift**: OpenAPI said "grouped by tier+state" but live returns Prisma-raw `[{ _count:{_all}, subTierId }]` grouped by **sub-tier only** (no state). Normalized → `{subTierId, count}`, present-only, canonical sort. Fetched via `Promise.allSettled` alongside `admin/members` so the list's 400 no longer blanks the card |
 | `GET/POST/PATCH/DELETE /api/v1/ebooks/` | `dashboard/(routes)/ebooks` | full admin CRUD (list + create/edit/delete, server actions, camelCase body, errors surfaced) |
+| `POST/PATCH/DELETE /api/v1/ebooks/{id}/chapters[/{chapterId}]` | `dashboard/(routes)/ebooks` (chapter-dialog) | admin chapter CRUD (server actions). Body camelCase `{chapterNumber, title, body, imageUrl, pullQuote, sortOrder}`. Edit needs the chapter `id` (UUID) from `GET /ebooks/{id}` |
+| `POST /api/v1/ebooks/presigned-url` | `dashboard/(routes)/ebooks` (`upload-asset.ts`) | ebook asset upload. `{filename, contentType}` → `{upload_url, download_url, object_key}`; client PUTs the raw file to `upload_url` with a matching `Content-Type` (no FormData), then stores `download_url` as `coverUrl` / chapter `imageUrl` / `<img src>` in the WYSIWYG body. Unique filename per upload (`{ts}-{rand}-{name}`) so multi-image uploads never collide. ✅ **PUT now 200** (was 403 `SignatureDoesNotMatch`; backend fixed the signing host 2026-07-17) |
 | `GET /api/v1/ebooks/` | `member/ebooks/page.tsx` | member library grid; server-computed `is_locked` per tier → lock badge + upgrade CTA on locked cards |
 | `GET /api/v1/ebooks/{id}` | `member/ebooks/[id]` | **long-form reader (halaman baca)** — chapters → shared `<EbookReader>`. 403 (tier-locked) → in-page upgrade gate |
 | `GET /api/v1/entries/` | `member/entry-history/page.tsx` · `member/page.tsx` | entry history + **member dashboard cycle card** (current_cycle → entry_status, total_token, renewal countdown) |
@@ -104,11 +106,17 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `GET /api/v1/billing/status` | `account/page.tsx` · `payment/success` | billing status card + success-page activation poll (`billing_status`, `next_renewal_at`, `grace_period`) |
 | `GET /api/v1/billing/invoices` | `account/page.tsx` | payment-history table (`data` = invoice array + `meta`). Seed empty → "No payments yet" |
 | `POST /api/v1/stripe/portal` | `account` (Manage Billing) | hosted Billing Portal; server action → redirect to `url`. 400 on seed customers; real members get a URL |
+| `POST /api/v1/stripe/checkout` | `account` (Upgrade buttons) | hosted Checkout; server action `startTierCheckout(tier)` → redirect to `url`. Body `{tier:'RED'\|'BLUE', couponId?}` → `{url, sessionId}` (verified live with `visitor@`). **Gated to `subTier.tier === 'VISITOR'`** — checkout opens a NEW subscription, so paid members must use the portal / `POST /memberships/upgrade` instead of double-subscribing. Returns to `/payment/success` (polls activation) or `/payment/cancel` |
 | `GET /api/v1/memberships/me` | `member/page.tsx` | dashboard summary card. Live shape == `MembershipRecord` (subTierId, billingStatus UPPERCASE, activatedAt, subTier). ⚠️ carries **no `state`** (session), no next-payment, no BENY |
 | `GET /api/v1/giveaways/` | `member/page.tsx` · `member/giveaways` | upcoming + list board. ✅ **now 200** (was 500; fixed 2026-07-09). DTO verified: `{giveaway_id,name,tier,type,prize,opens_at,closes_at,draws_at,is_entered,entry_status}`. Entries-per-giveaway = member cycle tokens (API has no per-giveaway count) |
 | `GET /api/v1/giveaways/{id}` | `member/giveaways/[id]` | detail (meta + `winners[]`). ⚠️ omits entry status → merged from the list item; rules/TPAL copy static (API/PRD don't supply it) |
 
 **Mapped in `endpoints.ts`, not called:** `POST /auth/refresh`, `POST /auth/logout`.
+
+### Stripe status (2026-07-17)
+- ✅ **`POST /stripe/checkout` wired** on `/account` for **Visitor → RED/BLUE** (the only safe use: it opens a new subscription). Verified live end-to-end against `visitor@`; DTO `{url, sessionId}` matches the backend's `docs/fe_stripe_guide.md`.
+- ❌ **Paid registration checkout still mocked** — `step-checkout.tsx` fakes the redirect. Blocked: `/stripe/checkout` needs a Bearer token, but a fresh paid account can't log in (`register` → `requires_otp:false`, yet `login` → 401 "Email verification is pending"). See BACKEND-ISSUES.md for the 3 possible backend fixes.
+- ❌ **BENY → Stripe still blocked** — `POST /beny/subscribe` still returns only `{beny_status}`, no checkout URL (re-checked against the live OpenAPI 2026-07-17). The `⚠️ BACKEND BLOCK` comments in [beny-actions.ts](<src/app/member/discounts/beny-actions.ts>) + [beny-section.tsx](<src/app/member/discounts/_components/beny-section.tsx>) stay until it does.
 
 ### Known gaps / deferred
 - **Token refresh not implemented** — access token expires → 401 → forced logout. Wire `POST /auth/refresh` into NextAuth `jwt` callback (refresh_token in session) to auto-rotate.
@@ -121,18 +129,20 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
   - Test side effect: `red@` dev account is now `pending_activation` (subscribe worked, DELETE can't clear pending) — admin activation or a backend reset needed to restore it to `inactive`.
 - **Dummy leftovers:** member **referral, billing, spin, prizes** still mock. `data/discounts.ts` trimmed to `BENY_CATEGORIES` (static marketing; `getBenyStatus`/`getDiscounts`/`DISCOUNTS` mock removed); `data/member-dashboard.ts` reduced to a session-backed `getCurrentMember`; `data/giveaways.ts` **deleted**.
 - ✅ **SP1 done** — member dashboard (`/member`) + giveaways list/detail now live off `memberships/me` + `entries/` + `discounts/` + `giveaways/`. Draw-cycle surface (entry_status, tokens, renewal) sourced from `entries/` current_cycle (never `draw_pass`).
-- ✅ **SP2 done** — member e-books: list (`member/ebooks`) off `GET /ebooks/` with per-tier lock badge/upgrade CTA, and the long-form reader (`member/ebooks/[id]`) off `GET /ebooks/{id}` → shared `<EbookReader>` (extracted from the public `(home)/ebooks` page; both now share it). Locked (403) → in-page upgrade gate. Chapter body split on blank lines; CMS cover images render `unoptimized` (host allowlist unknown — add to `next.config` `images.remotePatterns` if optimization wanted). `GET /ebooks/{id}` chapters CRUD (admin) still deferred.
+- ✅ **SP2 done** — member e-books: list (`member/ebooks`) off `GET /ebooks/` with per-tier lock badge/upgrade CTA, and the long-form reader (`member/ebooks/[id]`) off `GET /ebooks/{id}` → shared `<EbookReader>` (extracted from the public `(home)/ebooks` page; both now share it). Locked (403) → in-page upgrade gate. Chapter body split on blank lines; CMS cover images render `unoptimized` (host allowlist unknown — add to `next.config` `images.remotePatterns` if optimization wanted). ✅ **Update 2026-07-17:** admin **chapters CRUD** (`POST/PATCH/DELETE /ebooks/{id}/chapters`) is now wired via the chapter-dialog, and **image upload** (`POST /ebooks/presigned-url` → PUT → `download_url`) works end-to-end for covers, chapter feature images, and inline `<img>` in the WYSIWYG body.
 - `getCurrentMember()` now reads the session (name/sub_tier/state) with safe defaults — no longer dummy.
 - **Paid registration deferred** — register wizard only wires the Visitor path (register → OTP → sign-in). RED/BLUE still flow into the mock spin/checkout screens; `requires_payment`/`spin_available` flags + Stripe checkout land in the next task.
 - **No auto-login after OTP** — `verify-otp` returns a session token but it's discarded; the user is sent to `/sign-in`. Wire it into NextAuth (OTP mode) later if auto-login is wanted.
 - ✅ **RESOLVED: `GET /admin/members`** now returns 200 with the member list + `meta` pagination (was 400 `BAD_REQUEST`; backend fixed 2026-07-08). Members page + sub-tier stats no longer degrade. See [BACKEND-ISSUES.md](BACKEND-ISSUES.md).
 - **Dashboard theme** — `.slr-admin` now uses the member navy palette (`#131619` base) so the dashboard matches the member area; dashboard keeps its own sidebar/shell.
-- ✅ **RESOLVED 2026-07-09: admin tier-gate lifted** — `GET /discounts/`, `GET /discounts/{id}`, and `GET /ebooks/{id}` now return **200 for admin** (were all 403). The dashboard Discounts table populates from the live list; admin can GET a discount/ebook to prefill edits (FE follow-up to switch off session records). Remaining: member discount DTO now returns `code` + `terms` (✅); `value_label` dropped (redundant with `title`). Field-name mismatch stands (list snake_case, mutation camelCase). Ebooks: `PATCH` resets unsent numeric fields → FE sends the full object; chapters CRUD still deferred.
+- ✅ **RESOLVED 2026-07-09: admin tier-gate lifted** — `GET /discounts/`, `GET /discounts/{id}`, and `GET /ebooks/{id}` now return **200 for admin** (were all 403). The dashboard Discounts table populates from the live list; admin can GET a discount/ebook to prefill edits (FE follow-up to switch off session records). Remaining: member discount DTO now returns `code` + `terms` (✅); `value_label` dropped (redundant with `title`). Field-name mismatch stands (list snake_case, mutation camelCase). Ebooks: `PATCH` resets unsent numeric fields → FE sends the full object; chapters CRUD ✅ **now wired** (2026-07-17).
 
 - ✅ **RESOLVED: admin state change** — the draw-pool `state` half is changed via **`PATCH /api/v1/users/{id}`** with `{ "state": "NSW" }` (verified 2026-07-10: 200 "User updated.", persists). `change-tier` handles tier/sub-tier; `PATCH /users/{id}` handles state. FE **wired**: state dropdown on the member-detail admin actions → `PATCH /users/{id}`.
 
 - ✅ **RESOLVED: `GET /giveaways/`** now returns 200 (was 500; fixed 2026-07-09). DTOs + mappers in `resources/giveaways.ts` refit to the verified shape; dashboard upcoming + `/member/giveaways` list/detail render live. **Remaining giveaway gaps** (not blockers): payload has **no per-giveaway entry/pool counts** (FE shows the member's cycle tokens as entries; "in pool" hidden), and **no rules/description/TPAL copy** on `/{id}` (FE uses static copy from CLAUDE.md §1 — move to payload/CMS when available). Detail also omits `entry_status`, so the FE merges it from the list item.
-- **`memberships/me` shape gaps** — no `state` (session-sourced), no next-payment (derived `activatedAt + 28d` / `entries.current_cycle.end_at`), no BENY (row hidden until SP4). Also `entries.current_cycle.total_token` = 7 for the seed R4 vs PRD R4 = 4 tokens → confirm canonical token allocation.
+- **`memberships/me` shape gaps** — no `state` (session-sourced), no next-payment (derived `activatedAt + 28d` / `entries.current_cycle.end_at`), no BENY (row hidden until SP4). Also see the **entry-engine token bug** below.
+
+- ⚠️ **Seed cycles don't match tier config — and the entry engine is UNVERIFIED** (2026-07-17). `red@` (r4) shows `total_token: 7` and `blue@` (b4) shows `15`, vs a config of 4 for both. **Confirmed by backend: these are seed-script artifacts, not an allocator bug** — the accounts carry placeholder Stripe ids (`sub_seeded_red_123`, portal 400 `No such customer`), have **0 invoices**, and their cycle rows were written **7.56s** after the user row (UUIDv7 timestamps). So the allocator/webhook **never ran**. Consequence: no cycle here was ever created by a real payment, so we have no evidence the allocator reads `token` from config or resets on renewal — **item 4 can't be signed off**. Needs: re-seed to 4/4, plus one Stripe test checkout (`4242…`) to exercise the allocator. Verified-correct so far: 28-day cycle, `draw_pass=4`, no cycle before payment, `change-tier` doesn't mutate live tokens. Full evidence in [BACKEND-ISSUES.md](BACKEND-ISSUES.md).
 
 ### Suggested next
 `memberships/me` + `giveaways/` (member dashboard) · `ebooks/` (reader) · `auth/refresh` (stop forced logouts) · admin member detail/status/tier.
@@ -180,9 +190,9 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | PATCH | `/api/v1/discounts/{id}` | discounts | Admin: update discount → `dashboard/(routes)/discounts` edit (partial merge) |
 | ✅ | GET | `/api/v1/ebooks/` | ebooks | List published ebooks with is_locked properties |
 | ✅ | POST | `/api/v1/ebooks/` | ebooks | Admin: create ebook |
-| ❌ | DELETE | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: delete chapter |
-| ❌ | PATCH | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: update chapter |
-| ❌ | POST | `/api/v1/ebooks/{id}/chapters` | ebooks | Admin: create chapter |
+| ✅ | DELETE | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: delete chapter → `dashboard/(routes)/ebooks` |
+| ✅ | PATCH | `/api/v1/ebooks/{id}/chapters/{chapterId}` | ebooks | Admin: update chapter → chapter-dialog (needs chapter `id` from `GET /ebooks/{id}`) |
+| ✅ | POST | `/api/v1/ebooks/{id}/chapters` | ebooks | Admin: create chapter → chapter-dialog |
 | ✅ | DELETE | `/api/v1/ebooks/{id}` | ebooks | Admin: delete ebook |
 | ✅ | GET | `/api/v1/ebooks/{id}` | ebooks | Get ebook content and chapters if unlocked → `member/ebooks/[id]` reader. Below-tier member → 403 gate; **admin now 200** (was 403; fixed 2026-07-09) |
 | ✅ | PATCH | `/api/v1/ebooks/{id}` | ebooks | Admin: update ebook |
@@ -209,7 +219,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | POST | `/api/v1/referral/validate` | referral | Validate referral code before submission |
 | ❌ | POST | `/api/v1/spin/execute` | spin | Spin the wheel (one-time or pre-renewal) |
 | ❌ | GET | `/api/v1/spin/status` | spin | Check spin wheel status and availability |
-| 🟡 | POST | `/api/v1/stripe/checkout` | stripe | Create Stripe Checkout session for a tier (`createCheckoutSession` mapped; register-flow wiring pending) |
+| ✅ | POST | `/api/v1/stripe/checkout` | stripe | Create Stripe Checkout session → `/account` Visitor→RED/BLUE upgrade (verified live: `{url, sessionId}`). **Register-flow wiring still blocked** — see BACKEND-ISSUES.md |
 | ✅ | POST | `/api/v1/stripe/portal` | stripe | Create Stripe Billing Portal session → `/account` Manage Billing (400 on seed customers; real members get a URL) |
 | ❌ | POST | `/api/v1/webhooks/stripe/` | stripe | Stripe webhook (signature-verified, raw body) |
 | ❌ | GET | `/api/v1/subscriptions/` | subscriptions | Admin: list subscriptions |
