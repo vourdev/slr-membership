@@ -29,6 +29,7 @@ The client asked for four changes to the member-facing account area:
 - **(A) Route/nav:** consolidate under `/member/*`. Billing becomes `/member/membership` inside the member shell; `/account` redirects there.
 - **(A) Tier display format:** `SLR Red · Plus` (tier group + marketing name) — keeps the Red/Blue identity that matters for the draw pool, avoids the Standard/Plus/Premium collision between tiers. Badge stays tier-coloured.
 - **(B) Missing fields:** build the full UI the client envisions; fields the backend lacks are filled with **dummy data + a clear placeholder label**, and reported to backend.
+- **Address = `state`.** "Address" is not a new field — it reuses the existing `state`. State is **display-only** in the profile with a "request change (admin approval)" action, because state determines the draw pool and PRD forbids self-service state changes. (Same treatment as email.) So only `name` and `phone` are directly editable.
 
 ## 4. Design
 
@@ -49,14 +50,14 @@ Remove all billing/membership content. Sections:
 | Field | Source | Editable |
 |---|---|---|
 | Name | `full_name` | ✅ `PATCH /users/me { fullName }` |
-| Email | `email` | 🔒 display only; "changing email needs admin approval" note |
 | Phone | `phone` | ✅ `PATCH /users/me { phone }` |
-| State | `state` | ✅ `PATCH /users/me { state }` |
+| Email | `email` | 🔒 display only; "change needs admin approval" (no self-service endpoint) |
+| Address (= State) | `state` | 🔒 display only; "request change (admin approval)" — state drives the draw pool, PRD forbids self-change |
 | DOB | **dummy** | 📝 placeholder — data exists in DB, backend must expose it |
-| Address | **dummy** | 📝 placeholder — new field, backend must add |
 | Pay-ID email | **dummy** | 📝 placeholder — new field, backend must add |
 
-- Edit uses React Hook Form + Zod, a server action wrapping `PATCH /users/me` (only `fullName`, `phone`, `state` are sent; the rest are display/placeholder).
+- Edit uses React Hook Form + Zod, a server action wrapping `PATCH /users/me` — only `fullName` and `phone` are sent. State/email/dob/pay-id are display or placeholder.
+- Email and State each show a "request change (admin approval)" affordance. There is **no member-facing endpoint** for either request today (admin changes state via `PATCH /users/{id}`), so the button routes to the existing support/contact flow until a request endpoint exists — see backend gaps.
 - Placeholder fields render with a visible "Placeholder — pending backend" badge so they never look like real data, and are disabled in edit mode.
 
 **Security section:** keep the existing `SecuritySection` (password reset flow). **Support links:** keep.
@@ -101,15 +102,16 @@ Move `/account`'s content into this route and add the new sections. Order:
 ## 7. Backend Gaps to Report (from this client revision)
 
 1. **Expose `dob`** on `GET /auth/me` (or `/users/me`). Already collected at register + stored; just not returned. *(small)*
-2. **Add `address`** — new column + register capture + read/write on `/users/me`. Confirm with client **why** it's needed (likely prize-fulfilment / TPAL compliance). *(medium)*
-3. **Add `pay_id_email`** — new column + read/write on `/users/me`. Confirm purpose with client (likely prize payout via PayID). *(medium)*
-4. **Allow self-edit of `email`** or confirm it stays admin-approval-only (current API Contract: email/state change needs admin approval — but `PATCH /users/me` already accepts `state`, so confirm the real rule).
-5. Paid→paid upgrade + cancel endpoints must be wired in Ronde 3 to activate the disabled controls.
+2. **Add `pay_id_email`** — new column + read/write on `/users/me`. Confirm purpose with client (likely prize payout via PayID). *(medium)*
+3. **Member-facing change requests for `email` and `state`.** Both are admin-approval-only (state drives the draw pool). There is no member endpoint to *request* a change — admin edits state via `PATCH /users/{id}`. Either add a request endpoint, or confirm these go through the support/contact flow. Note the contradiction to resolve: `PATCH /users/me` currently accepts `state`, which shouldn't be self-service per PRD.
+4. Paid→paid upgrade + cancel endpoints must be wired in Ronde 3 to activate the disabled controls.
+
+**Dropped from the original list:** "Address" is no longer a backend gap — it reuses `state` (client decision 2026-07-18).
 
 ## 8. Verification
 
 - `formatTierName` unit-covered for every sub-tier + visitor.
-- Profile edit: live round-trip against `PATCH /users/me` (change phone/state, read back, restore) with a seed/test account.
+- Profile edit: live round-trip against `PATCH /users/me` (change name/phone, read back, restore) with a seed/test account. State/email remain display-only.
 - Membership page: renders live billing for `red@`; disabled controls show the Ronde-3 note; BENY section behaves as on the old location.
 - `/account` redirect resolves to `/member/membership`.
 - `npm run type-check` + `npx eslint` on all touched files. No raw tier code visible anywhere in the member UI (grep check).
