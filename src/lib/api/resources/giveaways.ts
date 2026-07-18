@@ -1,9 +1,10 @@
 import { cache } from 'react';
 
-import { formatDrawPool, isGiveawayLocked } from '@/lib/member';
-import type { EntryStatus, Giveaway, GiveawayDetail, PastWinner, TierGroup } from '@/types/member';
+import { formatDrawPool, formatShortDate, isGiveawayLocked } from '@/lib/member';
+import type { EntryStatus, Giveaway, GiveawayDetail, GiveawayEntryRow, PastWinner, TierGroup } from '@/types/member';
 
 import { API } from '../endpoints';
+import type { EntryCycle } from './entries';
 import { apiFetch } from '../http';
 
 // ─── DTOs (mirrored from the live GET /giveaways/winners response) ────────────
@@ -101,6 +102,23 @@ function toPastWinner(w: ApiGiveawayWinnerRow): PastWinner {
     };
 }
 
+// The API exposes entries at the cycle level, not per giveaway (one token count
+// applies to every giveaway in the member's tier). So "Your Entries" reflects the
+// member's current-cycle allocation — shown only when they're actually entered in
+// this giveaway. Past cycles are omitted: the entries feed can't tell us which
+// specific giveaways a member was in historically.
+function toEntryHistory(cycle: EntryCycle | null, entered: boolean): GiveawayEntryRow[] {
+    if (!entered || !cycle) return [];
+
+    return [
+        {
+            cycle: `Current Cycle · ${formatShortDate(cycle.start_at)} – ${formatShortDate(cycle.end_at)}`,
+            entries: cycle.total_token,
+            status: cycle.entry_status
+        }
+    ];
+}
+
 /**
  * Map an API giveaway → the UI `Giveaway`. The API exposes no `state` or per-giveaway
  * entry/pool counts, so pool = the member's `state + tier`, and (per CLAUDE.md §1)
@@ -135,8 +153,9 @@ export function toGiveawayDetail(
     listItem: ApiGiveaway | undefined,
     memberGroup: TierGroup,
     memberState: string,
-    memberTokens = 0
+    currentCycle: EntryCycle | null = null
 ): GiveawayDetail {
+    const memberTokens = currentCycle?.total_token ?? 0;
     const base = toGiveaway(
         {
             giveaway_id: d.giveaway_id,
@@ -160,7 +179,7 @@ export function toGiveawayDetail(
         prize_description: d.prize?.trim() || '-',
         rules: GIVEAWAY_RULES,
         tpal_note: TPAL_NOTE,
-        entry_history: [],
+        entry_history: toEntryHistory(currentCycle, base.entered),
         past_winners: (d.winners ?? []).map(toPastWinner)
     };
 }
