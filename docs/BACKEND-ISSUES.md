@@ -469,3 +469,35 @@ POST /api/v1/auth/login
 **Frontend status:** the paid registration path is **still mocked** (`step-checkout.tsx` fakes the redirect); the wizard only creates accounts on the Visitor path. `POST /stripe/checkout` itself is **verified working** for an already-authenticated member (returns a real `{url, sessionId}`), and is now wired live on **`/account`** for Visitor→RED/BLUE upgrades.
 
 > **Test data:** a throwaway paid account (`fe-test-<timestamp>@example.com`, VIC, r4) was created in production during this check and is stuck unverified — safe to purge.
+
+---
+
+## ⚠️ Member-account restructure (2026-07-18) — remaining gaps
+
+**Captured:** 2026-07-18 · **Context:** `/member/profile` + `/member/membership` split (client-revision to the member-facing account area, replacing the old `/account` page). Filed at close of that work so the outstanding items aren't rediscovered later.
+
+### 1. `pay_id_email` — new field needed on the user profile
+
+Add a `pay_id_email` column + expose it for read/write on `PATCH /users/me` / `GET /auth/me`. Today the frontend renders it from a placeholder (`profile.pay_id_email` is always `null` from the API — see [personal-info-section.tsx](<src/app/member/profile/_components/personal-info-section.tsx>), badged `Placeholder` in the UI). **Please confirm the purpose with the client** — likely a PayID payout email for prize winnings, but unconfirmed. This is the only remaining profile placeholder field (name/phone/dob are all real; see item 4).
+
+### 2. No member-facing change-request endpoint for `email` or `state`
+
+Both fields are **admin-approval-only** per PRD — `state` in particular drives the draw pool, so PRD forbids self-service changes. Today there is **no member endpoint to request a change**; the only mutation path is admin-side `PATCH /users/{id}` (see the "Admin tier-gate" / draw-pool section above). The profile page shows both as display-only with a "request change (admin approval)" affordance that currently just routes to the existing support/contact flow.
+
+**Ask:** either (a) add a member-facing request endpoint (e.g. `POST /users/me/change-request`) that queues an admin-reviewable request, or (b) confirm routing these through support/contact is the intended permanent flow, so the frontend affordance can be finalized instead of left as a placeholder.
+
+**Contradiction to resolve:** `PATCH /users/me` currently **accepts** a `state` field in its request schema, which contradicts the PRD's "admin-approval-only" rule for state. The frontend never sends `state` on this endpoint (only `fullName`/`phone` — see [actions.ts](src/app/member/profile/actions.ts)), but the schema allowing it is a latent self-service hole. Please either remove `state` from `PATCH /users/me`'s accepted body, or confirm self-service state changes are intentionally allowed (in which case the PRD/FE lock needs revisiting).
+
+### 3. Ronde 3: paid→paid upgrade + cancel not yet wired
+
+`/member/membership`'s "Manage Membership" card shows **"Coming soon"** for both **Change plan (upgrade/downgrade)** and **Cancel membership** for paid members (see [manage-tier.tsx](<src/app/member/membership/_components/manage-tier.tsx>)). These controls are intentionally disabled pending:
+- `POST /memberships/upgrade` — schedule a `pending_upgrade`, applied at next renewal, no proration, cancelable before it applies (per PRD).
+- `DELETE /memberships/upgrade` — cancel a scheduled pending upgrade.
+- The member-facing cancel-membership endpoint (subscription cancel at period end — distinct from BENY cancel, which is already wired).
+
+Once these are live and verified, the frontend just needs to swap the "Coming soon" badges for real controls — no structural change to the page.
+
+### ✅ Resolved as part of this restructure
+
+- **`dob`** — now exposed on `GET /auth/me` (backend added it 2026-07-18). Profile reads it directly; display-only since `PATCH /users/me` doesn't accept it.
+- **`address`** — dropped as a separate field; reuses the existing `state` (client decision 2026-07-18). No backend change needed beyond item 2 above.

@@ -92,6 +92,14 @@ export function formatDrawPool(group: TierGroup, state: string): string {
     return `SLR ${TIER_VISUALS[group].poolLabel} · ${state}`;
 }
 
+/** Customer-facing tier name — "SLR Red · Plus", "SLR Blue · Elite", "Visitor". Never shows the code. */
+export function formatTierName(code: SubTierCode): string {
+    const meta = SUB_TIERS[code];
+    if (meta.group === 'visitor') return 'Visitor';
+
+    return `SLR ${TIER_VISUALS[meta.group].poolLabel} · ${meta.marketingName}`;
+}
+
 /** Short date, e.g. "28 Jul 2026". */
 export function formatShortDate(iso: string): string {
     return format(new Date(iso), 'd MMM yyyy');

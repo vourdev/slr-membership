@@ -18,7 +18,7 @@ const SIZES = {
 interface TierBadgeProps {
     subTier: SubTierCode;
     size?: keyof typeof SIZES;
-    /** Show the tier group with the sub-tier code, e.g. "RED · R4". Off → "R4". */
+    /** Show the tier group with the marketing name, e.g. "RED · Plus". Off → "Plus". */
     showGroup?: boolean;
     className?: string;
 }
@@ -30,7 +30,12 @@ export function TierBadge({ subTier, size = 'md', showGroup = true, className }:
     const Icon = GROUP_ICON[meta.group];
     const sz = SIZES[size];
 
-    const label = meta.group === 'visitor' ? 'Visitor' : showGroup ? `${visual.label} · ${meta.label}` : meta.label;
+    const label =
+        meta.group === 'visitor'
+            ? 'Visitor'
+            : showGroup
+              ? `${visual.label} · ${meta.marketingName}`
+              : meta.marketingName;
 
     return (
         <span

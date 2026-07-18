@@ -55,6 +55,7 @@ export interface MeResult {
     email: string;
     phone: string;
     state: string;
+    dob: string | null;
     tier: string;
     sub_tier: string | null;
     token: number;

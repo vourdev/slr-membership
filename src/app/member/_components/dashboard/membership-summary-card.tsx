@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 import { TierBadge } from '@/components/common/tier-badge';
-import { SUB_TIERS, TIER_VISUALS } from '@/constant/tiers';
-import { formatAud, formatShortDate } from '@/lib/member';
+import { SUB_TIERS } from '@/constant/tiers';
+import { formatAud, formatShortDate, formatTierName } from '@/lib/member';
 import { cn } from '@/lib/utils';
 import type { BillingStatus, MembershipSummary } from '@/types/member';
 
@@ -37,10 +37,9 @@ export function MembershipSummaryCard({
     className?: string;
 }) {
     const meta = SUB_TIERS[summary.sub_tier];
-    const visual = TIER_VISUALS[meta.group];
     const billing = BILLING[summary.billing_status];
 
-    const tierName = meta.group === 'visitor' ? 'Visitor Pass' : `SLR ${visual.label}`;
+    const tierName = meta.group === 'visitor' ? 'Visitor Pass' : formatTierName(summary.sub_tier);
     const price = meta.price_cents === 0 ? 'Free' : formatAud(meta.price_cents);
 
     return (

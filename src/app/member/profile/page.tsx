@@ -4,8 +4,7 @@ import { TierBadge } from '@/components/common/tier-badge';
 import { getMemberProfile } from '@/data/profile';
 import { formatShortDate } from '@/lib/member';
 
-import { MembershipCardDialog } from './_components/membership-card-dialog';
-import { MembershipSection } from './_components/membership-section';
+import { PersonalInfoSection } from './_components/personal-info-section';
 import { SecuritySection } from './_components/security-section';
 import { SupportLinks } from './_components/support-links';
 import { MapPin } from 'lucide-react';
@@ -47,21 +46,7 @@ export default async function ProfilePage() {
                 </div>
             </header>
 
-            <MembershipCardDialog
-                name={profile.name}
-                subTier={profile.sub_tier}
-                memberId={profile.member_id}
-                joinedAt={profile.joined_at}
-            />
-
-            <MembershipSection
-                subTier={profile.sub_tier}
-                priceCents={profile.price_cents}
-                billingStatus={profile.billing_status}
-                nextPaymentDate={profile.next_payment_date}
-                pendingUpgrade={profile.pending_upgrade}
-                invoices={profile.invoices}
-            />
+            <PersonalInfoSection profile={profile} />
 
             <div className='grid gap-6 lg:grid-cols-2'>
                 <SecuritySection />

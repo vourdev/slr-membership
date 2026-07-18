@@ -1,3 +1,5 @@
+import { getMe } from '@/lib/api/resources/auth';
+import { getAccessToken } from '@/lib/api/server';
 import { getSessionIdentity } from '@/lib/session-member';
 import type { MemberProfile } from '@/types/member';
 
@@ -11,8 +13,11 @@ import type { MemberProfile } from '@/types/member';
 const PROFILE: MemberProfile = {
     name: 'James Carter',
     email: 'james.carter@example.com',
+    phone: '+61400000000',
     sub_tier: 'R4',
     state: 'NSW',
+    dob: null,
+    pay_id_email: 'payid@example.com',
     member_id: 'SLR-NSW-004821',
     joined_at: '2026-02-13',
     billing_status: 'active',
@@ -53,12 +58,28 @@ const PROFILE: MemberProfile = {
 
 export async function getMemberProfile(): Promise<MemberProfile> {
     const id = await getSessionIdentity();
+    const token = await getAccessToken();
+    let dob: string | null = null;
+    let phone: string | null = null;
+    let fullName: string | null = null;
+    if (token) {
+        try {
+            const me = await getMe(token);
+            dob = me.dob;
+            phone = me.phone;
+            fullName = me.full_name;
+        } catch {
+            dob = null; // profile still renders; dob shows "-"
+        }
+    }
 
     return {
         ...PROFILE,
-        name: id.name ?? PROFILE.name,
+        name: fullName ?? id.name ?? PROFILE.name,
         email: id.email ?? PROFILE.email,
         sub_tier: id.sub_tier ?? PROFILE.sub_tier,
-        state: id.state ?? PROFILE.state
+        state: id.state ?? PROFILE.state,
+        dob,
+        phone
     };
 }

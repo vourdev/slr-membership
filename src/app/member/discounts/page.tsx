@@ -4,13 +4,11 @@ import Link from 'next/link';
 import EmptyState from '@/components/common/empty-state';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
-import { type BenyStatusValue, getBenyStatus } from '@/lib/api/resources/beny';
 import { type Discount, getDiscounts } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
 import { tierGroupOf } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
 
-import { BenySection } from './_components/beny-section';
 import { DiscountsExplorer } from './_components/discounts-explorer';
 import { ArrowRight, CircleAlert, Lock, Tag } from 'lucide-react';
 
@@ -25,26 +23,16 @@ export default async function DiscountsPage() {
 
     let discounts: Discount[] = [];
     let failed = false;
-    let benyStatus: BenyStatusValue = 'inactive';
 
     if (canAccess) {
         const token = await getAccessToken();
         if (token) {
-            // Independent reads — allSettled so a discounts failure can't blank BENY (and vice versa).
-            const [discountsRes, benyRes] = await Promise.allSettled([getDiscounts(token), getBenyStatus(token)]);
-
-            if (discountsRes.status === 'fulfilled') {
+            try {
                 // Only show discounts that actually carry data.
-                discounts = discountsRes.value.filter((d) => d.title?.trim() || d.partner_name?.trim());
-            } else {
-                handleApiAuthError(discountsRes.reason); // expired session → force logout
+                discounts = (await getDiscounts(token)).filter((d) => d.title?.trim() || d.partner_name?.trim());
+            } catch (error) {
+                handleApiAuthError(error); // expired session → force logout
                 failed = true;
-            }
-
-            if (benyRes.status === 'fulfilled') {
-                benyStatus = benyRes.value.beny_status ?? 'inactive';
-            } else {
-                handleApiAuthError(benyRes.reason);
             }
         }
     }
@@ -77,7 +65,6 @@ export default async function DiscountsPage() {
                             description='New partner offers are on the way — check back soon.'
                         />
                     )}
-                    <BenySection status={benyStatus} />
                 </>
             ) : (
                 <div className='bg-card-dark-navy border-slr-navy-border flex flex-col items-center rounded-2xl border px-6 py-14 text-center'>
