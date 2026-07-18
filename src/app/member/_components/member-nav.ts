@@ -1,5 +1,6 @@
 import {
     BookOpen,
+    CreditCard,
     Gift,
     History,
     LayoutDashboard,
@@ -27,5 +28,6 @@ export const MEMBER_NAV: MemberNavItem[] = [
     { title: 'E-Books', href: '/member/ebooks', icon: BookOpen },
     { title: 'Referral', href: '/member/referral', icon: Users },
     { title: 'Entry History', href: '/member/entry-history', icon: History },
+    { title: 'Membership', href: '/member/membership', icon: CreditCard },
     { title: 'Profile', href: '/member/profile', icon: UserCircle }
 ];
