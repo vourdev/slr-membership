@@ -46,7 +46,7 @@ export function DiscountDetailDialog({ discount, onClose }: { discount: Discount
                                         alt=''
                                         fill
                                         unoptimized
-                                        className='object-cover'
+                                        className='object-contain'
                                     />
                                 ) : (
                                     <span className='text-slr-dim flex h-full w-full items-center justify-center text-3xl font-bold'>

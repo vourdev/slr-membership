@@ -17,7 +17,13 @@ export function DiscountCard({ discount, onSelect }: { discount: Discount; onSel
             <div className='flex items-start justify-between gap-2'>
                 <div className='bg-slr-navy-card border-slr-navy-border relative size-14 shrink-0 overflow-hidden rounded-lg border'>
                     {discount.thumbnail_url ? (
-                        <Image src={discount.thumbnail_url} alt='' fill unoptimized className='object-cover' />
+                        <Image
+                            src={discount.thumbnail_url}
+                            alt=''
+                            fill
+                            unoptimized
+                            className='object-contain p-1'
+                        />
                     ) : (
                         <span className='text-slr-dim flex h-full w-full items-center justify-center text-lg font-semibold'>
                             {initial}
