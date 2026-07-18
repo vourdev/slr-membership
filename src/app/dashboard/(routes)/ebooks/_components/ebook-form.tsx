@@ -155,7 +155,9 @@ export function EbookForm({ initialData }: EbookFormProps) {
                 : { ...values, pdfUrl: null as unknown as string };
 
         startTransition(async () => {
-            const res = initialData ? await updateEbookAction(initialData.id, payload) : await createEbookAction(payload);
+            const res = initialData
+                ? await updateEbookAction(initialData.id, payload)
+                : await createEbookAction(payload);
 
             if (res.ok) {
                 toast.success(res.message);
