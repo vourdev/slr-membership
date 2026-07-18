@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { EbookReader, type ReaderChapter } from '@/components/common/ebook-reader';
+import { PdfEbookViewer } from '@/components/common/pdf-ebook-viewer';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { type EbookChapter, type EbookDetail, getEbook } from '@/lib/api/resources/ebooks';
 import { getAccessToken } from '@/lib/api/server';
@@ -104,7 +105,8 @@ export default async function EbookReaderPage({ params }: { params: Promise<{ id
         notFound(); // 404 / 500 / other
     }
 
-    const chapters = toReaderChapters(ebook.chapters);
+    const isPdf = Boolean(ebook.pdf_url);
+    const chapters = isPdf ? [] : toReaderChapters(ebook.chapters);
 
     return (
         <div className='flex-1'>
@@ -127,10 +129,12 @@ export default async function EbookReaderPage({ params }: { params: Promise<{ id
                             <Clock className='size-4' />
                             {ebook.reading_time_minutes} min read
                         </span>
-                        <span className='inline-flex items-center gap-1.5'>
-                            <Layers className='size-4' />
-                            {ebook.chapter_count} {ebook.chapter_count === 1 ? 'chapter' : 'chapters'}
-                        </span>
+                        {!isPdf && (
+                            <span className='inline-flex items-center gap-1.5'>
+                                <Layers className='size-4' />
+                                {ebook.chapter_count} {ebook.chapter_count === 1 ? 'chapter' : 'chapters'}
+                            </span>
+                        )}
                         {ebook.published_at && (
                             <span className='inline-flex items-center gap-1.5'>
                                 <BookOpen className='size-4' />
@@ -146,17 +150,22 @@ export default async function EbookReaderPage({ params }: { params: Promise<{ id
                 </div>
             </div>
 
-            {/* Long-form reader */}
-            <section id='guide' className='scroll-mt-24 py-6 md:py-10'>
-                <EbookReader
-                    chapters={chapters}
-                    finishLabel={`You Finished ${ebook.title}`}
-                    shareTitle={ebook.title}
-                    shareText={`Read "${ebook.title}" on SLR Rewards.`}
-                    nextHref='/member/ebooks'
-                    nextLabel='More E-Books'
-                />
-            </section>
+            {isPdf ? (
+                <section className='py-6 md:py-10'>
+                    <PdfEbookViewer pdfUrl={ebook.pdf_url!} title={ebook.title} />
+                </section>
+            ) : (
+                <section id='guide' className='scroll-mt-24 py-6 md:py-10'>
+                    <EbookReader
+                        chapters={chapters}
+                        finishLabel={`You Finished ${ebook.title}`}
+                        shareTitle={ebook.title}
+                        shareText={`Read "${ebook.title}" on SLR Rewards.`}
+                        nextHref='/member/ebooks'
+                        nextLabel='More E-Books'
+                    />
+                </section>
+            )}
         </div>
     );
 }

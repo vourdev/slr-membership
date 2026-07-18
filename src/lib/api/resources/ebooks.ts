@@ -13,6 +13,7 @@ export interface EbookListItem {
     title: string;
     subtitle: string | null;
     cover_url: string | null;
+    pdf_url: string | null;
     description: string | null;
     category: string | null;
     footnote: string | null;
@@ -27,6 +28,7 @@ export interface EbookAdmin {
     title: string;
     subtitle: string | null;
     coverUrl: string | null;
+    pdfUrl: string | null;
     description: string | null;
     category: string | null;
     footnote: string | null;
@@ -43,6 +45,7 @@ export interface EbookPayload {
     title: string;
     subtitle?: string;
     coverUrl?: string;
+    pdfUrl?: string | null;
     description?: string;
     category?: string;
     footnote?: string;
@@ -66,6 +69,7 @@ export interface EbookDetail {
     title: string;
     subtitle: string | null;
     cover_url: string | null;
+    pdf_url: string | null;
     footnote: string | null;
     reading_time_minutes: number;
     chapter_count: number;

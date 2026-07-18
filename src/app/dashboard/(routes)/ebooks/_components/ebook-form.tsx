@@ -6,11 +6,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { ImageUploadField } from '@/components/common/image-upload-field';
+import { PdfUploadField } from '@/components/common/pdf-upload-field';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { WysiwygEditor } from '@/components/ui/wysiwyg-editor';
 import type { EbookChapter, EbookTier } from '@/lib/api/resources/ebooks';
@@ -30,6 +32,7 @@ const formSchema = z.object({
     title: z.string().min(1, 'Title is required'),
     subtitle: z.string().optional(),
     coverUrl: z.string().optional(),
+    pdfUrl: z.string().optional(),
     description: z.string().optional(),
     category: z.string().optional(),
     footnote: z.string().optional(),
@@ -46,6 +49,7 @@ interface EbookFormProps {
         subtitle: string;
         description: string;
         coverUrl: string;
+        pdfUrl: string;
         category: string;
         footnote: string;
         tierAccess: EbookTier;
@@ -61,6 +65,13 @@ export function EbookForm({ initialData }: EbookFormProps) {
     const [chapters, setChapters] = useState<EbookChapter[]>(initialData?.chapters || []);
     const [isChapterDialogOpen, setIsChapterDialogOpen] = useState(false);
     const [selectedChapter, setSelectedChapter] = useState<EbookChapter | null>(null);
+
+    // Content type is chosen at create time and locked on edit (derived from pdfUrl).
+    const isPdfEbook = Boolean(initialData?.pdfUrl);
+    const [contentMode, setContentMode] = useState<'chapters' | 'pdf'>(
+        initialData ? (isPdfEbook ? 'pdf' : 'chapters') : 'chapters'
+    );
+    const isEditing = Boolean(initialData);
 
     useEffect(() => {
         if (initialData?.chapters) {
@@ -107,6 +118,7 @@ export function EbookForm({ initialData }: EbookFormProps) {
               title: initialData.title,
               subtitle: initialData.subtitle,
               coverUrl: initialData.coverUrl,
+              pdfUrl: initialData.pdfUrl,
               description: initialData.description,
               category: initialData.category,
               footnote: initialData.footnote,
@@ -117,6 +129,7 @@ export function EbookForm({ initialData }: EbookFormProps) {
               title: '',
               subtitle: '',
               coverUrl: '',
+              pdfUrl: '',
               description: '',
               category: '',
               footnote: '',
@@ -130,8 +143,21 @@ export function EbookForm({ initialData }: EbookFormProps) {
     });
 
     const onSubmit = (values: FormValues) => {
+        if (contentMode === 'pdf' && !values.pdfUrl) {
+            form.setError('pdfUrl', { message: 'Upload a PDF or paste its URL.' });
+
+            return;
+        }
+
+        const payload: FormValues =
+            contentMode === 'pdf'
+                ? { ...values, pdfUrl: values.pdfUrl, description: '' }
+                : { ...values, pdfUrl: null as unknown as string };
+
         startTransition(async () => {
-            const res = initialData ? await updateEbookAction(initialData.id, values) : await createEbookAction(values);
+            const res = initialData
+                ? await updateEbookAction(initialData.id, payload)
+                : await createEbookAction(payload);
 
             if (res.ok) {
                 toast.success(res.message);
@@ -157,6 +183,26 @@ export function EbookForm({ initialData }: EbookFormProps) {
             <div className='rounded-xl border border-white/10 bg-white/5 p-6'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-6'>
+                        <div className='flex flex-col gap-2'>
+                            <span className='text-sm font-medium text-white/80'>Content type</span>
+                            <ToggleGroup
+                                type='single'
+                                value={contentMode}
+                                onValueChange={(v) => {
+                                    if (v && !isEditing) setContentMode(v as 'chapters' | 'pdf');
+                                }}
+                                disabled={isEditing}
+                                className='w-fit'>
+                                <ToggleGroupItem value='chapters'>Chapters</ToggleGroupItem>
+                                <ToggleGroupItem value='pdf'>PDF</ToggleGroupItem>
+                            </ToggleGroup>
+                            <p className='text-xs text-white/40'>
+                                {isEditing
+                                    ? 'Content type is fixed after creation.'
+                                    : 'Choose whether this ebook is a multi-chapter reader or a single uploaded PDF.'}
+                            </p>
+                        </div>
+
                         <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                             <FormField
                                 control={form.control}
@@ -186,23 +232,45 @@ export function EbookForm({ initialData }: EbookFormProps) {
                             />
                         </div>
 
-                        <FormField
-                            control={form.control}
-                            name='description'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Content / Description</FormLabel>
-                                    <FormControl>
-                                        <WysiwygEditor
-                                            placeholder='Write the ebook content or description...'
-                                            onImageUpload={uploadEbookAsset}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {contentMode === 'chapters' && (
+                            <FormField
+                                control={form.control}
+                                name='description'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Content / Description</FormLabel>
+                                        <FormControl>
+                                            <WysiwygEditor
+                                                placeholder='Write the ebook content or description...'
+                                                onImageUpload={uploadEbookAsset}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        {contentMode === 'pdf' && (
+                            <FormField
+                                control={form.control}
+                                name='pdfUrl'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>PDF file</FormLabel>
+                                        <FormControl>
+                                            <PdfUploadField
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                onUpload={uploadEbookAsset}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <div className='grid grid-cols-1 items-start gap-6 md:grid-cols-2'>
                             <FormField
@@ -320,7 +388,7 @@ export function EbookForm({ initialData }: EbookFormProps) {
                 </Form>
             </div>
 
-            {initialData && (
+            {initialData && contentMode === 'chapters' && (
                 <div className='rounded-xl border border-white/10 bg-white/5 p-6'>
                     <div className='mb-6 flex items-center justify-between border-b border-white/10 pb-4'>
                         <div>
