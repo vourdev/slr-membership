@@ -53,10 +53,11 @@ Remove all billing/membership content. Sections:
 | Phone | `phone` | ✅ `PATCH /users/me { phone }` |
 | Email | `email` | 🔒 display only; "change needs admin approval" (no self-service endpoint) |
 | Address (= State) | `state` | 🔒 display only; "request change (admin approval)" — state drives the draw pool, PRD forbids self-change |
-| DOB | **dummy** | 📝 placeholder — data exists in DB, backend must expose it |
+| DOB | `dob` (`GET /auth/me`) | 🔒 display only — real field (backend exposed it 2026-07-18); `PATCH /users/me` doesn't accept it. ISO date → formatted (`d MMM yyyy`). Null for seed accounts → `-`. |
 | Pay-ID email | **dummy** | 📝 placeholder — new field, backend must add |
 
-- Edit uses React Hook Form + Zod, a server action wrapping `PATCH /users/me` — only `fullName` and `phone` are sent. State/email/dob/pay-id are display or placeholder.
+- Edit uses React Hook Form + Zod, a server action wrapping `PATCH /users/me` — only `fullName` and `phone` are sent. State/email/dob are display; pay-id is placeholder.
+- `dob` is read from `/auth/me` (the `getMe` resource / `MeResult` DTO needs a `dob: string | null` field added). Read from `/auth/me`, not `/users/me` (the latter 400s — it validates a uuid `id` path param).
 - Email and State each show a "request change (admin approval)" affordance. There is **no member-facing endpoint** for either request today (admin changes state via `PATCH /users/{id}`), so the button routes to the existing support/contact flow until a request endpoint exists — see backend gaps.
 - Placeholder fields render with a visible "Placeholder — pending backend" badge so they never look like real data, and are disabled in edit mode.
 
@@ -101,12 +102,13 @@ Move `/account`'s content into this route and add the new sections. Order:
 
 ## 7. Backend Gaps to Report (from this client revision)
 
-1. **Expose `dob`** on `GET /auth/me` (or `/users/me`). Already collected at register + stored; just not returned. *(small)*
-2. **Add `pay_id_email`** — new column + read/write on `/users/me`. Confirm purpose with client (likely prize payout via PayID). *(medium)*
-3. **Member-facing change requests for `email` and `state`.** Both are admin-approval-only (state drives the draw pool). There is no member endpoint to *request* a change — admin edits state via `PATCH /users/{id}`. Either add a request endpoint, or confirm these go through the support/contact flow. Note the contradiction to resolve: `PATCH /users/me` currently accepts `state`, which shouldn't be self-service per PRD.
-4. Paid→paid upgrade + cancel endpoints must be wired in Ronde 3 to activate the disabled controls.
+1. **Add `pay_id_email`** — new column + read/write on `/users/me`. Confirm purpose with client (likely prize payout via PayID). *(medium)* — **the only remaining placeholder field.**
+2. **Member-facing change requests for `email` and `state`.** Both are admin-approval-only (state drives the draw pool). There is no member endpoint to *request* a change — admin edits state via `PATCH /users/{id}`. Either add a request endpoint, or confirm these go through the support/contact flow. Note the contradiction to resolve: `PATCH /users/me` currently accepts `state`, which shouldn't be self-service per PRD.
+3. Paid→paid upgrade + cancel endpoints must be wired in Ronde 3 to activate the disabled controls.
 
-**Dropped from the original list:** "Address" is no longer a backend gap — it reuses `state` (client decision 2026-07-18).
+**Resolved / dropped since first draft:**
+- ✅ **`dob` exposed** on `GET /auth/me` (backend added it 2026-07-18) — no longer a gap; profile reads it directly (display-only, since `PATCH /users/me` doesn't accept it).
+- **"Address"** dropped — reuses `state` (client decision 2026-07-18).
 
 ## 8. Verification
 
