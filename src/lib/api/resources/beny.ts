@@ -44,9 +44,9 @@ export const subscribeBeny = (token: string, body: BenySubscribePayload) =>
  *
  * Verified live 2026-07-17: `data` is `{ success, message }` (or `null`) — it does
  * NOT carry `beny_status`, so callers must assume "cancelled" or re-read
- * `getBenyStatus`. Returns 404 `NOT_FOUND` unless the subscription is already
- * `active`; a `pending_activation` member cannot cancel, which contradicts the
- * PRD ("user bisa cancel kapan saja"). See docs/BACKEND-ISSUES.md.
+ * `getBenyStatus`. Backend fix (2026-07-17) now accepts cancelling a
+ * `pending_activation` subscription too (not just `active`), matching the PRD
+ * ("user bisa cancel kapan saja"). See docs/BACKEND-ISSUES.md.
  */
 export const cancelBeny = (token: string) =>
     apiFetch<{ success?: boolean; message?: string } | null>(API.beny.subscribe, { method: 'DELETE', token });
