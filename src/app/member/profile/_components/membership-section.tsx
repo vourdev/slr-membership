@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-import { SUB_TIERS, TIER_VISUALS } from '@/constant/tiers';
-import { formatAud, formatShortDate } from '@/lib/member';
+import { formatAud, formatShortDate, formatTierName } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import type { BillingStatus, Invoice, PendingUpgrade, SubTierCode } from '@/types/member';
@@ -31,12 +30,6 @@ interface MembershipSectionProps {
     invoices: Invoice[];
 }
 
-function tierName(code: SubTierCode): string {
-    const meta = SUB_TIERS[code];
-
-    return meta.group === 'visitor' ? 'Visitor' : `SLR ${TIER_VISUALS[meta.group].label} · ${meta.label}`;
-}
-
 export function MembershipSection({
     subTier,
     priceCents,
@@ -58,7 +51,7 @@ export function MembershipSection({
             <div className='mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-white/5 pt-4'>
                 <div>
                     <p className='text-slr-dim text-xs tracking-widest uppercase'>Current plan</p>
-                    <p className='mt-0.5 text-lg font-semibold text-white'>{tierName(subTier)}</p>
+                    <p className='mt-0.5 text-lg font-semibold text-white'>{formatTierName(subTier)}</p>
                     <p className='text-slr-muted mt-1 text-sm'>
                         <span className='text-gradient-gold font-semibold'>{formatAud(priceCents)}</span> / 28-day cycle
                         · <span className={BILLING_TEXT[billingStatus]}>{billingStatus.replace('_', ' ')}</span>
@@ -89,8 +82,8 @@ export function MembershipSection({
                 <div className='mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#2878E84D] bg-[#0E1828] p-4'>
                     <p className='text-sm text-white/90'>
                         <span className='font-semibold'>Scheduled change:</span> switching to{' '}
-                        <span className='font-semibold'>{tierName(pending.to_sub_tier)}</span> at your next renewal on{' '}
-                        {formatShortDate(pending.effective_date)}.
+                        <span className='font-semibold'>{formatTierName(pending.to_sub_tier)}</span> at your next
+                        renewal on {formatShortDate(pending.effective_date)}.
                     </p>
                     <button
                         type='button'

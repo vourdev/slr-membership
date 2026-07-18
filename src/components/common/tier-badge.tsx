@@ -30,7 +30,12 @@ export function TierBadge({ subTier, size = 'md', showGroup = true, className }:
     const Icon = GROUP_ICON[meta.group];
     const sz = SIZES[size];
 
-    const label = meta.group === 'visitor' ? 'Visitor' : showGroup ? `${visual.label} · ${meta.label}` : meta.label;
+    const label =
+        meta.group === 'visitor'
+            ? 'Visitor'
+            : showGroup
+              ? `${visual.label} · ${meta.marketingName}`
+              : meta.marketingName;
 
     return (
         <span
