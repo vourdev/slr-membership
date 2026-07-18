@@ -469,3 +469,20 @@ POST /api/v1/auth/login
 **Frontend status:** the paid registration path is **still mocked** (`step-checkout.tsx` fakes the redirect); the wizard only creates accounts on the Visitor path. `POST /stripe/checkout` itself is **verified working** for an already-authenticated member (returns a real `{url, sessionId}`), and is now wired live on **`/account`** for Visitor→RED/BLUE upgrades.
 
 > **Test data:** a throwaway paid account (`fe-test-<timestamp>@example.com`, VIC, r4) was created in production during this check and is stuck unverified — safe to purge.
+
+---
+
+## ⚠️ `GET /api/v1/discounts/{id}` omits `isActive` — admin can't reactivate a deactivated discount via the edit form
+
+**Captured:** 2026-07-18 · **Account:** `admin@smartliferewards.com.au`
+
+Admin GET works (200, tier-gate lifted 2026-07-09). But the detail response omits the active flag:
+```
+GET /api/v1/discounts/{id} → 200
+data keys: discount_id, title, partner_name, description, category, is_featured,
+           code, terms, thumbnail_url, website_url, maps_url
+           # ← no is_active / isActive
+```
+`POST`/`PATCH` accept `isActive`, and the list/detail never return it. Consequence on the new admin discount **edit page** (`/dashboard/discounts/[id]`): the FE can't know the true state, so the Active switch defaults **ON**. The update payload gates `isActive` on the dirty flag (so an edit never *accidentally deactivates*), but that same gate means a genuinely **inactive** discount **cannot be reactivated** through the form — the switch already shows ON, toggling ON→OFF→ON un-dirties, and `isActive` is never sent.
+
+**Ask:** add `is_active` to `GET /api/v1/discounts/` and `GET /api/v1/discounts/{id}`. Once returned, the FE will seed the switch from the real value and both activate/deactivate work through the edit form. No frontend change resolves this — the true state is unknowable client-side.

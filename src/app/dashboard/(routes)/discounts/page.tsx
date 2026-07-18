@@ -11,9 +11,9 @@ export default async function DiscountsPage() {
     let rows: DiscountRow[] = [];
     let listError: ListError | null = null;
 
-    // The list is tier-gated to RED/BLUE members, so admin currently gets 403.
-    // We still attempt it and surface the exact error so it can be reported to
-    // the backend. If they open it up, the real rows render here automatically.
+    // Admin list returns 200 (tier-gate lifted 2026-07-09). The try/catch + error
+    // card stays as a defensive fallback so any future regression surfaces the
+    // exact backend error instead of a blank table.
     try {
         const discounts = token ? await getDiscounts(token) : [];
         rows = discounts.map((d) => ({
