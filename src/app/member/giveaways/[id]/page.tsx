@@ -47,9 +47,14 @@ async function loadGiveaway(id: string): Promise<GiveawayDetail | null> {
             getEntryHistory(token).catch(() => null)
         ]);
         const listItem = list.find((g) => g.giveaway_id === id);
-        const tokens = entries?.current_cycle?.total_token ?? 0;
 
-        return toGiveawayDetail(detail, listItem, tierGroupOf(member.sub_tier), member.state, tokens);
+        return toGiveawayDetail(
+            detail,
+            listItem,
+            tierGroupOf(member.sub_tier),
+            member.state,
+            entries?.current_cycle ?? null
+        );
     } catch (error) {
         handleApiAuthError(error); // expired session → force logout
 
