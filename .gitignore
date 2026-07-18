@@ -40,3 +40,5 @@ next-env.d.ts
 
 # claude code (per-user local settings)
 .claude/settings.local.json
+
+graphify-out/
