@@ -60,12 +60,14 @@ export async function getMemberProfile(): Promise<MemberProfile> {
     const id = await getSessionIdentity();
     const token = await getAccessToken();
     let dob: string | null = null;
-    let phone: string | null = PROFILE.phone;
+    let phone: string | null = null;
+    let fullName: string | null = null;
     if (token) {
         try {
             const me = await getMe(token);
             dob = me.dob;
             phone = me.phone;
+            fullName = me.full_name;
         } catch {
             dob = null; // profile still renders; dob shows "-"
         }
@@ -73,7 +75,7 @@ export async function getMemberProfile(): Promise<MemberProfile> {
 
     return {
         ...PROFILE,
-        name: id.name ?? PROFILE.name,
+        name: fullName ?? id.name ?? PROFILE.name,
         email: id.email ?? PROFILE.email,
         sub_tier: id.sub_tier ?? PROFILE.sub_tier,
         state: id.state ?? PROFILE.state,

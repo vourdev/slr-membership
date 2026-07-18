@@ -27,8 +27,6 @@ const INVOICE_TYPE: Record<string, string> = { initial: 'Initial', renewal: 'Ren
 
 export default async function MembershipPage() {
     const member = await getCurrentMember();
-    const subTier = subTierCodeOf(member.sub_tier);
-    const isVisitor = tierGroupOf(subTier) === 'visitor';
     const token = await getAccessToken();
 
     let billing: BillingStatus | null = null;
@@ -53,6 +51,8 @@ export default async function MembershipPage() {
         else handleApiAuthError(y.reason);
     }
 
+    const subTier = subTierCodeOf(membership?.subTierId ?? member.sub_tier);
+    const isVisitor = tierGroupOf(subTier) === 'visitor';
     const priceCents = membership?.subTier.priceCents ?? SUB_TIERS[subTier].price_cents;
 
     return (
