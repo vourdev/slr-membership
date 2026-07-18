@@ -472,17 +472,8 @@ POST /api/v1/auth/login
 
 ---
 
-## ⚠️ `GET /api/v1/discounts/{id}` omits `isActive` — admin can't reactivate a deactivated discount via the edit form
+## ~~`GET /api/v1/discounts/{id}` omits `isActive`~~ — RESOLVED (FE dropped the field)
 
-**Captured:** 2026-07-18 · **Account:** `admin@smartliferewards.com.au`
+**Captured:** 2026-07-18 · **Resolved:** 2026-07-18
 
-Admin GET works (200, tier-gate lifted 2026-07-09). But the detail response omits the active flag:
-```
-GET /api/v1/discounts/{id} → 200
-data keys: discount_id, title, partner_name, description, category, is_featured,
-           code, terms, thumbnail_url, website_url, maps_url
-           # ← no is_active / isActive
-```
-`POST`/`PATCH` accept `isActive`, and the list/detail never return it. Consequence on the new admin discount **edit page** (`/dashboard/discounts/[id]`): the FE can't know the true state, so the Active switch defaults **ON**. The update payload gates `isActive` on the dirty flag (so an edit never *accidentally deactivates*), but that same gate means a genuinely **inactive** discount **cannot be reactivated** through the form — the switch already shows ON, toggling ON→OFF→ON un-dirties, and `isActive` is never sent.
-
-**Ask:** add `is_active` to `GET /api/v1/discounts/` and `GET /api/v1/discounts/{id}`. Once returned, the FE will seed the switch from the real value and both activate/deactivate work through the edit form. No frontend change resolves this — the true state is unknowable client-side.
+The detail/list GET never returned `is_active`, so the admin edit form couldn't seed the Active switch or reactivate an inactive discount. Per client, the active toggle isn't needed in the admin UI — the FE removed `isActive` entirely from the discount form, DTOs, and table (2026-07-18). No backend change required. If active/inactive management is ever wanted again, backend must add `is_active` to `GET /discounts/` and `GET /discounts/{id}`.

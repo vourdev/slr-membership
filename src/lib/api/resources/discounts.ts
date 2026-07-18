@@ -34,7 +34,6 @@ export interface DiscountAdmin {
     websiteUrl: string | null;
     mapsUrl: string | null;
     isFeatured: boolean;
-    isActive: boolean;
     createdAt: string;
     updatedAt: string;
 }
@@ -50,7 +49,6 @@ export interface CreateDiscountPayload {
     websiteUrl?: string;
     mapsUrl?: string;
     isFeatured?: boolean;
-    isActive?: boolean;
 }
 
 // PATCH is a partial merge (verified: sending only { isFeatured } keeps description/terms).

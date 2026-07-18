@@ -21,8 +21,7 @@ export default async function DiscountsPage() {
             title: d.title || '-',
             partner: d.partner_name || '-',
             category: d.category || '-',
-            featured: d.is_featured ? 'Yes' : 'No',
-            active: '-'
+            featured: d.is_featured ? 'Yes' : 'No'
         }));
     } catch (error) {
         handleApiAuthError(error); // 401 only → force logout; 403 falls through

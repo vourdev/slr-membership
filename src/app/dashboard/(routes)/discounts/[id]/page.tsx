@@ -29,10 +29,7 @@ export default async function EditDiscountPage({ params }: EditDiscountPageProps
             thumbnailUrl: d.thumbnail_url ?? '',
             websiteUrl: d.website_url ?? '',
             mapsUrl: d.maps_url ?? '',
-            isFeatured: d.is_featured,
-            // GET /discounts/{id} doesn't expose isActive — default true so an edit
-            // doesn't accidentally deactivate a discount unless the admin toggles it.
-            isActive: true
+            isFeatured: d.is_featured
         };
 
         return <DiscountForm initialData={initialData} />;

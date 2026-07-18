@@ -20,7 +20,6 @@ export type DiscountRow = {
     partner: string;
     category: string;
     featured: string;
-    active: string;
 };
 
 export type ListError = {

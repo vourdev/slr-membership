@@ -12,7 +12,7 @@ import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import type { CreateDiscountPayload, UpdateDiscountPayload } from '@/lib/api/resources/discounts';
+import type { CreateDiscountPayload } from '@/lib/api/resources/discounts';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { createDiscountAction, updateDiscountAction } from '../actions';
@@ -32,8 +32,7 @@ const formSchema = z.object({
     thumbnailUrl: z.string().optional(),
     websiteUrl: z.string().optional(),
     mapsUrl: z.string().optional(),
-    isFeatured: z.boolean(),
-    isActive: z.boolean()
+    isFeatured: z.boolean()
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -51,7 +50,6 @@ interface DiscountFormProps {
         websiteUrl: string;
         mapsUrl: string;
         isFeatured: boolean;
-        isActive: boolean;
     };
 }
 
@@ -73,8 +71,7 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
               thumbnailUrl: initialData.thumbnailUrl,
               websiteUrl: initialData.websiteUrl,
               mapsUrl: initialData.mapsUrl,
-              isFeatured: initialData.isFeatured,
-              isActive: initialData.isActive
+              isFeatured: initialData.isFeatured
           }
         : {
               title: '',
@@ -86,8 +83,7 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
               thumbnailUrl: '',
               websiteUrl: '',
               mapsUrl: '',
-              isFeatured: false,
-              isActive: true
+              isFeatured: false
           };
 
     const form = useForm<FormValues>({
@@ -107,16 +103,12 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
                 thumbnailUrl: values.thumbnailUrl ?? '',
                 websiteUrl: values.websiteUrl ?? '',
                 mapsUrl: values.mapsUrl ?? '',
-                isFeatured: values.isFeatured,
-                isActive: values.isActive
+                isFeatured: values.isFeatured
             };
 
             let res;
             if (initialData) {
-                const { isActive, ...rest } = payload;
-                const updatePayload: UpdateDiscountPayload = form.formState.dirtyFields.isActive ? payload : rest;
-
-                res = await updateDiscountAction(initialData.id, updatePayload);
+                res = await updateDiscountAction(initialData.id, payload);
             } else {
                 res = await createDiscountAction(payload);
             }
@@ -278,32 +270,18 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
                             />
                         </div>
 
-                        <div className='flex gap-8'>
-                            <FormField
-                                control={form.control}
-                                name='isFeatured'
-                                render={({ field }) => (
-                                    <FormItem className='flex items-center gap-2'>
-                                        <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
-                                        <FormLabel className='mt-0!'>Featured</FormLabel>
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='isActive'
-                                render={({ field }) => (
-                                    <FormItem className='flex items-center gap-2'>
-                                        <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
-                                        <FormLabel className='mt-0!'>Active</FormLabel>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        <FormField
+                            control={form.control}
+                            name='isFeatured'
+                            render={({ field }) => (
+                                <FormItem className='flex items-center gap-2'>
+                                    <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                    </FormControl>
+                                    <FormLabel className='mt-0!'>Featured</FormLabel>
+                                </FormItem>
+                            )}
+                        />
 
                         <div className='flex justify-end gap-3 border-t border-white/10 pt-6'>
                             <Button type='button' variant='outline' asChild>
