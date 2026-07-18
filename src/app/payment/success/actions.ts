@@ -3,6 +3,7 @@
 import { getBillingStatus } from '@/lib/api/resources/billing';
 import { getMyMembership } from '@/lib/api/resources/memberships';
 import { getAccessToken } from '@/lib/api/server';
+import { formatTierName, subTierCodeOf } from '@/lib/member';
 
 export interface ActivationState {
     /** false = no app session (e.g. checked out without logging in) → show a generic success. */
@@ -23,8 +24,7 @@ export async function checkActivation(): Promise<ActivationState> {
             getMyMembership(token).catch(() => null)
         ]);
 
-        const tier = membership?.subTier;
-        const tierLabel = tier ? `SLR ${tier.tier}${tier.marketingName ? ` · ${tier.marketingName}` : ''}` : undefined;
+        const tierLabel = membership ? formatTierName(subTierCodeOf(membership.subTierId)) : undefined;
 
         return {
             authed: true,
