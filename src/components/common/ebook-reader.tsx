@@ -124,9 +124,9 @@ export function EbookReader({
                 />
             </div>
 
-            <div className='grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]'>
+            <div className='grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)]'>
                 {/* Sidebar — sticky table of contents with reading progress */}
-                <aside className='hidden lg:block lg:border-r lg:border-white/10 lg:pr-10'>
+                <aside className='hidden xl:block xl:border-r xl:border-white/10 xl:pr-10'>
                     <div className='sticky top-30'>
                         <div className='flex items-center gap-2'>
                             <span className='bg-slr-gold-label h-1.5 w-1.5 animate-pulse rounded-full' />
@@ -210,7 +210,10 @@ export function EbookReader({
                             <Fragment key={chapter.num}>
                                 {index > 0 && <DiamondSeparator className='py-12 md:py-16' />}
 
-                                <article id={`chapter-${chapter.num}`} data-chapter-index={index} className='scroll-mt-24'>
+                                <article
+                                    id={`chapter-${chapter.num}`}
+                                    data-chapter-index={index}
+                                    className='scroll-mt-24'>
                                     {isHtml && (
                                         <style
                                             dangerouslySetInnerHTML={{
@@ -289,7 +292,7 @@ export function EbookReader({
                                     <div className='mt-6 space-y-5'>
                                         {isHtml ? (
                                             <div
-                                                className='prose prose-invert max-w-none text-slr-muted text-sm leading-relaxed md:text-base space-y-5 tiptap'
+                                                className='prose prose-invert text-slr-muted tiptap max-w-none space-y-5 text-sm leading-relaxed md:text-base'
                                                 dangerouslySetInnerHTML={{ __html: chapter.body[0] }}
                                             />
                                         ) : (
@@ -313,7 +316,7 @@ export function EbookReader({
                                         )}
 
                                         {chapter.quote && isHtml && (
-                                            <blockquote className='border-slr-gold-label text-slr-gold-label border-l-[3px] py-1 pl-4 text-base font-semibold italic md:text-lg my-6'>
+                                            <blockquote className='border-slr-gold-label text-slr-gold-label my-6 border-l-[3px] py-1 pl-4 text-base font-semibold italic md:text-lg'>
                                                 &ldquo;{chapter.quote}&rdquo;
                                             </blockquote>
                                         )}

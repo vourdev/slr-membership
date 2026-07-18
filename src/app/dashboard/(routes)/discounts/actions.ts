@@ -2,12 +2,12 @@
 
 import {
     type CreateDiscountPayload,
-    type Discount,
     type DiscountAdmin,
+    type PresignedUrlResponse,
     type UpdateDiscountPayload,
     createDiscount,
     deleteDiscount,
-    getDiscount,
+    getDiscountPresignedUrl,
     updateDiscount
 } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
@@ -52,20 +52,6 @@ export async function createDiscountAction(payload: CreateDiscountPayload): Prom
     }
 }
 
-/** Fetch one discount to prefill the edit form. Admin GET works since 2026-07-09 (was 403). */
-export async function getDiscountAction(id: string): Promise<ActionResult<Discount>> {
-    const token = await getAccessToken();
-    if (!token) return { ok: false, message: 'Not authenticated.' };
-
-    try {
-        const data = await getDiscount(id, token);
-
-        return { ok: true, data, message: 'OK' };
-    } catch (error) {
-        return toActionError(error);
-    }
-}
-
 export async function updateDiscountAction(
     id: string,
     payload: UpdateDiscountPayload
@@ -90,6 +76,22 @@ export async function deleteDiscountAction(id: string): Promise<ActionResult<nul
         await deleteDiscount(token, id);
 
         return { ok: true, data: null, message: 'Discount deleted.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function getDiscountPresignedUrlAction(
+    filename: string,
+    contentType: string
+): Promise<ActionResult<PresignedUrlResponse>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await getDiscountPresignedUrl(token, { filename, contentType });
+
+        return { ok: true, data, message: 'Upload URL generated.' };
     } catch (error) {
         return toActionError(error);
     }

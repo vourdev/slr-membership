@@ -501,3 +501,11 @@ Once these are live and verified, the frontend just needs to swap the "Coming so
 
 - **`dob`** — now exposed on `GET /auth/me` (backend added it 2026-07-18). Profile reads it directly; display-only since `PATCH /users/me` doesn't accept it.
 - **`address`** — dropped as a separate field; reuses the existing `state` (client decision 2026-07-18). No backend change needed beyond item 2 above.
+
+---
+
+## ~~`GET /api/v1/discounts/{id}` omits `isActive`~~ — RESOLVED (FE dropped the field)
+
+**Captured:** 2026-07-18 · **Resolved:** 2026-07-18
+
+The detail/list GET never returned `is_active`, so the admin edit form couldn't seed the Active switch or reactivate an inactive discount. Per client, the active toggle isn't needed in the admin UI — the FE removed `isActive` entirely from the discount form, DTOs, and table (2026-07-18). No backend change required. If active/inactive management is ever wanted again, backend must add `is_active` to `GET /discounts/` and `GET /discounts/{id}`.

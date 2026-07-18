@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { ImageUploadField } from '@/components/common/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import Heading from '@/components/ui/heading';
@@ -17,7 +18,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { createEbookAction, deleteChapterAction, updateEbookAction } from '../actions';
 import { ChapterDialog } from './chapter-dialog';
-import { ImageUploadField } from './image-upload-field';
 import { uploadEbookAsset } from './upload-asset';
 import { ArrowLeft, Info, Loader2Icon } from 'lucide-react';
 import { type Resolver, useForm } from 'react-hook-form';
@@ -104,25 +104,25 @@ export function EbookForm({ initialData }: EbookFormProps) {
 
     const defaultValues: FormValues = initialData
         ? {
-            title: initialData.title,
-            subtitle: initialData.subtitle,
-            coverUrl: initialData.coverUrl,
-            description: initialData.description,
-            category: initialData.category,
-            footnote: initialData.footnote,
-            tierAccess: initialData.tierAccess,
-            readingTimeMinutes: initialData.readingTimeMinutes
-        }
+              title: initialData.title,
+              subtitle: initialData.subtitle,
+              coverUrl: initialData.coverUrl,
+              description: initialData.description,
+              category: initialData.category,
+              footnote: initialData.footnote,
+              tierAccess: initialData.tierAccess,
+              readingTimeMinutes: initialData.readingTimeMinutes
+          }
         : {
-            title: '',
-            subtitle: '',
-            coverUrl: '',
-            description: '',
-            category: '',
-            footnote: '',
-            tierAccess: 'RED',
-            readingTimeMinutes: 0
-        };
+              title: '',
+              subtitle: '',
+              coverUrl: '',
+              description: '',
+              category: '',
+              footnote: '',
+              tierAccess: 'RED',
+              readingTimeMinutes: 0
+          };
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema) as Resolver<FormValues>,
@@ -212,7 +212,11 @@ export function EbookForm({ initialData }: EbookFormProps) {
                                     <FormItem>
                                         <FormLabel>Cover image</FormLabel>
                                         <FormControl>
-                                            <ImageUploadField value={field.value} onChange={field.onChange} />
+                                            <ImageUploadField
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                onUpload={uploadEbookAsset}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

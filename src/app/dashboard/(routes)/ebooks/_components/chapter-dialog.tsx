@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 
+import { ImageUploadField } from '@/components/common/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { createChapterAction, updateChapterAction } from '../actions';
-import { ImageUploadField } from './image-upload-field';
 import { uploadEbookAsset } from './upload-asset';
 import { ChevronRight, Loader2Icon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -226,6 +226,7 @@ export function ChapterDialog({ isOpen, onClose, ebookId, chapter, onSuccess }: 
                                                         <ImageUploadField
                                                             value={field.value}
                                                             onChange={field.onChange}
+                                                            onUpload={uploadEbookAsset}
                                                             placeholder='https://example.com/image.webp'
                                                         />
                                                     </FormControl>

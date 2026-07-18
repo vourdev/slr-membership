@@ -8,11 +8,13 @@ import { inputClassName } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 
 import { DiscountCard } from './discount-card';
+import { DiscountDetailDialog } from './discount-detail-dialog';
 import { Search } from 'lucide-react';
 
 export function DiscountsExplorer({ discounts, categories }: { discounts: Discount[]; categories: readonly string[] }) {
     const [query, setQuery] = useState('');
     const [category, setCategory] = useState('All');
+    const [selected, setSelected] = useState<Discount | null>(null);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -63,12 +65,14 @@ export function DiscountsExplorer({ discounts, categories }: { discounts: Discou
             {filtered.length > 0 ? (
                 <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                     {filtered.map((d) => (
-                        <DiscountCard key={d.discount_id} discount={d} />
+                        <DiscountCard key={d.discount_id} discount={d} onSelect={setSelected} />
                     ))}
                 </div>
             ) : (
                 <p className='text-slr-dim py-10 text-center text-sm'>No partners match your search.</p>
             )}
+
+            <DiscountDetailDialog discount={selected} onClose={() => setSelected(null)} />
         </div>
     );
 }

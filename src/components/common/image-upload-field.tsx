@@ -7,18 +7,25 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-import { uploadEbookAsset } from './upload-asset';
 import { ImageUp, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ImageUploadFieldProps {
     value?: string;
     onChange: (url: string) => void;
+    /** Uploads the picked file and resolves to its public URL. */
+    onUpload: (file: File) => Promise<string>;
     placeholder?: string;
     disabled?: boolean;
 }
 
-export function ImageUploadField({ value, onChange, placeholder = 'https://…', disabled }: ImageUploadFieldProps) {
+export function ImageUploadField({
+    value,
+    onChange,
+    onUpload,
+    placeholder = 'https://…',
+    disabled
+}: ImageUploadFieldProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -36,7 +43,7 @@ export function ImageUploadField({ value, onChange, placeholder = 'https://…',
         setIsUploading(true);
         const toastId = toast.loading('Uploading image…');
         try {
-            const url = await uploadEbookAsset(file);
+            const url = await onUpload(file);
             onChange(url);
             toast.success('Image uploaded.', { id: toastId });
         } catch (error) {
