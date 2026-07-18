@@ -34,14 +34,19 @@ export function DiscountDetailDialog({ discount, onClose }: { discount: Discount
                     <div className='grid gap-6 md:grid-cols-2'>
                         {/* Left: identity + code */}
                         <div className='space-y-4'>
-                            <div className='bg-slr-navy-card border-slr-navy-border relative aspect-video overflow-hidden rounded-xl border'>
+                            <div
+                                className={
+                                    discount.thumbnail_url
+                                        ? 'relative aspect-video overflow-hidden rounded-xl'
+                                        : 'bg-slr-navy-card border-slr-navy-border relative aspect-video overflow-hidden rounded-xl border'
+                                }>
                                 {discount.thumbnail_url ? (
                                     <Image
                                         src={discount.thumbnail_url}
                                         alt=''
                                         fill
                                         unoptimized
-                                        className='object-contain p-3'
+                                        className='object-cover'
                                     />
                                 ) : (
                                     <span className='text-slr-dim flex h-full w-full items-center justify-center text-3xl font-bold'>

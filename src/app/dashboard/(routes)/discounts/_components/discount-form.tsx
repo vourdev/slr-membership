@@ -12,7 +12,7 @@ import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import type { CreateDiscountPayload } from '@/lib/api/resources/discounts';
+import type { CreateDiscountPayload, UpdateDiscountPayload } from '@/lib/api/resources/discounts';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { createDiscountAction, updateDiscountAction } from '../actions';
@@ -111,9 +111,15 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
                 isActive: values.isActive
             };
 
-            const res = initialData
-                ? await updateDiscountAction(initialData.id, payload)
-                : await createDiscountAction(payload);
+            let res;
+            if (initialData) {
+                const { isActive, ...rest } = payload;
+                const updatePayload: UpdateDiscountPayload = form.formState.dirtyFields.isActive ? payload : rest;
+
+                res = await updateDiscountAction(initialData.id, updatePayload);
+            } else {
+                res = await createDiscountAction(payload);
+            }
 
             if (res.ok) {
                 toast.success(res.message);
