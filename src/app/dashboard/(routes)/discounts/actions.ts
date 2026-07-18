@@ -4,10 +4,12 @@ import {
     type CreateDiscountPayload,
     type Discount,
     type DiscountAdmin,
+    type PresignedUrlResponse,
     type UpdateDiscountPayload,
     createDiscount,
     deleteDiscount,
     getDiscount,
+    getDiscountPresignedUrl,
     updateDiscount
 } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
@@ -90,6 +92,22 @@ export async function deleteDiscountAction(id: string): Promise<ActionResult<nul
         await deleteDiscount(token, id);
 
         return { ok: true, data: null, message: 'Discount deleted.' };
+    } catch (error) {
+        return toActionError(error);
+    }
+}
+
+export async function getDiscountPresignedUrlAction(
+    filename: string,
+    contentType: string
+): Promise<ActionResult<PresignedUrlResponse>> {
+    const token = await getAccessToken();
+    if (!token) return { ok: false, message: 'Not authenticated.' };
+
+    try {
+        const data = await getDiscountPresignedUrl(token, { filename, contentType });
+
+        return { ok: true, data, message: 'Upload URL generated.' };
     } catch (error) {
         return toActionError(error);
     }

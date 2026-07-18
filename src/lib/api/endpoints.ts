@@ -35,7 +35,8 @@ export const API = {
         create: '/api/v1/discounts/',
         detail: (id: string) => `/api/v1/discounts/${id}`,
         update: (id: string) => `/api/v1/discounts/${id}`,
-        remove: (id: string) => `/api/v1/discounts/${id}`
+        remove: (id: string) => `/api/v1/discounts/${id}`,
+        presignedUrl: '/api/v1/discounts/presigned-url'
     },
     beny: {
         status: '/api/v1/beny/status',

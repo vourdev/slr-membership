@@ -16,6 +16,9 @@ export interface Discount {
     // there is no separate value_label. `code` + `terms` are returned by the member API.
     code?: string | null;
     terms?: string | null;
+    thumbnail_url: string | null;
+    website_url: string | null;
+    maps_url: string | null;
 }
 
 // Admin create/patch responses are camelCase and richer than the member list DTO.
@@ -27,6 +30,9 @@ export interface DiscountAdmin {
     category: string;
     code: string | null;
     terms: string | null;
+    thumbnailUrl: string | null;
+    websiteUrl: string | null;
+    mapsUrl: string | null;
     isFeatured: boolean;
     isActive: boolean;
     createdAt: string;
@@ -38,6 +44,11 @@ export interface CreateDiscountPayload {
     partnerName: string;
     category: string;
     description?: string;
+    code?: string;
+    terms?: string;
+    thumbnailUrl?: string;
+    websiteUrl?: string;
+    mapsUrl?: string;
     isFeatured?: boolean;
     isActive?: boolean;
 }
@@ -68,3 +79,12 @@ export const updateDiscount = (token: string, id: string, body: UpdateDiscountPa
 /** Admin: delete a discount by id. */
 export const deleteDiscount = (token: string, id: string) =>
     apiFetch<null>(API.discounts.remove(id), { method: 'DELETE', token });
+
+export interface PresignedUrlResponse {
+    upload_url: string;
+    download_url: string;
+    object_key: string;
+}
+
+export const getDiscountPresignedUrl = (token: string, body: { filename: string; contentType: string }) =>
+    apiFetch<PresignedUrlResponse>(API.discounts.presignedUrl, { method: 'POST', token, body });
