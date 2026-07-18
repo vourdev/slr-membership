@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 
+import { ImageUploadField } from '@/components/common/image-upload-field';
 import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { discountsColumns } from './_components/columns';
 import { createDiscountAction, deleteDiscountAction, getDiscountAction, updateDiscountAction } from './actions';
+import { uploadDiscountAsset } from './upload-asset';
 import { Loader2Icon, Plus, TriangleAlert } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -48,6 +50,11 @@ const formSchema = z.object({
     partnerName: z.string().min(1, 'Partner name is required'),
     category: z.string().min(1, 'Category is required'),
     description: z.string().optional(),
+    code: z.string().optional(),
+    terms: z.string().optional(),
+    thumbnailUrl: z.string().optional(),
+    websiteUrl: z.string().optional(),
+    mapsUrl: z.string().optional(),
     isFeatured: z.boolean(),
     isActive: z.boolean()
 });
@@ -114,12 +121,36 @@ export function DiscountsClient({
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
-        defaultValues: { title: '', partnerName: '', category: '', description: '', isFeatured: false, isActive: true }
+        defaultValues: {
+            title: '',
+            partnerName: '',
+            category: '',
+            description: '',
+            code: '',
+            terms: '',
+            thumbnailUrl: '',
+            websiteUrl: '',
+            mapsUrl: '',
+            isFeatured: false,
+            isActive: true
+        }
     });
 
     const openCreate = () => {
         setEditing(null);
-        form.reset({ title: '', partnerName: '', category: '', description: '', isFeatured: false, isActive: true });
+        form.reset({
+            title: '',
+            partnerName: '',
+            category: '',
+            description: '',
+            code: '',
+            terms: '',
+            thumbnailUrl: '',
+            websiteUrl: '',
+            mapsUrl: '',
+            isFeatured: false,
+            isActive: true
+        });
         setDialogOpen(true);
     };
 
@@ -133,6 +164,11 @@ export function DiscountsClient({
             partnerName: row.partner === '-' ? '' : row.partner,
             category: row.category === '-' ? '' : row.category,
             description: full?.description ?? '',
+            code: full?.code ?? '',
+            terms: full?.terms ?? '',
+            thumbnailUrl: full?.thumbnailUrl ?? '',
+            websiteUrl: full?.websiteUrl ?? '',
+            mapsUrl: full?.mapsUrl ?? '',
             isFeatured: row.featured === 'Yes',
             isActive: full ? full.isActive : true
         });
@@ -149,6 +185,11 @@ export function DiscountsClient({
                         partnerName: res.data.partner_name || '',
                         category: res.data.category || '',
                         description: res.data.description ?? '',
+                        code: res.data.code ?? '',
+                        terms: res.data.terms ?? '',
+                        thumbnailUrl: res.data.thumbnail_url ?? '',
+                        websiteUrl: res.data.website_url ?? '',
+                        mapsUrl: res.data.maps_url ?? '',
                         isFeatured: res.data.is_featured,
                         isActive: form.getValues('isActive')
                     });
@@ -175,6 +216,11 @@ export function DiscountsClient({
                     category: values.category,
                     isFeatured: values.isFeatured,
                     description: values.description ?? '',
+                    code: values.code ?? '',
+                    terms: values.terms ?? '',
+                    thumbnailUrl: values.thumbnailUrl ?? '',
+                    websiteUrl: values.websiteUrl ?? '',
+                    mapsUrl: values.mapsUrl ?? '',
                     ...(sendActive ? { isActive: values.isActive } : {})
                 };
                 const res = await updateDiscountAction(editing.id, payload);
@@ -296,9 +342,78 @@ export function DiscountsClient({
                                 name='description'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Description</FormLabel>
+                                        <FormLabel>Short description</FormLabel>
                                         <FormControl>
                                             <Textarea rows={3} placeholder='Optional details' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='thumbnailUrl'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Thumbnail</FormLabel>
+                                        <FormControl>
+                                            <ImageUploadField
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                onUpload={uploadDiscountAsset}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='code'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Code</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder='SLR-XXXX' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='terms'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Long description (merchant + how to claim)</FormLabel>
+                                        <FormControl>
+                                            <Textarea rows={5} placeholder='Merchant info + how to claim' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='websiteUrl'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Website URL</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder='https://…' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='mapsUrl'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Maps URL</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder='https://maps.google.com/…' {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
