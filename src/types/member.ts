@@ -208,6 +208,7 @@ export interface PendingUpgrade {
 export interface MemberProfile {
     name: string;
     email: string;
+    phone: string | null; // from live /auth/me, "-" in UI when null
     sub_tier: SubTierCode;
     state: string;
     dob: string | null; // ISO — from live /auth/me, "-" in UI when null

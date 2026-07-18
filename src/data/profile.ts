@@ -13,6 +13,7 @@ import type { MemberProfile } from '@/types/member';
 const PROFILE: MemberProfile = {
     name: 'James Carter',
     email: 'james.carter@example.com',
+    phone: '+61400000000',
     sub_tier: 'R4',
     state: 'NSW',
     dob: null,
@@ -59,9 +60,12 @@ export async function getMemberProfile(): Promise<MemberProfile> {
     const id = await getSessionIdentity();
     const token = await getAccessToken();
     let dob: string | null = null;
+    let phone: string | null = PROFILE.phone;
     if (token) {
         try {
-            dob = (await getMe(token)).dob;
+            const me = await getMe(token);
+            dob = me.dob;
+            phone = me.phone;
         } catch {
             dob = null; // profile still renders; dob shows "-"
         }
@@ -73,6 +77,7 @@ export async function getMemberProfile(): Promise<MemberProfile> {
         email: id.email ?? PROFILE.email,
         sub_tier: id.sub_tier ?? PROFILE.sub_tier,
         state: id.state ?? PROFILE.state,
-        dob
+        dob,
+        phone
     };
 }

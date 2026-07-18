@@ -65,6 +65,7 @@ export const API = {
         read: (id: string) => `/api/v1/notifications/${id}/read`
     },
     users: {
+        me: '/api/v1/users/me',
         update: (id: string) => `/api/v1/users/${id}`
     },
     billing: {
