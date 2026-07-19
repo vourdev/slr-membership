@@ -17,6 +17,7 @@ export interface Discount {
     code?: string | null;
     terms?: string | null;
     thumbnail_url: string | null;
+    logo_url: string | null;
     website_url: string | null;
     maps_url: string | null;
 }
@@ -31,6 +32,7 @@ export interface DiscountAdmin {
     code: string | null;
     terms: string | null;
     thumbnailUrl: string | null;
+    logoUrl: string | null;
     websiteUrl: string | null;
     mapsUrl: string | null;
     isFeatured: boolean;
@@ -46,6 +48,7 @@ export interface CreateDiscountPayload {
     code?: string;
     terms?: string;
     thumbnailUrl?: string;
+    logoUrl?: string;
     websiteUrl?: string;
     mapsUrl?: string;
     isFeatured?: boolean;

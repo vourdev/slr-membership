@@ -27,6 +27,7 @@ export default async function EditDiscountPage({ params }: EditDiscountPageProps
             terms: d.terms ?? '',
             code: d.code ?? '',
             thumbnailUrl: d.thumbnail_url ?? '',
+            logoUrl: d.logo_url ?? '',
             websiteUrl: d.website_url ?? '',
             mapsUrl: d.maps_url ?? '',
             isFeatured: d.is_featured

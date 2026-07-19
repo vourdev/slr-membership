@@ -30,6 +30,7 @@ const formSchema = z.object({
     code: z.string().optional(),
     terms: z.string().optional(),
     thumbnailUrl: z.string().optional(),
+    logoUrl: z.string().optional(),
     websiteUrl: z.string().optional(),
     mapsUrl: z.string().optional(),
     isFeatured: z.boolean()
@@ -47,6 +48,7 @@ interface DiscountFormProps {
         terms: string;
         code: string;
         thumbnailUrl: string;
+        logoUrl: string;
         websiteUrl: string;
         mapsUrl: string;
         isFeatured: boolean;
@@ -69,6 +71,7 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
               code: initialData.code,
               terms: initialData.terms,
               thumbnailUrl: initialData.thumbnailUrl,
+              logoUrl: initialData.logoUrl,
               websiteUrl: initialData.websiteUrl,
               mapsUrl: initialData.mapsUrl,
               isFeatured: initialData.isFeatured
@@ -81,6 +84,7 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
               code: '',
               terms: '',
               thumbnailUrl: '',
+              logoUrl: '',
               websiteUrl: '',
               mapsUrl: '',
               isFeatured: false
@@ -101,6 +105,7 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
                 code: values.code ?? '',
                 terms: values.terms ?? '',
                 thumbnailUrl: values.thumbnailUrl ?? '',
+                logoUrl: values.logoUrl ?? '',
                 websiteUrl: values.websiteUrl ?? '',
                 mapsUrl: values.mapsUrl ?? '',
                 isFeatured: values.isFeatured
@@ -240,6 +245,24 @@ export function DiscountForm({ initialData }: DiscountFormProps) {
                                 )}
                             />
                         </div>
+
+                        <FormField
+                            control={form.control}
+                            name='logoUrl'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Logo</FormLabel>
+                                    <FormControl>
+                                        <ImageUploadField
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            onUpload={uploadDiscountAsset}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                             <FormField
