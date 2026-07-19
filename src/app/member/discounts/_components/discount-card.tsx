@@ -11,38 +11,35 @@ export function DiscountCard({ discount, onSelect }: { discount: Discount; onSel
     const initial = (discount.partner_name || discount.title || '?').charAt(0).toUpperCase();
 
     return (
-        <div className='bg-card-dark-navy border-slr-navy-border hover:border-slr-gold-label/40 flex w-full flex-col gap-3 rounded-2xl border p-4 transition-colors'>
-            {discount.thumbnail_url ? (
-                <div className='relative flex h-28 w-full items-center justify-center'>
-                    <Image src={discount.thumbnail_url} alt='' fill unoptimized className='object-contain p-2' />
-                </div>
-            ) : (
-                <div className='bg-slr-navy-card border-slr-navy-border flex h-28 w-full items-center justify-center rounded-xl border'>
-                    <span className='text-slr-gold-label text-3xl font-bold'>{initial}</span>
-                </div>
-            )}
-
-            <div className='border-slr-gold-label/40 bg-gold-tint rounded-lg border px-3 py-2 text-center'>
-                <p className='line-clamp-2 text-sm text-white'>{discount.title || '-'}</p>
+        <div className='bg-card-dark-navy border-slr-navy-border hover:border-slr-gold-label/40 flex w-full flex-col overflow-hidden rounded-2xl border transition-colors'>
+            <div className='bg-slr-navy-card relative flex h-36 w-full items-center justify-center'>
+                {discount.thumbnail_url ? (
+                    <Image src={discount.thumbnail_url} alt='' fill unoptimized className='object-cover' />
+                ) : (
+                    <span className='text-slr-gold-label text-4xl font-bold'>{initial}</span>
+                )}
             </div>
 
-            <p className='truncate font-semibold text-white'>{discount.partner_name || '-'}</p>
+            <div className='flex flex-col gap-2 p-4'>
+                <h3 className='line-clamp-2 text-base font-semibold text-white'>{discount.title || '-'}</h3>
+                <p className='text-slr-muted truncate text-sm'>{discount.partner_name || '-'}</p>
 
-            {discount.description ? (
-                <p className='text-slr-muted line-clamp-2 text-xs'>{discount.description}</p>
-            ) : null}
+                {discount.description ? (
+                    <p className='text-slr-dim line-clamp-2 text-xs'>{discount.description}</p>
+                ) : null}
 
-            <span className='text-slr-dim inline-flex w-fit items-center gap-1 text-xs'>
-                <Tag className='size-3' /> {discount.category || '-'}
-            </span>
+                <span className='text-slr-dim inline-flex w-fit items-center gap-1 text-xs'>
+                    <Tag className='size-3' /> {discount.category || '-'}
+                </span>
 
-            <button
-                type='button'
-                onClick={() => onSelect(discount)}
-                className='mt-1 h-11 w-full rounded-xl text-sm font-bold uppercase'
-                style={goldButtonStyle}>
-                Claim Deal
-            </button>
+                <button
+                    type='button'
+                    onClick={() => onSelect(discount)}
+                    className='mt-1 h-11 w-full rounded-xl text-sm font-bold uppercase'
+                    style={goldButtonStyle}>
+                    Claim Deal
+                </button>
+            </div>
         </div>
     );
 }
