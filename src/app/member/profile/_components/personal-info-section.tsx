@@ -11,15 +11,6 @@ import { updateProfileAction } from '../actions';
 import { Lock, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Placeholder = backend has no field/self-edit yet (see docs/BACKEND-ISSUES.md).
-function Placeholder() {
-    return (
-        <span className='ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-400 uppercase'>
-            Placeholder
-        </span>
-    );
-}
-
 interface PersonalInfoSectionProps {
     profile: MemberProfile;
 }
@@ -84,10 +75,6 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
                 </Row>
                 <Row label='Date of Birth'>
                     <span className='text-white/90'>{profile.dob ? formatShortDate(profile.dob) : '-'}</span>
-                </Row>
-                <Row label='Pay-ID Email'>
-                    <span className='text-white/60'>{profile.pay_id_email || '-'}</span>
-                    <Placeholder />
                 </Row>
             </dl>
 

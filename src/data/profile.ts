@@ -17,7 +17,6 @@ const PROFILE: MemberProfile = {
     sub_tier: 'R4',
     state: 'NSW',
     dob: null,
-    pay_id_email: 'payid@example.com',
     member_id: 'SLR-NSW-004821',
     joined_at: '2026-02-13',
     billing_status: 'active',
