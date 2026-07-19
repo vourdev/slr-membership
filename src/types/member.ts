@@ -212,7 +212,6 @@ export interface MemberProfile {
     sub_tier: SubTierCode;
     state: string;
     dob: string | null; // ISO — from live /auth/me, "-" in UI when null
-    pay_id_email: string | null; // PayID payout email (placeholder until the endpoint lands)
     member_id: string; // shown on the digital card / QR
     joined_at: string; // ISO
     billing_status: BillingStatus;
