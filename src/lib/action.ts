@@ -1,5 +1,4 @@
 'use server';
-import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
 
 import { auth, signIn } from '@/auth';
@@ -68,5 +67,10 @@ export const signInCredentials = async (prevState: unknown, formData: FormData) 
     // enforces the same split as a fallback.
     const session = await auth();
     const role = ((session?.user as { role?: string })?.role ?? '').toLowerCase();
-    redirect(role.includes('admin') ? '/dashboard' : '/member');
+
+    // Return the target instead of redirect() so the client does a full-page
+    // navigation (window.location). A hard load always fetches HTML matching the
+    // live deployment, avoiding the post-login chunk/RSC skew error right after a
+    // redeploy (a soft RSC redirect would try to fetch the stale build's payload).
+    return { success: true as const, redirectTo: role.includes('admin') ? '/dashboard' : '/member' };
 };

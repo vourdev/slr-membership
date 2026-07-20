@@ -27,6 +27,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
     const [showPassword, setShowPassword] = useState(false);
 
+    // Full-page navigation on success (not router.push) so login always lands on
+    // HTML from the live deployment — sidesteps post-redeploy chunk/RSC skew.
+    const redirectTo = state && 'success' in state ? state.redirectTo : undefined;
+    React.useEffect(() => {
+        if (redirectTo) window.location.href = redirectTo;
+    }, [redirectTo]);
+    const isRedirecting = Boolean(redirectTo);
+
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
@@ -105,7 +113,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                             </div>
 
                             <div className='flex flex-col gap-3 pt-2'>
-                                {isPending ? (
+                                {isPending || isRedirecting ? (
                                     <Button
                                         disabled
                                         style={goldBgStyle}
