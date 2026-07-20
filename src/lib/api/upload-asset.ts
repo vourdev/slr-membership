@@ -16,7 +16,7 @@ interface PresignErr {
  */
 export async function uploadViaPresign(
     file: File,
-    getPresigned: (filename: string, contentType: string) => Promise<PresignOk | PresignErr>
+    getPresigned: (filename: string, contentType: string, fileSize: number) => Promise<PresignOk | PresignErr>
 ): Promise<string> {
     const dot = file.name.lastIndexOf('.');
     const ext = dot >= 0 ? file.name.slice(dot).toLowerCase() : '';
@@ -27,7 +27,7 @@ export async function uploadViaPresign(
             .slice(0, 40) || 'image';
     const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${base}${ext}`;
 
-    const res = await getPresigned(uniqueName, file.type);
+    const res = await getPresigned(uniqueName, file.type, file.size);
     if (!res.ok) {
         console.error('[upload] presigned URL request failed', res);
         throw new Error(res.message);

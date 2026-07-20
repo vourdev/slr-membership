@@ -83,13 +83,14 @@ export async function deleteDiscountAction(id: string): Promise<ActionResult<nul
 
 export async function getDiscountPresignedUrlAction(
     filename: string,
-    contentType: string
+    contentType: string,
+    fileSize: number
 ): Promise<ActionResult<PresignedUrlResponse>> {
     const token = await getAccessToken();
     if (!token) return { ok: false, message: 'Not authenticated.' };
 
     try {
-        const data = await getDiscountPresignedUrl(token, { filename, contentType });
+        const data = await getDiscountPresignedUrl(token, { filename, contentType, fileSize });
 
         return { ok: true, data, message: 'Upload URL generated.' };
     } catch (error) {

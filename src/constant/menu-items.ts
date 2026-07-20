@@ -14,10 +14,6 @@ export const menuItems: IMenuItem[] = [
         url: '/prizes'
     },
     {
-        text: 'E-Book Library',
-        url: '/ebook-library'
-    },
-    {
         text: 'About',
         url: '/about'
     },

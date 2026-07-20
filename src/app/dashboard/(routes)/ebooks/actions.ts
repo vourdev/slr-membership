@@ -93,13 +93,14 @@ export async function deleteEbookAction(id: string): Promise<ActionResult<null>>
 
 export async function getEbookPresignedUrlAction(
     filename: string,
-    contentType: string
+    contentType: string,
+    fileSize: number
 ): Promise<ActionResult<PresignedUrlResponse>> {
     const token = await getAccessToken();
     if (!token) return { ok: false, message: 'Not authenticated.' };
 
     try {
-        const data = await getEbookPresignedUrl(token, { filename, contentType });
+        const data = await getEbookPresignedUrl(token, { filename, contentType, fileSize });
 
         return { ok: true, data, message: 'Upload URL generated.' };
     } catch (error) {

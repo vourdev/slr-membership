@@ -87,5 +87,7 @@ export interface PresignedUrlResponse {
     object_key: string;
 }
 
-export const getDiscountPresignedUrl = (token: string, body: { filename: string; contentType: string }) =>
-    apiFetch<PresignedUrlResponse>(API.discounts.presignedUrl, { method: 'POST', token, body });
+export const getDiscountPresignedUrl = (
+    token: string,
+    body: { filename: string; contentType: string; fileSize: number }
+) => apiFetch<PresignedUrlResponse>(API.discounts.presignedUrl, { method: 'POST', token, body });

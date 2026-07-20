@@ -123,6 +123,7 @@ export const deleteEbook = (token: string, id: string) =>
 export interface PresignedUrlPayload {
     filename: string;
     contentType: string;
+    fileSize: number;
 }
 
 export interface PresignedUrlResponse {
