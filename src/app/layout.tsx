@@ -5,6 +5,7 @@ import { Bebas_Neue, Montserrat } from 'next/font/google';
 
 import '@/app/globals.css';
 import { Toaster } from '@/components/ui/sonner';
+import { VersionWatcher } from '@/components/common/version-watcher';
 
 const montserrat = Montserrat({
     subsets: ['latin'],
@@ -68,6 +69,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
                 className={`${montserrat.variable} ${bebasNeue.variable} text-foreground bg-slr-ink overscroll-none antialiased`}>
                 {children}
                 <Toaster />
+                <VersionWatcher />
             </body>
         </html>
     );

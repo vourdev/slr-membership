@@ -40,6 +40,29 @@ export function DashboardHomeSkeleton() {
     );
 }
 
+/** Admin overview: heading → 4 stat cards → 2 breakdown cards → footnote. (/dashboard) */
+export function AdminDashboardSkeleton() {
+    return (
+        <div className='mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6'>
+            <div className='space-y-2'>
+                <Skeleton className={`${SK} h-8 w-40`} />
+                <Skeleton className={`${SK} h-4 w-56`} />
+            </div>
+            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className={`${SK} h-28 rounded-xl`} />
+                ))}
+            </div>
+            <div className='grid gap-4 md:grid-cols-2'>
+                {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton key={i} className={`${SK} h-48 rounded-xl`} />
+                ))}
+            </div>
+            <Skeleton className={`${SK} h-4 w-72`} />
+        </div>
+    );
+}
+
 /** Admin list: heading → toolbar → bordered table with rows. */
 export function TableSkeleton() {
     return (

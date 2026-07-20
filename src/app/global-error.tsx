@@ -1,22 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-// Safety net for deployment skew (Vercel free + Docker, no paid Skew Protection):
-// after a redeploy, a still-open client can request JS chunks / RSC payloads from a
-// build that no longer exists → ChunkLoadError / "Failed to fetch". A full reload
-// pulls HTML matching the live deployment. Time-based guard prevents a reload loop
-// while still allowing recovery from a genuinely new error later in the session.
-const RELOAD_KEY = 'slr_skew_reloaded_at';
-const RELOAD_COOLDOWN_MS = 10_000;
+// Deployment-skew recovery (Vercel free + Docker, no paid Skew Protection). After a
+// production update a still-open client can crash on the first interaction: stale JS
+// chunks, an RSC payload from a build that no longer exists, or — most commonly on
+// login — a **server-action id mismatch** ("Failed to find Server Action … from an
+// older or newer deployment"). We do NOT try to classify the error: in production
+// React strips the message to a bare `digest`, so any root error gets ONE reload
+// attempt. A fresh load pulls assets matching the live deployment and self-heals.
+// The cooldown guard stops a loop — if the same error survives the reload (recurs
+// within the window) we stop reloading and show the error UI instead.
+const RELOAD_KEY = 'slr_error_reloaded_at';
+const RELOAD_COOLDOWN_MS = 15_000;
 
-const isSkewError = (error: Error): boolean =>
-    /ChunkLoadError|Loading chunk|Failed to fetch|dynamically imported module|RSC payload/i.test(
-        `${error?.name ?? ''} ${error?.message ?? ''}`
-    );
-
-// SMIL spinner — self-contained so it animates without globals.css (global-error
-// replaces the root layout, so no Tailwind/keyframes are available here).
 function Spinner() {
     return (
         <svg width='40' height='40' viewBox='0 0 40 40' fill='none' aria-hidden='true'>
@@ -36,17 +33,23 @@ function Spinner() {
 }
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-    const skew = isSkewError(error);
+    // Decide once on mount whether this is the first hit (→ reload) or a repeat
+    // within the cooldown (→ give up and show the error).
+    const [reloading] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0);
+
+        return Date.now() - last > RELOAD_COOLDOWN_MS;
+    });
 
     useEffect(() => {
-        if (typeof window === 'undefined' || !skew) return;
+        // Keep the real error in the console — production strips it from the UI.
+        console.error(error);
+        if (!reloading) return;
 
-        const last = Number(sessionStorage.getItem(RELOAD_KEY) ?? 0);
-        if (Date.now() - last > RELOAD_COOLDOWN_MS) {
-            sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
-            window.location.reload();
-        }
-    }, [skew]);
+        sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+        window.location.reload();
+    }, [reloading, error]);
 
     return (
         <html lang='en'>
@@ -61,9 +64,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
                     color: '#fff',
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif'
                 }}>
-                {skew ? (
-                    // Deployment skew after a production update → not a crash. Show an
-                    // "updating" affordance while the auto-reload (above) swaps builds.
+                {reloading ? (
+                    // First hit → auto-reloading. Read as "updating", not a crash.
                     <div
                         style={{
                             display: 'flex',
@@ -84,6 +86,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
                         <p style={{ fontSize: 13, color: '#ADB0B5', margin: 0 }}>This only takes a moment.</p>
                     </div>
                 ) : (
+                    // Reload did not clear it → a real error. Show it once.
                     <div style={{ maxWidth: 420, padding: 24, textAlign: 'center' }}>
                         <h1 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px' }}>Something went wrong</h1>
                         <p style={{ fontSize: 14, color: '#ADB0B5', margin: '0 0 20px' }}>

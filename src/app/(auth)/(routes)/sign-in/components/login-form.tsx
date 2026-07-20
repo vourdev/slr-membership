@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { signInCredentials } from '@/lib/action';
 import { goldBgStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
+import { SignInSchema } from '@/lib/zod';
 
 import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import { getSession, signIn } from 'next-auth/react';
 
 // Glassmorphism style per design system
 const glassStyle: React.CSSProperties = {
@@ -23,20 +24,43 @@ const glassStyle: React.CSSProperties = {
 };
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
-    const [state, formAction, isPending] = React.useActionState(signInCredentials, null);
-
     const [showPassword, setShowPassword] = useState(false);
-
-    // Full-page navigation on success (not router.push) so login always lands on
-    // HTML from the live deployment — sidesteps post-redeploy chunk/RSC skew.
-    const redirectTo = state && 'success' in state ? state.redirectTo : undefined;
-    React.useEffect(() => {
-        if (redirectTo) window.location.href = redirectTo;
-    }, [redirectTo]);
-    const isRedirecting = Boolean(redirectTo);
+    const [error, setError] = useState<string | null>(null);
+    // `busy` covers both the sign-in request AND the redirect that follows, so the
+    // button never flips back to idle between success and the page swap.
+    const [busy, setBusy] = useState(false);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    // Client-side login: signIn() hits the stable /api/auth route (NOT a build-hashed
+    // server action), so a redeploy can't strand this call — no post-update crash at
+    // the login gate. Redirect via full-page load so we land on the live deployment.
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setError(null);
+
+        const form = new FormData(event.currentTarget);
+        const parsed = SignInSchema.safeParse(Object.fromEntries(form));
+        if (!parsed.success) {
+            setError('Please enter a valid email and password (min 10 characters).');
+
+            return;
+        }
+
+        setBusy(true);
+        const res = await signIn('credentials', { ...parsed.data, redirect: false });
+        if (!res || res.error) {
+            setBusy(false);
+            setError('Invalid credentials. Please try again.');
+
+            return;
+        }
+
+        const session = await getSession();
+        const role = String((session?.user as { role?: string })?.role ?? '').toLowerCase();
+        window.location.href = role.includes('admin') ? '/dashboard' : '/member';
     };
 
     return (
@@ -49,14 +73,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     <CardDescription className='text-slr-muted'>
                         Enter your email below to login to your account
                     </CardDescription>
-                    {state?.message && (
+                    {error && (
                         <div className='mt-2 rounded-md border border-red-500/30 bg-red-500/10 p-2 text-sm text-red-400'>
-                            {state?.message}
+                            {error}
                         </div>
                     )}
                 </CardHeader>
                 <CardContent>
-                    <form action={formAction}>
+                    <form onSubmit={handleSubmit}>
                         <div className='flex flex-col gap-5'>
                             <div className='grid gap-2'>
                                 <Label htmlFor='email' className='text-sm font-medium text-white'>
@@ -70,9 +94,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                     required
                                     className='h-11 rounded-lg border-white/10 bg-white/5 text-white placeholder:text-white/40 focus-visible:border-[#D4AF37]/60 focus-visible:ring-[#D4AF37]/20'
                                 />
-                                {state?.error?.email && (
-                                    <span className='text-xs text-red-400'>{state?.error?.email}</span>
-                                )}
                             </div>
 
                             <div className='grid gap-2'>
@@ -107,13 +128,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                                         )}
                                     </button>
                                 </div>
-                                {state?.error?.password && (
-                                    <span className='text-xs text-red-400'>{state?.error?.password}</span>
-                                )}
                             </div>
 
                             <div className='flex flex-col gap-3 pt-2'>
-                                {isPending || isRedirecting ? (
+                                {busy ? (
                                     <Button
                                         disabled
                                         style={goldBgStyle}
