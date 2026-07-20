@@ -4,7 +4,7 @@ import EmptyState from '@/components/common/empty-state';
 import { SUB_TIERS } from '@/constant/tiers';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
-import { getDiscounts } from '@/lib/api/resources/discounts';
+import { type Discount, getPublicDiscounts } from '@/lib/api/resources/discounts';
 import { getEntryHistory } from '@/lib/api/resources/entries';
 import { type ApiGiveaway, getGiveaways, tierGroupFromApi, toGiveaway } from '@/lib/api/resources/giveaways';
 import { getMyMembership } from '@/lib/api/resources/memberships';
@@ -18,7 +18,7 @@ import {
     subTierCodeOf,
     tierGroupOf
 } from '@/lib/member';
-import type { DrawStatus, FeaturedDiscount, MembershipSummary, UpcomingGiveaway } from '@/types/member';
+import type { DrawStatus, MembershipSummary, UpcomingGiveaway } from '@/types/member';
 
 import { DrawStatusCard } from './_components/dashboard/draw-status-card';
 import { FeaturedDiscounts } from './_components/dashboard/featured-discounts';
@@ -38,24 +38,22 @@ export default async function MemberDashboardPage() {
     const token = await getAccessToken();
 
     // Independent authed reads — allSettled so the giveaways 500 can't blank the
-    // membership/cycle/discount cards (per API-INTEGRATION.md degradation rules).
-    const [membershipR, entriesR, discountsR, giveawaysR] = token
-        ? await Promise.allSettled([
-              getMyMembership(token),
-              getEntryHistory(token),
-              getDiscounts(token),
-              getGiveaways(token)
-          ])
+    // membership/cycle cards (per API-INTEGRATION.md degradation rules).
+    const [membershipR, entriesR, giveawaysR] = token
+        ? await Promise.allSettled([getMyMembership(token), getEntryHistory(token), getGiveaways(token)])
         : [];
 
     // Any expired-session failure → force logout (never returns).
-    for (const result of [membershipR, entriesR, discountsR, giveawaysR]) {
+    for (const result of [membershipR, entriesR, giveawaysR]) {
         if (result?.status === 'rejected') handleApiAuthError(result.reason);
     }
 
+    // Featured offers use the PUBLIC discounts endpoint (no tier gate) so they show
+    // for every member, Visitor included. Failure is non-fatal → empty list.
+    const publicDiscounts = await getPublicDiscounts().catch(() => [] as Discount[]);
+
     const membership = membershipR?.status === 'fulfilled' ? membershipR.value : null;
     const cycle = entriesR?.status === 'fulfilled' ? entriesR.value.current_cycle : null;
-    const discounts = discountsR?.status === 'fulfilled' ? discountsR.value : [];
     const giveaways = giveawaysR?.status === 'fulfilled' ? giveawaysR.value : [];
 
     const subTier = membership ? subTierCodeOf(membership.subTierId) : member.sub_tier;
@@ -120,17 +118,11 @@ export default async function MemberDashboardPage() {
     const drawEyebrow = giveawayDraw ? 'Current Draw' : 'Current Cycle';
     const drawDateWord = giveawayDraw ? 'Draws' : 'Renews';
 
-    // Featured partner offers — is_featured first, capped. Visitor (403) → empty → hidden.
-    const featuredDiscounts: FeaturedDiscount[] = discounts
+    // Featured partner offers — is_featured first, capped. Empty → section hidden.
+    const featuredDiscounts: Discount[] = publicDiscounts
         .filter((d) => d.title?.trim() || d.partner_name?.trim())
         .sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
-        .slice(0, 8)
-        .map((d) => ({
-            id: d.discount_id,
-            brand: d.partner_name?.trim() || d.title?.trim() || '-',
-            category: d.category?.trim() || '-',
-            value_label: d.title?.trim() || '-'
-        }));
+        .slice(0, 3);
 
     // Upcoming giveaways — exclude the one already shown as the Current Draw.
     const upcomingGiveaways: UpcomingGiveaway[] = giveaways

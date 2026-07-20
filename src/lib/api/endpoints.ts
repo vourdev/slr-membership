@@ -32,6 +32,7 @@ export const API = {
     },
     discounts: {
         list: '/api/v1/discounts/',
+        public: '/api/v1/public/discounts/',
         create: '/api/v1/discounts/',
         detail: (id: string) => `/api/v1/discounts/${id}`,
         update: (id: string) => `/api/v1/discounts/${id}`,

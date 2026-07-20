@@ -1,5 +1,7 @@
 import Image from 'next/image';
 
+import { type Discount, getPublicDiscounts } from '@/lib/api/resources/discounts';
+
 import FreeVisitorsSection from './_components/free-visitors-section';
 import HeroSection from './_components/hero-section';
 import MerchandiseSection from './_components/merchandise-section';
@@ -11,7 +13,12 @@ import TrustedSection from './_components/trusted-section';
 import WelcomeSection from './_components/welcome-section';
 import WhyJoinSection from './_components/why-join-section';
 
-const MembershipPage = () => {
+const MembershipPage = async () => {
+    // Public partner logos for the Community Givebacks marquee. Non-fatal → [] →
+    // PartnersSection falls back to its static partner set.
+    const publicDiscounts = await getPublicDiscounts().catch(() => [] as Discount[]);
+    const partnerLogos = publicDiscounts.map((d) => d.logo_url?.trim()).filter((url): url is string => Boolean(url));
+
     return (
         <main className='bg-slr-ink min-h-screen'>
             <HeroSection />
@@ -33,7 +40,7 @@ const MembershipPage = () => {
             <SlrRedBlueTiersSpinWheelSection />
             <TrustedSection />
             <SavingTiersSection />
-            <PartnersSection />
+            <PartnersSection logos={partnerLogos} />
             <MerchandiseSection />
         </main>
     );

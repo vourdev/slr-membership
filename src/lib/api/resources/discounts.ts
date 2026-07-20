@@ -64,6 +64,9 @@ export const getDiscounts = cache((token: string) =>
     apiFetch<Discount[]>(API.discounts.list, { token, cache: 'no-store' })
 );
 
+/** Public partner discounts — no auth, no tier gate (safe for visitors / logged-out). */
+export const getPublicDiscounts = cache(() => apiFetch<Discount[]>(API.discounts.public, { revalidate: 3600 }));
+
 /** One discount's detail. ⚠️ tier-gated like the list (admin gets 403); member DTO omits code/terms. */
 export const getDiscount = cache((id: string, token: string) =>
     apiFetch<Discount>(API.discounts.detail(id), { token, cache: 'no-store' })

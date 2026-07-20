@@ -29,9 +29,9 @@ export function DiscountDetailDialog({ discount, onClose }: { discount: Discount
 
     return (
         <Dialog open={discount !== null} onOpenChange={(open) => (open ? null : onClose())}>
-            <DialogContent className='slr-member dark border-slr-navy-border bg-slr-navy-deep max-h-[90vh] overflow-y-auto sm:max-w-2xl'>
+            <DialogContent className='slr-member dark border-slr-navy-border bg-slr-navy-deep max-h-[90vh] overflow-y-auto sm:max-w-4xl lg:max-w-5xl'>
                 {discount ? (
-                    <div className='grid gap-6 md:grid-cols-2'>
+                    <div className='grid gap-6 p-1 md:grid-cols-2 md:gap-8 md:p-2'>
                         {/* Left: identity + code */}
                         <div className='space-y-4'>
                             <div
@@ -56,10 +56,12 @@ export function DiscountDetailDialog({ discount, onClose }: { discount: Discount
                             </div>
                             <div>
                                 <p className='text-slr-dim text-xs'>Partner</p>
-                                <DialogTitle className='text-lg font-semibold text-white'>
+                                <DialogTitle className='text-xl font-semibold text-white md:text-2xl'>
                                     {discount.partner_name || '-'}
                                 </DialogTitle>
-                                <p className='text-gradient-gold mt-1 text-xl font-bold'>{discount.title || '-'}</p>
+                                <p className='text-gradient-gold mt-1 text-2xl font-bold md:text-3xl'>
+                                    {discount.title || '-'}
+                                </p>
                             </div>
 
                             <button
@@ -92,7 +94,7 @@ export function DiscountDetailDialog({ discount, onClose }: { discount: Discount
                             </div>
 
                             {discount.terms ? (
-                                <p className='text-slr-muted text-sm leading-relaxed whitespace-pre-line'>
+                                <p className='text-slr-muted text-sm leading-relaxed whitespace-pre-line md:text-base'>
                                     {discount.terms}
                                 </p>
                             ) : null}

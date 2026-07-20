@@ -8,7 +8,7 @@ import SectionHeading from '@/components/common/section-heading';
 
 import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 
-const partners = Array.from({ length: 10 }, (_, idx) => ({
+const STATIC_PARTNERS = Array.from({ length: 10 }, (_, idx) => ({
     src: `/images/list-partner-logo-${idx + 1}.webp`,
     alt: `Partner Logo ${idx + 1}`
 }));
@@ -16,7 +16,12 @@ const partners = Array.from({ length: 10 }, (_, idx) => ({
 // Auto-scroll speed (pixels per second)
 const SPEED = 30;
 
-const PartnersSection = () => {
+// `logos` = public discount logo_urls (fetched server-side). Section-level fallback:
+// any real logos → show them; none (empty / fetch failed) → the static partner set.
+const PartnersSection = ({ logos }: { logos?: string[] }) => {
+    const partners =
+        logos && logos.length > 0 ? logos.map((src, idx) => ({ src, alt: `Partner Logo ${idx + 1}` })) : STATIC_PARTNERS;
+
     const xRow1 = useMotionValue(0);
     const xRow2 = useMotionValue(0);
 
