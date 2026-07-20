@@ -64,8 +64,12 @@ export const getDiscounts = cache((token: string) =>
     apiFetch<Discount[]>(API.discounts.list, { token, cache: 'no-store' })
 );
 
-/** Public partner discounts — no auth, no tier gate (safe for visitors / logged-out). */
-export const getPublicDiscounts = cache(() => apiFetch<Discount[]>(API.discounts.public, { revalidate: 3600 }));
+/**
+ * Public partner discounts — no auth, no tier gate (safe for visitors / logged-out).
+ * `no-store`: admin logo/discount edits must show immediately (the data cache was
+ * serving stale logo_urls after an update). React.cache still dedups within a render.
+ */
+export const getPublicDiscounts = cache(() => apiFetch<Discount[]>(API.discounts.public, { cache: 'no-store' }));
 
 /** One discount's detail. ⚠️ tier-gated like the list (admin gets 403); member DTO omits code/terms. */
 export const getDiscount = cache((id: string, token: string) =>

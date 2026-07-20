@@ -159,6 +159,7 @@ const PartnerCard: React.FC<PartnerCardProps> = ({ src, alt }) => (
             width={140}
             height={60}
             draggable={false}
+            unoptimized
             className='pointer-events-none h-8 w-auto object-contain sm:h-9 lg:h-10'
         />
     </div>
