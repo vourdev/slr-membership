@@ -12,7 +12,7 @@ export function DiscountCard({ discount, onSelect }: { discount: Discount; onSel
 
     return (
         <div className='bg-card-dark-navy border-slr-navy-border hover:border-slr-gold-label/40 flex w-full flex-col overflow-hidden rounded-2xl border transition-colors'>
-            <div className='bg-slr-navy-card relative flex h-32 w-full items-center justify-center'>
+            <div className='bg-slr-navy-card relative flex h-40 w-full items-center justify-center'>
                 {discount.thumbnail_url ? (
                     <Image src={discount.thumbnail_url} alt='' fill unoptimized className='object-cover' />
                 ) : (

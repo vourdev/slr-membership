@@ -118,11 +118,10 @@ export default async function MemberDashboardPage() {
     const drawEyebrow = giveawayDraw ? 'Current Draw' : 'Current Cycle';
     const drawDateWord = giveawayDraw ? 'Draws' : 'Renews';
 
-    // Featured partner offers — is_featured first, capped. Empty → section hidden.
+    // Featured partner offers — ONLY discounts flagged is_featured, capped. Empty → hidden.
     const featuredDiscounts: Discount[] = publicDiscounts
-        .filter((d) => d.title?.trim() || d.partner_name?.trim())
-        .sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
-        .slice(0, 3);
+        .filter((d) => d.is_featured && (d.title?.trim() || d.partner_name?.trim()))
+        .slice(0, 6);
 
     // Upcoming giveaways — exclude the one already shown as the Current Draw.
     const upcomingGiveaways: UpcomingGiveaway[] = giveaways
