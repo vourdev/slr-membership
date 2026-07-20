@@ -10,7 +10,6 @@ const navigationLinks: FooterLink[] = [
     { name: 'Membership', href: '/membership' },
     { name: 'Rewards', href: '/#tiers' },
     { name: 'Offers', href: '/#partners' },
-    { name: 'E-Books', href: '/ebooks' },
     { name: 'Win', href: '/#tiers' },
     { name: 'About Us', href: '/about' }
 ];

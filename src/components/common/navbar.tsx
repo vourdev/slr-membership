@@ -21,8 +21,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '../ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { UserInfo } from '../ui/user-info';
 import Container from './container';
+import { useInitials } from '@/hooks/use-initials';
 import { Menu, X } from 'lucide-react';
 
 type NavbarProps = {
@@ -34,6 +36,7 @@ export function Navbar({ user }: NavbarProps) {
     const [activeHash, setActiveHash] = useState<string>('');
     const [scrolled, setScrolled] = useState<boolean>(false);
     const pathname = usePathname();
+    const getInitials = useInitials();
 
     if (pathname.startsWith('/ebooks') && !user) return null;
 
@@ -41,6 +44,11 @@ export function Navbar({ user }: NavbarProps) {
 
     // Auth-gated items (e.g. E-Books) only appear once a session exists.
     const visibleMenuItems = menuItems.filter((item) => !item.authRequired || !!user);
+
+    // Members can't enter /dashboard (middleware bounces them to /member), so the
+    // account links point at each role's real home.
+    const role = String((user?.user as { role?: string })?.role ?? '').toLowerCase();
+    const homeHref = role.includes('admin') ? '/dashboard' : '/member';
 
     // Track current hash so hash-based menu items can show their active state
     useEffect(() => {
@@ -105,7 +113,7 @@ export function Navbar({ user }: NavbarProps) {
                 <nav
                     style={navStyle}
                     className={cn(
-                        'mx-auto flex items-center justify-between px-5 py-4 transition-all duration-300 lg:mt-5 xl:py-3',
+                        'relative mx-auto flex items-center justify-between px-5 py-4 transition-all duration-300 lg:mt-5 xl:py-3',
                         isOpen ? '' : 'rounded-b-2xl lg:rounded-[20px]'
                     )}>
                     {/* Logo */}
@@ -122,7 +130,7 @@ export function Navbar({ user }: NavbarProps) {
                     </Link>
 
                     {/* Desktop Menu */}
-                    <ul className='hidden items-center gap-1 xl:flex'>
+                    <ul className='hidden items-center gap-1 xl:absolute xl:left-1/2 xl:flex xl:-translate-x-1/2'>
                         {visibleMenuItems.map((item) => {
                             const active = isActive(item.url);
 
@@ -152,7 +160,7 @@ export function Navbar({ user }: NavbarProps) {
                                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Link href='/dashboard'>Dashboard</Link>
+                                            <Link href={homeHref}>Dashboard</Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => logoutAction()}>Log Out</DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -176,6 +184,25 @@ export function Navbar({ user }: NavbarProps) {
                                 </Link>
                             </div>
                         )}
+
+                        {/* Logged-in avatar beside the hamburger (mobile/tablet) */}
+                        {user ? (
+                            <button
+                                type='button'
+                                onClick={toggleMenu}
+                                aria-label='Open account menu'
+                                className='cursor-pointer xl:hidden'>
+                                <Avatar className='h-8 w-8 rounded-lg'>
+                                    <AvatarImage
+                                        src={(user?.user as { avatar?: string })?.avatar}
+                                        alt={(user?.user as { name?: string })?.name ?? 'User'}
+                                    />
+                                    <AvatarFallback className='rounded-lg text-xs'>
+                                        {getInitials((user?.user as { name?: string })?.name ?? 'User')}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </button>
+                        ) : null}
 
                         {/* Mobile toggler */}
                         <button
@@ -224,15 +251,44 @@ export function Navbar({ user }: NavbarProps) {
                                 </li>
                             );
                         })}
-                        <li className='pt-2'>
-                            <Link
-                                href='/sign-up'
-                                style={goldButtonStyle}
-                                className='block w-full rounded-xl px-5 py-2 text-center text-sm font-bold shadow-md transition-opacity hover:opacity-90'
-                                onClick={toggleMenu}>
-                                Join Now
-                            </Link>
-                        </li>
+                        {user ? (
+                            <li className='dark mt-2 flex flex-col gap-1 border-t border-white/10 pt-3 text-white'>
+                                <div className='px-3 py-2'>
+                                    <UserInfo user={user?.user} showEmail={true} />
+                                </div>
+                                <Link
+                                    href={homeHref}
+                                    onClick={toggleMenu}
+                                    className='text-slr-muted block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/5 hover:text-white'>
+                                    Dashboard
+                                </Link>
+                                <button
+                                    type='button'
+                                    onClick={() => {
+                                        toggleMenu();
+                                        logoutAction();
+                                    }}
+                                    className='text-slr-muted block rounded-md px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-white/5 hover:text-white'>
+                                    Log Out
+                                </button>
+                            </li>
+                        ) : (
+                            <li className='flex flex-col gap-2 pt-2'>
+                                <Link
+                                    href='/sign-in'
+                                    onClick={toggleMenu}
+                                    className='block w-full rounded-xl border border-[#FFD147] bg-[#FFD1471A] px-5 py-2 text-center text-sm font-semibold text-[#FFDC75] transition-colors hover:bg-[#FFD14726]'>
+                                    Login
+                                </Link>
+                                <Link
+                                    href='/sign-up'
+                                    style={goldButtonStyle}
+                                    className='block w-full rounded-xl px-5 py-2 text-center text-sm font-bold shadow-md transition-opacity hover:opacity-90'
+                                    onClick={toggleMenu}>
+                                    Join Now
+                                </Link>
+                            </li>
+                        )}
                     </ul>
                 </div>
             </Transition>
