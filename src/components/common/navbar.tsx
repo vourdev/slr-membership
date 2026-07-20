@@ -185,23 +185,33 @@ export function Navbar({ user }: NavbarProps) {
                             </div>
                         )}
 
-                        {/* Logged-in avatar beside the hamburger (mobile/tablet) */}
+                        {/* Logged-in avatar dropdown beside the hamburger (mobile/tablet) */}
                         {user ? (
-                            <button
-                                type='button'
-                                onClick={toggleMenu}
-                                aria-label='Open account menu'
-                                className='cursor-pointer xl:hidden'>
-                                <Avatar className='h-8 w-8 rounded-lg'>
-                                    <AvatarImage
-                                        src={(user?.user as { avatar?: string })?.avatar}
-                                        alt={(user?.user as { name?: string })?.name ?? 'User'}
-                                    />
-                                    <AvatarFallback className='rounded-lg text-xs'>
-                                        {getInitials((user?.user as { name?: string })?.name ?? 'User')}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </button>
+                            <div className='dark xl:hidden'>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger aria-label='Open account menu' className='cursor-pointer'>
+                                        <Avatar className='h-8 w-8 rounded-lg'>
+                                            <AvatarImage
+                                                src={(user?.user as { avatar?: string })?.avatar}
+                                                alt={(user?.user as { name?: string })?.name ?? 'User'}
+                                            />
+                                            <AvatarFallback className='rounded-lg bg-white/15 text-xs font-semibold text-white'>
+                                                {getInitials((user?.user as { name?: string })?.name ?? 'User')}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className='dark' align='end'>
+                                        <DropdownMenuLabel className='font-normal'>
+                                            <UserInfo user={user?.user} showEmail={true} />
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href={homeHref}>Dashboard</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => logoutAction()}>Log Out</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         ) : null}
 
                         {/* Mobile toggler */}
@@ -251,28 +261,7 @@ export function Navbar({ user }: NavbarProps) {
                                 </li>
                             );
                         })}
-                        {user ? (
-                            <li className='dark mt-2 flex flex-col gap-1 border-t border-white/10 pt-3 text-white'>
-                                <div className='px-3 py-2'>
-                                    <UserInfo user={user?.user} showEmail={true} />
-                                </div>
-                                <Link
-                                    href={homeHref}
-                                    onClick={toggleMenu}
-                                    className='text-slr-muted block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-white/5 hover:text-white'>
-                                    Dashboard
-                                </Link>
-                                <button
-                                    type='button'
-                                    onClick={() => {
-                                        toggleMenu();
-                                        logoutAction();
-                                    }}
-                                    className='text-slr-muted block rounded-md px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-white/5 hover:text-white'>
-                                    Log Out
-                                </button>
-                            </li>
-                        ) : (
+                        {user ? null : (
                             <li className='flex flex-col gap-2 pt-2'>
                                 <Link
                                     href='/sign-in'
