@@ -15,7 +15,8 @@ import {
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
-    SidebarMenuItem
+    SidebarMenuItem,
+    useSidebar
 } from '@/components/ui/sidebar';
 import { useInitials } from '@/hooks/use-initials';
 import type { CurrentMember } from '@/types/member';
@@ -30,9 +31,16 @@ interface MemberSidebarProps {
 export function MemberSidebar({ user, member }: MemberSidebarProps) {
     const pathname = usePathname();
     const getInitials = useInitials();
+    const { isMobile, setOpenMobile } = useSidebar();
 
     // Dashboard ('/member') is exact-match; deeper pages match by prefix.
     const isActive = (href: string) => (href === '/member' ? pathname === '/member' : pathname.startsWith(href));
+
+    // On mobile the sidebar is an overlay sheet — dismiss it once a destination is
+    // picked, otherwise it stays covering the page the user just navigated to.
+    const closeOnMobile = () => {
+        if (isMobile) setOpenMobile(false);
+    };
 
     return (
         <Sidebar collapsible='icon' variant='inset'>
@@ -40,7 +48,7 @@ export function MemberSidebar({ user, member }: MemberSidebarProps) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size='lg' asChild>
-                            <Link href='/member' prefetch>
+                            <Link href='/member' prefetch onClick={closeOnMobile}>
                                 <Image
                                     src='/images/slr-rewards-logo.webp'
                                     alt='SLR Rewards'
@@ -67,7 +75,7 @@ export function MemberSidebar({ user, member }: MemberSidebarProps) {
                                     isActive={isActive(item.href)}
                                     tooltip={{ children: item.title }}
                                     className='gap-3 text-base group-data-[collapsible=icon]:gap-0! group-data-[collapsible=icon]:pl-0! [&>svg]:size-5'>
-                                    <Link href={item.href}>
+                                    <Link href={item.href} onClick={closeOnMobile}>
                                         <item.icon />
                                         <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                                     </Link>
