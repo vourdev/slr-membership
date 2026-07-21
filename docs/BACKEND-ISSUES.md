@@ -169,6 +169,60 @@ pending member   → 404 { "success": false, "code": "NOT_FOUND",
 
 ---
 
+## ✅ Member profile — change-password + editable `dob` — RESOLVED 2026-07-21 (same day)
+
+**Account:** `red@smartliferewards.com.au` · reported and shipped by the backend within the day. Both fixes re-verified live; FE wired.
+
+### 1. ✅ `POST /api/v1/auth/change-password` — added
+
+```
+POST /api/v1/auth/change-password   (Bearer)
+{ current_password: 1-128, new_password: 10-128, confirm_password: 1-128 }   // all required
+```
+
+Full live round-trip on `red@` (password changed, then restored):
+
+```
+new == current        → 400 BAD_REQUEST      "New password must be different from your current password."
+wrong current         → 400 BAD_REQUEST      "Current password is incorrect."
+confirm mismatch      → 400 VALIDATION_ERROR errors[0] { field: "confirm_password",
+                                              message: "Password confirmation does not match." }
+valid change          → 200                  "Password changed successfully."
+login with OLD        → 401                  ← old password really is dead
+login with NEW        → 200
+restore + login OLD   → 200 / NEW → 401      ← account left exactly as seeded
+```
+
+All three server-side rules match what the PRD-facing form needs, so the FE validation is a mirror, not the authority.
+
+**Was:** the API had only the emailed reset flow, and the FE Security card *faked* success — "Password updated." with **zero network calls**, which is why members reported "password changed but the old one still works". Now wired to the real endpoint via `changePasswordAction` in [profile/actions.ts](<src/app/member/profile/actions.ts>).
+
+**Session behaviour (confirmed by backend 2026-07-21, by design):** a successful change does **not** revoke other sessions — existing access and refresh tokens keep working. FE relies on this: the member stays signed in after changing their password, so the Security card doesn't sign them out.
+
+### 2. ✅ `PATCH /users/me` now accepts `dob`
+
+Schema keys are now `fullName | phone | state | dob` (`dob`: string, `format: date-time`). A **date-only** string is accepted and coerced:
+
+```http
+PATCH /api/v1/users/me   { "dob": "1990-05-14" }
+→ 200 { … "dob": "1990-05-14T00:00:00.000Z" }
+GET  /api/v1/auth/me     → "dob": "1990-05-14T00:00:00.000Z"   ← persists
+```
+
+**Was:** the key was silently stripped (`unknownKeys: "strip"`) while still answering 200 "Profile updated." — a success message that lied. The FE's echo-comparison guard has been removed now that the field lands.
+
+**Side effect:** `red@` now carries a `dob` from these tests (was `null`). Harmless, but re-seed if you want it clean — the API takes no `null`, so it can't be cleared from the app.
+
+### 3. Correct behavior, noted — `phone` validation
+
+`PATCH /users/me { "phone": "+61abc12345" }` → **400 `VALIDATION_ERROR`** `{ field: "phone", message: "Invalid" }`, pattern `^\+?[0-9]{8,15}$`. Correct; the FE just wasn't enforcing it (letters reached the API). Now the field is digits-only with a fixed `+61` prefix, so the joined value always matches.
+
+### 4. ⚠️ Unrelated: `/auth/login` returned 500 for ~45s (2026-07-21)
+
+During the above run, `POST /auth/login` answered `500 INTERNAL_ERROR` for **every** account — including `blue@`, which was never touched — then recovered on its own after ~45 seconds. Not caused by the password change (the control account proves that), but worth checking the logs: a total login outage has no user-visible cause and no retry guidance. `requestId`s: `019f8531-b737-7089-9e19-b0a55f7d279a`, `019f8531-b988-7468-8eb1-16dd3b2f224e`. Also note `GET /healthz` is **404** on the public host, so there's no probe to distinguish "API down" from "login down".
+
+---
+
 ## ⚠️ Business-logic gaps (return 200, but off-spec per PRD)
 
 ### `POST /api/v1/beny/subscribe` — Subscribe to BENY add-on

@@ -91,6 +91,13 @@ export async function requestPasswordReset(email: string) {
     });
 }
 
+export async function changePassword(
+    token: string,
+    body: { current_password: string; new_password: string; confirm_password: string }
+) {
+    return apiFetch<null>(API.auth.changePassword, { method: 'POST', token, body });
+}
+
 export async function resetPassword(resetToken: string, newPassword: string) {
     return apiFetch<null>(API.auth.resetPassword, {
         method: 'POST',

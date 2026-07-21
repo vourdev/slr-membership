@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MIN_PASSWORD_LENGTH } from '@/constant/password';
 import { resetPassword } from '@/lib/api/resources/auth';
 import { ApiError } from '@/lib/api/types';
 import { goldButtonStyle } from '@/lib/styles';
@@ -35,8 +36,8 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters.');
+        if (password.length < MIN_PASSWORD_LENGTH) {
+            setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
 
             return;
         }

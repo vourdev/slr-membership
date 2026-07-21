@@ -3,33 +3,68 @@
 import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { formatShortDate } from '@/lib/member';
+import { cn } from '@/lib/utils';
 import type { MemberProfile } from '@/types/member';
 
 import { updateProfileAction } from '../actions';
-import { Lock, Pencil } from 'lucide-react';
+import { format } from 'date-fns';
+import { CalendarIcon, Lock, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PersonalInfoSectionProps {
     profile: MemberProfile;
 }
 
+const PHONE_PREFIX = '+61';
+
+// Backend validates the joined number against /^\+?[0-9]{8,15}$/, so the local
+// part (everything after +61) has to stay between 6 and 13 digits.
+const LOCAL_MIN = 6;
+const LOCAL_MAX = 13;
+
+function toLocalDigits(raw: string): string {
+    const digits = raw.replace(/\D/g, '');
+    const national = digits.startsWith('61') ? digits.slice(2) : digits;
+
+    return national.replace(/^0+/, '').slice(0, LOCAL_MAX);
+}
+
 export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
     const [editing, setEditing] = useState(false);
     const [pending, startTransition] = useTransition();
     const [fullName, setFullName] = useState(profile.name);
-    const [phone, setPhone] = useState(profile.phone ?? '');
+    const [phoneLocal, setPhoneLocal] = useState(toLocalDigits(profile.phone ?? ''));
+    const [dob, setDob] = useState(profile.dob ? profile.dob.slice(0, 10) : '');
 
     const save = () => {
+        if (!fullName.trim()) {
+            toast.error('Name cannot be empty.');
+
+            return;
+        }
+        if (phoneLocal.length < LOCAL_MIN || phoneLocal.length > LOCAL_MAX) {
+            toast.error(`Enter a valid phone number — ${LOCAL_MIN}–${LOCAL_MAX} digits after ${PHONE_PREFIX}.`);
+
+            return;
+        }
+
         startTransition(async () => {
-            const res = await updateProfileAction({ fullName, phone });
-            if (res.ok) {
-                toast.success('Profile updated.');
-                setEditing(false);
-            } else {
+            const res = await updateProfileAction({
+                fullName: fullName.trim(),
+                phone: `${PHONE_PREFIX}${phoneLocal}`,
+                dob
+            });
+            if (!res.ok) {
                 toast.error(res.message);
+
+                return;
             }
+            toast.success('Profile updated.');
+            setEditing(false);
         });
     };
 
@@ -56,7 +91,21 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
                 </Row>
                 <Row label='Phone'>
                     {editing ? (
-                        <Input value={phone} onChange={(e) => setPhone(e.target.value)} disabled={pending} />
+                        <div className='flex w-full items-center gap-2'>
+                            <span className='border-slr-navy-border text-slr-muted shrink-0 rounded-md border bg-white/5 px-2.5 py-2 text-sm'>
+                                {PHONE_PREFIX}
+                            </span>
+                            <Input
+                                value={phoneLocal}
+                                onChange={(e) => setPhoneLocal(toLocalDigits(e.target.value))}
+                                disabled={pending}
+                                type='tel'
+                                inputMode='numeric'
+                                autoComplete='tel-national'
+                                placeholder='400000000'
+                                aria-label='Phone number without country code'
+                            />
+                        </div>
                     ) : (
                         <span className='text-white'>{profile.phone || '-'}</span>
                     )}
@@ -74,7 +123,38 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
                     </span>
                 </Row>
                 <Row label='Date of Birth'>
-                    <span className='text-white/90'>{profile.dob ? formatShortDate(profile.dob) : '-'}</span>
+                    {editing ? (
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    type='button'
+                                    variant='outline'
+                                    disabled={pending}
+                                    aria-label='Date of birth'
+                                    className={cn(
+                                        'h-9 w-full justify-between px-3 font-normal',
+                                        !dob && 'text-white/40'
+                                    )}>
+                                    {dob ? format(new Date(dob), 'dd/MM/yyyy') : <span>Select date…</span>}
+                                    <CalendarIcon className='h-4 w-4 text-white/50' />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-auto border-white/10 bg-[#141820] p-0 text-white' align='end'>
+                                <Calendar
+                                    mode='single'
+                                    captionLayout='dropdown'
+                                    selected={dob ? new Date(dob) : undefined}
+                                    defaultMonth={dob ? new Date(dob) : undefined}
+                                    onSelect={(date) => setDob(date ? format(date, 'yyyy-MM-dd') : '')}
+                                    startMonth={new Date(1900, 0)}
+                                    endMonth={new Date()}
+                                    className='bg-[#141820] text-white'
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    ) : (
+                        <span className='text-white/90'>{profile.dob ? formatShortDate(profile.dob) : '-'}</span>
+                    )}
                 </Row>
             </dl>
 

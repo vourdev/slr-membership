@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AU_STATES, AuStateCode } from '@/constant/au-states';
+import { MIN_PASSWORD_LENGTH } from '@/constant/password';
 import { goldButtonStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import { SignUpSchema } from '@/lib/zod';
@@ -119,7 +120,7 @@ const StepAccount = ({ data, onNext }: StepAccountProps) => {
                     <Input
                         id='password'
                         type={showPassword ? 'text' : 'password'}
-                        placeholder='Minimum 8 characters'
+                        placeholder={`Minimum ${MIN_PASSWORD_LENGTH} characters`}
                         value={values.password}
                         onChange={(e) => update('password', e.target.value)}
                         autoComplete='new-password'

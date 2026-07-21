@@ -1,23 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 import { Input } from '@/components/ui/input';
+import { MIN_PASSWORD_LENGTH } from '@/constant/password';
 import { goldButtonStyle, inputClassName } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 
-import { Check, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { changePasswordAction } from '../actions';
+import { Check, EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
 
 function PasswordInput({
     value,
     onChange,
     placeholder,
-    autoComplete
+    autoComplete,
+    disabled
 }: {
     value: string;
     onChange: (v: string) => void;
     placeholder: string;
     autoComplete: string;
+    disabled: boolean;
 }) {
     const [show, setShow] = useState(false);
 
@@ -25,6 +29,7 @@ function PasswordInput({
         <div className='relative isolate'>
             <Input
                 required
+                disabled={disabled}
                 type={show ? 'text' : 'password'}
                 autoComplete={autoComplete}
                 placeholder={placeholder}
@@ -43,30 +48,47 @@ function PasswordInput({
     );
 }
 
+const EMPTY = { current: '', next: '', confirm: '' };
+
 export function SecuritySection() {
-    const [pw, setPw] = useState({ current: '', next: '', confirm: '' });
+    const [pw, setPw] = useState(EMPTY);
     const [error, setError] = useState('');
     const [saved, setSaved] = useState(false);
+    const [pending, startTransition] = useTransition();
+
+    // Mirrors the server-side checks in changePasswordAction so the member gets
+    // feedback without a round-trip; the action stays authoritative.
+    const validate = (): string => {
+        if (pw.next.length < MIN_PASSWORD_LENGTH) {
+            return `New password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+        }
+        if (pw.next !== pw.confirm) return 'New passwords do not match.';
+        if (pw.next === pw.current) return 'New password must be different from your current password.';
+
+        return '';
+    };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
+        setSaved(false);
 
-        if (pw.next.length < 8) {
-            setError('New password must be at least 8 characters.');
+        const invalid = validate();
+        setError(invalid);
+        if (invalid) return;
 
-            return;
-        }
-        if (pw.next !== pw.confirm) {
-            setError('New passwords do not match.');
-
-            return;
-        }
-
-        // Mock — real flow calls the Express auth API.
-        setSaved(true);
-        setPw({ current: '', next: '', confirm: '' });
-        setTimeout(() => setSaved(false), 2500);
+        startTransition(async () => {
+            const res = await changePasswordAction({
+                currentPassword: pw.current,
+                newPassword: pw.next,
+                confirmPassword: pw.confirm
+            });
+            if (res.ok) {
+                setPw(EMPTY);
+                setSaved(true);
+            } else {
+                setError(res.message);
+            }
+        });
     };
 
     return (
@@ -80,30 +102,40 @@ export function SecuritySection() {
                     onChange={(v) => setPw({ ...pw, current: v })}
                     placeholder='Current password'
                     autoComplete='current-password'
+                    disabled={pending}
                 />
                 <PasswordInput
                     value={pw.next}
                     onChange={(v) => setPw({ ...pw, next: v })}
-                    placeholder='New password'
+                    placeholder={`New password (min ${MIN_PASSWORD_LENGTH} characters)`}
                     autoComplete='new-password'
+                    disabled={pending}
                 />
                 <PasswordInput
                     value={pw.confirm}
                     onChange={(v) => setPw({ ...pw, confirm: v })}
                     placeholder='Confirm new password'
                     autoComplete='new-password'
+                    disabled={pending}
                 />
-                {error && <p className='text-sm text-red-400'>{error}</p>}
-                {saved && (
+                {error ? <p className='text-sm text-red-400'>{error}</p> : null}
+                {saved ? (
                     <p className='inline-flex items-center gap-1.5 text-sm text-emerald-400'>
-                        <Check className='size-4' /> Password updated.
+                        <Check className='size-4' /> Password updated. Use it the next time you sign in.
                     </p>
-                )}
+                ) : null}
                 <button
                     type='submit'
-                    className='inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-bold uppercase'
+                    disabled={pending}
+                    className='inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold uppercase disabled:opacity-70'
                     style={goldButtonStyle}>
-                    Update password
+                    {pending ? (
+                        <>
+                            <Loader2Icon className='size-4 animate-spin' /> Updating
+                        </>
+                    ) : (
+                        'Update password'
+                    )}
                 </button>
             </form>
         </section>

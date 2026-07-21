@@ -17,3 +17,22 @@ export interface AdminUserRecord {
 
 export const updateUser = (userId: string, body: UserUpdatePayload, token: string) =>
     apiFetch<AdminUserRecord>(API.users.update(userId), { method: 'PATCH', body, token });
+
+// `dob` takes a date-only string and comes back coerced to an ISO date-time.
+export interface MyProfileUpdatePayload {
+    fullName?: string;
+    phone?: string;
+    dob?: string;
+}
+
+export interface MyProfileRecord {
+    id: string;
+    email: string;
+    fullName: string | null;
+    phone: string | null;
+    state: string | null;
+    dob: string | null;
+}
+
+export const updateMyProfile = (body: MyProfileUpdatePayload, token: string) =>
+    apiFetch<MyProfileRecord>(API.users.me, { method: 'PATCH', body, token });

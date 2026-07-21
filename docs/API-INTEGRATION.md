@@ -79,6 +79,8 @@ Dev bypass: `NEXT_PUBLIC_ALLOW_DEV_LOGIN=true` → login `SLRadmin` / `SLRadmin`
 | `POST /api/v1/auth/verify-otp` | `sign-up/.../step-otp.tsx` | Visitor OTP; 401 on bad/expired code (caught locally, no forced logout). Returned session discarded → user signs in after |
 | `POST /api/v1/auth/resend-otp` | `sign-up/.../step-otp.tsx` | 30s client cooldown |
 | `POST /api/v1/auth/forgot-password` | `forgot-password/page.tsx` | Reset request |
+| `POST /api/v1/auth/change-password` | `member/profile` (actions.ts → security-section) | ✅ **added by backend 2026-07-21**. Body `{current_password, new_password, confirm_password}` (all required, `new_password` ≥10). Replaced a mock that faked success with zero network calls — the reason "password changed but the old one still works" was reported. Server rejects new==current / wrong current (400 `BAD_REQUEST`) and confirm mismatch (400 `VALIDATION_ERROR` on `confirm_password`); the client mirrors all three. Full live round-trip verified (old password → 401 after change, then restored). By design it does **not** revoke other sessions, so the member stays signed in afterwards (no sign-out in the Security card) |
+| `PATCH /api/v1/users/me` | `member/profile` (actions.ts) | self-service name/phone/dob. Phone is sent as `+61` + digits-only local part (server pattern `^\+?[0-9]{8,15}$`, letters → 400). ✅ **`dob` accepted since 2026-07-21** — send date-only (`1990-05-14`), comes back as ISO date-time; the earlier silent-strip guard is gone |
 | `POST /api/v1/auth/reset-password` | `reset-password/.../reset-password-form.tsx` | Body `{reset_token, new_password}`; `reset_token` ≥20 chars server-validated. Reads `?token=` from email link |
 | `GET /api/v1/memberships/tiers` | `membership/page.tsx` | live prices + EmptyState (public) |
 | `GET /api/v1/admin/members` | `dashboard/(routes)/members` | live table. ✅ **now 200** (previously 400 `BAD_REQUEST` — backend fixed 2026-07-08); returns the member list + `meta` pagination. FE row-map hardened (`-` defaults) |
@@ -190,6 +192,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ✅ | POST | `/api/v1/auth/resend-otp` | auth | Resend OTP code |
 | ✅ | POST | `/api/v1/auth/reset-password` | auth | Confirm password reset with token |
 | ✅ | POST | `/api/v1/auth/verify-otp` | auth | Verify OTP code |
+| ✅ | POST | `/api/v1/auth/change-password` | auth | Authenticated password change → `member/profile` Security card (added 2026-07-21) |
 | ✅ | GET | `/api/v1/beny/status` | beny | Get current user BENY status → `member/discounts` BenySection |
 | ✅ | DELETE | `/api/v1/beny/subscribe` | beny | Cancel BENY subscription. 🐞 **404 `NOT_FOUND` on `pending_activation`** — active-only, but PRD says *"cancel kapan saja"* → **PRD violation**, the last Ronde 2 blocker |
 | ✅ | POST | `/api/v1/beny/subscribe` | beny | Subscribe to BENY add-on (⚠️ no Stripe charge — see blockers) |
@@ -240,7 +243,7 @@ Legend: ✅ integrated (called) · 🟡 mapped, not called · ❌ not integrated
 | ❌ | GET | `/api/v1/subscriptions/me` | subscriptions | My subscriptions |
 | ❌ | GET | `/api/v1/subscriptions/{id}` | subscriptions | Admin: subscription detail |
 | ❌ | GET | `/api/v1/users/` | users | Admin: list users (filter/sort/search/cursor) |
-| ❌ | PATCH | `/api/v1/users/me` | users | Update my profile |
+| ✅ | PATCH | `/api/v1/users/me` | users | Self-service profile → `member/profile` (name, phone, dob). Keys `fullName \| phone \| state \| dob`; `dob` accepted since 2026-07-21 |
 | ❌ | GET | `/api/v1/users/{id}` | users | Read one user (self or admin) |
 | ✅ | PATCH | `/api/v1/users/{id}` | users | Admin: update user → member-detail **Draw-pool state** control (`{state}`, verified) |
 

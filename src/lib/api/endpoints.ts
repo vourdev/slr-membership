@@ -11,7 +11,8 @@ export const API = {
         verifyOtp: '/api/v1/auth/verify-otp',
         resendOtp: '/api/v1/auth/resend-otp',
         forgotPassword: '/api/v1/auth/forgot-password',
-        resetPassword: '/api/v1/auth/reset-password'
+        resetPassword: '/api/v1/auth/reset-password',
+        changePassword: '/api/v1/auth/change-password'
     },
     memberships: {
         tiers: '/api/v1/memberships/tiers',
