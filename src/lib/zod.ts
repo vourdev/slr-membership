@@ -1,5 +1,6 @@
 import { AU_STATE_CODES } from '@/constant/au-states';
 import { MIN_PASSWORD_LENGTH } from '@/constant/password';
+import { MIN_AGE_YEARS, isAdultDob } from '@/lib/dob';
 
 import { email, literal, object, string, union, enum as zEnum } from 'zod';
 
@@ -25,19 +26,5 @@ export const SignUpSchema = object({
         .regex(/^[0-9 +()-]+$/, 'Only digits, spaces, +, -, () allowed'),
     dob: string()
         .min(1, 'Date of birth is required')
-        .refine(
-            (val) => {
-                const date = new Date(val);
-                if (isNaN(date.getTime())) return false;
-                const today = new Date();
-                let age = today.getFullYear() - date.getFullYear();
-                const monthDiff = today.getMonth() - date.getMonth();
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
-                    age--;
-                }
-
-                return age >= 18;
-            },
-            { message: 'You must be at least 18 years old' }
-        )
+        .refine(isAdultDob, { message: `You must be at least ${MIN_AGE_YEARS} years old` })
 });

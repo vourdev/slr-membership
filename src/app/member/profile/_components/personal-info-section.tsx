@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MIN_AGE_YEARS, isAdultDob, latestAdultDob } from '@/lib/dob';
 import { formatShortDate } from '@/lib/member';
 import { cn } from '@/lib/utils';
 import type { MemberProfile } from '@/types/member';
@@ -48,6 +49,11 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
         }
         if (phoneLocal.length < LOCAL_MIN || phoneLocal.length > LOCAL_MAX) {
             toast.error(`Enter a valid phone number — ${LOCAL_MIN}–${LOCAL_MAX} digits after ${PHONE_PREFIX}.`);
+
+            return;
+        }
+        if (dob && !isAdultDob(dob)) {
+            toast.error(`You must be at least ${MIN_AGE_YEARS} years old.`);
 
             return;
         }
@@ -146,8 +152,9 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
                                     selected={dob ? new Date(dob) : undefined}
                                     defaultMonth={dob ? new Date(dob) : undefined}
                                     onSelect={(date) => setDob(date ? format(date, 'yyyy-MM-dd') : '')}
+                                    disabled={{ after: latestAdultDob() }}
                                     startMonth={new Date(1900, 0)}
-                                    endMonth={new Date()}
+                                    endMonth={latestAdultDob()}
                                     className='bg-[#141820] text-white'
                                 />
                             </PopoverContent>
