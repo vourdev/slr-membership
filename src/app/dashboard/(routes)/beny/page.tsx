@@ -49,7 +49,8 @@ export default async function BenyPage({ searchParams }: { searchParams: Promise
                 activatedAt: b.activated_at ? formatDate(b.activated_at) : null,
                 accessEndsAt: b.access_ends_at ? formatDate(b.access_ends_at) : null,
                 accessEndsAtIso: b.access_ends_at ?? null,
-                deactivatedAt: b.deactivated_at ? formatDate(b.deactivated_at) : null,
+                deactivatedAt:
+                    b.deactivated_at || b.cancelled_at ? formatDate(b.deactivated_at ?? b.cancelled_at) : null,
                 deactivationReason: b.deactivation_reason || null
             }));
         } catch (error) {

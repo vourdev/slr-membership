@@ -32,6 +32,10 @@ export function benyColumnsFor(tab: BenyTab, { onActivate, onDeactivate }: Handl
         base.push({ key: 'activatedAt', label: 'Activated At', render: (row) => row.activatedAt || '-' });
     }
 
+    if (tab === 'cancelled') {
+        base.push({ key: 'deactivatedAt', label: 'Deactivated Date', render: (row) => row.deactivatedAt || '-' });
+    }
+
     if (tab === 'pending_activation') {
         base.push({
             key: 'rowAction',
