@@ -11,6 +11,7 @@ import { createMembershipCheckout, createPortalSession } from '@/lib/api/resourc
 import { cancelMySubscription } from '@/lib/api/resources/subscriptions';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError, apiErrorMessage } from '@/lib/api/types';
+import { CHECKOUT_UNAVAILABLE_MESSAGE, isTrialWindowError } from '@/lib/checkout-errors';
 import { SAFE_HOURS_MESSAGE, isSafeHoursError } from '@/lib/safe-hours';
 import type { SubTierCode } from '@/types/member';
 
@@ -45,6 +46,7 @@ export async function startSubTierCheckout(
 function toActionMessage(error: unknown, fallback: string): string {
     if (error instanceof ApiError) {
         if (isSafeHoursError(error)) return SAFE_HOURS_MESSAGE;
+        if (isTrialWindowError(error)) return CHECKOUT_UNAVAILABLE_MESSAGE;
 
         return apiErrorMessage(error);
     }
