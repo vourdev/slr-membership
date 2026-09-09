@@ -40,7 +40,7 @@ export default async function EntryHistoryPage() {
             <header className='space-y-1'>
                 <h1 className='font-bebas-neue text-3xl tracking-wide uppercase sm:text-4xl'>Entry History</h1>
                 <p className='text-slr-muted text-sm md:text-base'>
-                    Your entry status and tokens grouped by billing cycle. Tokens are allocated to all eligible draws
+                    Your entry status and entries grouped by billing cycle. Entries are allocated to all eligible draws
                     within that cycle.
                 </p>
             </header>
@@ -58,7 +58,7 @@ export default async function EntryHistoryPage() {
                     description='You do not have any entry cycles yet. Your entries will appear here once your cycle starts.'
                 />
             ) : (
-                <EntryHistoryTable entries={entries} />
+                <EntryHistoryTable entries={entries} currentCycleId={data?.current_cycle?.cycle_id} />
             )}
         </div>
     );
