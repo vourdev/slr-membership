@@ -107,7 +107,7 @@ src/
 
 - Use **Axios** with a single configured client (base URL from env, interceptors for auth token + error toasts).
 - Auth flow: NextAuth credentials provider → calls Express `/auth/login` → stores JWT in session. See [auth.ts](src/auth.ts), [auth.config.ts](src/auth.config.ts).
-- API base URL from `NEXT_PUBLIC_API_URL` (or server-only `API_URL` for server actions). Check [.env.example](.env.example) when adding new vars.
+- API base URL from `NEXT_PUBLIC_API_BASE` (see [endpoints.ts](src/lib/api/endpoints.ts) — falls back to the production host when unset). Check [.env.example](.env.example) when adding new vars.
 - **Stripe Checkout is hosted** — frontend redirects, backend handles webhooks. Don't build PCI-handling forms.
 - **Backend Verification & Rules:** Wajib merujuk ke [RULES.md](RULES.md) untuk pedoman verifikasi API, penanganan duplikasi email, rules spin wheel, dan pengetesan Stripe webhook.
 

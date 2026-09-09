@@ -54,7 +54,7 @@ APP_PORT=3001
 
 AUTH_TRUST_HOST=true
 NEXTAUTH_URL=https://membership.smartliferewards.com.au
-NEXT_PUBLIC_API_URL=https://api.smartliferewards.com.au
+NEXT_PUBLIC_API_BASE=https://api.smartliferewards.com.au
 ```
 
 ---
@@ -70,7 +70,7 @@ APP_PORT=3000
 
 AUTH_TRUST_HOST=true
 NEXTAUTH_URL=https://dev-membership.smartliferewards.com.au
-NEXT_PUBLIC_API_URL=https://dev-api.smartliferewards.com.au
+NEXT_PUBLIC_API_BASE=https://dev-api.smartliferewards.com.au
 ```
 
 ---
