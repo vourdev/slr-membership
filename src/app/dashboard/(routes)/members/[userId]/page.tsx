@@ -157,8 +157,8 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                                         <TableHead className='text-muted-foreground font-medium'>Tier</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>Start</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>End</TableHead>
-                                        <TableHead className='text-muted-foreground font-medium'>Tokens</TableHead>
-                                        <TableHead className='text-muted-foreground font-medium'>Entry</TableHead>
+                                        <TableHead className='text-muted-foreground font-medium'>Entries</TableHead>
+                                        <TableHead className='text-muted-foreground font-medium'>Entry Status</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
