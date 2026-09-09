@@ -230,6 +230,9 @@ export interface AdminWinner {
     giveaway_id?: string;
     user_id: string;
     full_name?: string | null;
+
+    // Free-text winner recorded without a draw-pool member. Pending backend support (WIN-01).
+    winner_name?: string | null;
     state?: string | null;
     prize: string;
     recorded_at?: string | null;
@@ -238,8 +241,12 @@ export interface AdminWinner {
 
 export interface AdminWinnerPayload {
     giveaway_id: string;
-    user_id: string;
     prize: string;
+
+    // Exactly one of these is sent: user_id when picked from the draw pool,
+    // winner_name when the admin types the name in.
+    user_id?: string;
+    winner_name?: string;
 }
 
 interface ListQuery {

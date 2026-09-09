@@ -11,6 +11,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import Heading from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { TIER_VISUALS } from '@/constant/tiers';
 import type { AdminGiveawayTier, AdminWinnerPayload } from '@/lib/api/resources/giveaways';
 import { tierGroupFromApi } from '@/lib/api/resources/giveaways';
@@ -24,11 +25,24 @@ import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-const formSchema = z.object({
-    giveawayId: z.string().min(1, 'Giveaway is required'),
-    userId: z.string().min(1, 'Member is required'),
-    prize: z.string().min(1, 'Prize is required')
-});
+type WinnerMode = 'member' | 'manual';
+
+const formSchema = z
+    .object({
+        giveawayId: z.string().min(1, 'Giveaway is required'),
+        mode: z.enum(['member', 'manual']),
+        userId: z.string(),
+        winnerName: z.string(),
+        prize: z.string().min(1, 'Prize is required')
+    })
+    .superRefine((values, ctx) => {
+        if (values.mode === 'member' && !values.userId) {
+            ctx.addIssue({ code: 'custom', path: ['userId'], message: 'Member is required' });
+        }
+        if (values.mode === 'manual' && !values.winnerName.trim()) {
+            ctx.addIssue({ code: 'custom', path: ['winnerName'], message: 'Winner name is required' });
+        }
+    });
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -38,6 +52,7 @@ export interface WinnerFormInitialData {
     userId: string;
     prize: string;
 
+    winnerName?: string;
     memberName?: string;
     memberState?: string;
 }
@@ -69,11 +84,20 @@ export function WinnerForm({
         ? 'Correct a recorded draw result'
         : 'Record the result of a draw run at randomdraws.com/au';
 
+    // A record with a free-text name and no member reopens in manual mode.
+    const initialMode: WinnerMode = initialData && !initialData.userId && initialData.winnerName ? 'manual' : 'member';
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema) as Resolver<FormValues>,
         defaultValues: initialData
-            ? { giveawayId: initialData.giveawayId, userId: initialData.userId, prize: initialData.prize }
-            : { giveawayId: defaultGiveawayId ?? '', userId: '', prize: '' }
+            ? {
+                  giveawayId: initialData.giveawayId,
+                  mode: initialMode,
+                  userId: initialData.userId,
+                  winnerName: initialData.winnerName ?? '',
+                  prize: initialData.prize
+              }
+            : { giveawayId: defaultGiveawayId ?? '', mode: 'member', userId: '', winnerName: '', prize: '' }
     });
 
     const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
@@ -92,11 +116,18 @@ export function WinnerForm({
 
     const submit = (values: FormValues) => {
         startTransition(async () => {
-            const payload: AdminWinnerPayload = {
-                giveaway_id: values.giveawayId,
-                user_id: values.userId,
-                prize: values.prize
-            };
+            const payload: AdminWinnerPayload =
+                values.mode === 'manual'
+                    ? {
+                          giveaway_id: values.giveawayId,
+                          winner_name: values.winnerName.trim(),
+                          prize: values.prize
+                      }
+                    : {
+                          giveaway_id: values.giveawayId,
+                          user_id: values.userId,
+                          prize: values.prize
+                      };
 
             try {
                 const res = initialData
@@ -128,6 +159,7 @@ export function WinnerForm({
         return g ? `${g.label} (${g.tier})` : id;
     };
 
+    const mode = form.watch('mode');
     const selectedGiveawayId = form.watch('giveawayId');
     const selectedGiveaway = giveawayById(selectedGiveawayId);
     const selectedGroup = selectedGiveaway ? tierGroupFromApi(selectedGiveaway.tier) : null;
@@ -190,45 +222,104 @@ export function WinnerForm({
                             )}
                         />
 
+                        <FormField
+                            control={form.control}
+                            name='mode'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Winner source</FormLabel>
+                                    <FormControl>
+                                        <ToggleGroup
+                                            type='single'
+                                            value={field.value}
+                                            onValueChange={(next) => {
+                                                if (!next) return;
+                                                field.onChange(next);
+                                                form.clearErrors(['userId', 'winnerName']);
+                                            }}
+                                            className='justify-start'>
+                                            <ToggleGroupItem value='member' className='px-4'>
+                                                From draw pool
+                                            </ToggleGroupItem>
+                                            <ToggleGroupItem value='manual' className='px-4'>
+                                                Enter name manually
+                                            </ToggleGroupItem>
+                                        </ToggleGroup>
+                                    </FormControl>
+                                    <FormDescription>
+                                        Pick a member from this giveaway’s draw pool, or type the winner’s name the same
+                                        way you type the prize.
+                                    </FormDescription>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Both branches need a key: without one React reuses the same Controller
+                            instance across the swap and the new field's errors never render. */}
                         <div className='grid grid-cols-1 items-start gap-6 md:grid-cols-2'>
-                            <FormField
-                                control={form.control}
-                                name='userId'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Member</FormLabel>
-                                        <FormControl>
-                                            <input type='hidden' {...field} />
-                                        </FormControl>
-                                        <div className='flex flex-col gap-2'>
-                                            <div className='border-input flex min-h-11 items-center rounded-md border px-3 py-2 text-sm'>
-                                                {member ? (
-                                                    <span className='flex flex-col'>
-                                                        <span className='font-medium text-white'>{member.name}</span>
-                                                        <span className='text-slr-dim text-xs'>{member.state}</span>
-                                                    </span>
-                                                ) : (
-                                                    <span className='text-muted-foreground'>No member assigned</span>
-                                                )}
+                            {mode === 'manual' ? (
+                                <FormField
+                                    key='winnerName'
+                                    control={form.control}
+                                    name='winnerName'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Winner name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder='Jane Doe' {...field} />
+                                            </FormControl>
+                                            <FormDescription>
+                                                Recorded as typed. No member is linked to this result.
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            ) : (
+                                <FormField
+                                    key='userId'
+                                    control={form.control}
+                                    name='userId'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Member</FormLabel>
+                                            <FormControl>
+                                                <input type='hidden' {...field} />
+                                            </FormControl>
+                                            <div className='flex flex-col gap-2'>
+                                                <div className='border-input flex min-h-11 items-center rounded-md border px-3 py-2 text-sm'>
+                                                    {member ? (
+                                                        <span className='flex flex-col'>
+                                                            <span className='font-medium text-white'>
+                                                                {member.name}
+                                                            </span>
+                                                            <span className='text-slr-dim text-xs'>{member.state}</span>
+                                                        </span>
+                                                    ) : (
+                                                        <span className='text-muted-foreground'>
+                                                            No member assigned
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <Button
+                                                    type='button'
+                                                    variant='outline'
+                                                    disabled={!selectedGroup}
+                                                    onClick={() => setPickerOpen(true)}>
+                                                    <UserSearch className='mr-2 h-4 w-4' />
+                                                    {member ? 'Change Member' : 'Assign Member'}
+                                                </Button>
                                             </div>
-                                            <Button
-                                                type='button'
-                                                variant='outline'
-                                                disabled={!selectedGroup}
-                                                onClick={() => setPickerOpen(true)}>
-                                                <UserSearch className='mr-2 h-4 w-4' />
-                                                {member ? 'Change Member' : 'Assign Member'}
-                                            </Button>
-                                        </div>
-                                        <FormDescription>
-                                            {selectedGiveaway
-                                                ? 'Members are scoped to this giveaway’s draw pool — filter by state or search by name/email.'
-                                                : 'Select a giveaway first — the member list is scoped to its draw pool.'}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            <FormDescription>
+                                                {selectedGiveaway
+                                                    ? 'Members are scoped to this giveaway’s draw pool — filter by state or search by name/email.'
+                                                    : 'Select a giveaway first — the member list is scoped to its draw pool.'}
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
                             <FormField
                                 control={form.control}
                                 name='prize'
@@ -239,7 +330,7 @@ export function WinnerForm({
                                             <Input placeholder='Toyota HiLux SR5' {...field} />
                                         </FormControl>
                                         <FormDescription>
-                                            What this member actually won. Defaults are not copied from the giveaway.
+                                            What the winner actually won. Defaults are not copied from the giveaway.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -285,12 +376,14 @@ export function WinnerForm({
                 desc={
                     <span className='flex flex-col gap-2'>
                         <span>
-                            Recording a winner removes them from the remaining giveaways in this cycle. Check the member
-                            before continuing.
+                            This records the draw result only — it does not change the member’s entry status. Check the
+                            member before continuing.
                         </span>
                         <span className='text-white/80'>
                             {giveawayLabel(pendingValues?.giveawayId ?? '')} · {pendingValues?.prize} ·{' '}
-                            {member?.name ?? pendingValues?.userId}
+                            {pendingValues?.mode === 'manual'
+                                ? pendingValues.winnerName
+                                : (member?.name ?? pendingValues?.userId)}
                         </span>
                     </span>
                 }

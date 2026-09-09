@@ -30,7 +30,7 @@ export default async function WinnersPage({ searchParams }: { searchParams: Prom
                     prize: w.prize || '-',
                     giveaway: w.giveaway?.name || '-',
                     tier: w.giveaway?.tier || '-',
-                    winner: w.full_name || '-',
+                    winner: w.full_name || w.winner_name || '-',
                     state: w.state || '-',
                     opens: formatDateTime(w.giveaway?.opens_at),
                     closes: formatDateTime(w.giveaway?.closes_at ?? w.giveaway?.ends_at),
