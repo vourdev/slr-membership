@@ -56,7 +56,7 @@ export function PastDraws({ winners }: { winners: GiveawayWinner[] }) {
             <header className='space-y-1'>
                 <h2 className='font-bebas-neue text-2xl tracking-wide uppercase sm:text-3xl'>Past Draws</h2>
                 <p className='text-slr-muted text-sm md:text-base'>
-                    Winners already drawn and certified across every SLR pool.
+                    Winners already drawn across every SLR pool.
                 </p>
             </header>
 
@@ -64,7 +64,7 @@ export function PastDraws({ winners }: { winners: GiveawayWinner[] }) {
                 <EmptyState
                     icon={Trophy}
                     title='No Past Draws Yet'
-                    description='Winners appear here once a draw has been run and certified.'
+                    description='Winners appear here once a draw has been run.'
                 />
             ) : (
                 <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>

@@ -21,7 +21,7 @@ import { formatDrawDateTime, formatShortDate, tierGroupOf } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
 import type { GiveawayDetail, GiveawayEntryRow } from '@/types/member';
 
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Lock, MapPin, ShieldCheck, Ticket, Trophy } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Lock, MapPin, Ticket, Trophy } from 'lucide-react';
 
 async function loadGiveaway(id: string): Promise<GiveawayDetail | null> {
     const member = await getCurrentMember();
@@ -190,16 +190,6 @@ export default async function GiveawayDetailPage({ params }: { params: Promise<{
                     <InfoCard title='How It Works'>
                         <DrawRulesBody html={drawRules?.content} fallback={giveaway.rules} />
                     </InfoCard>
-
-                    <section className='bg-gold-tint rounded-2xl border border-[#D4AF3759] p-5 md:p-6'>
-                        <div className='flex items-center gap-2'>
-                            <ShieldCheck className='text-slr-gold-label size-5 shrink-0' />
-                            <h2 className='font-bebas-neue text-lg tracking-wide text-white uppercase'>
-                                TPAL Certification
-                            </h2>
-                        </div>
-                        <p className='text-slr-muted mt-2 text-sm leading-relaxed'>{giveaway.tpal_note}</p>
-                    </section>
                 </div>
 
                 <div className='space-y-5'>
