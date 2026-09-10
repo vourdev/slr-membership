@@ -15,11 +15,11 @@ export function Greeting({ member }: { member: CurrentMember }) {
                     </p>
                     <span aria-hidden className='slr-hairline-gold h-px w-16' />
                 </div>
-                <h1 className='font-bebas-neue mt-2 text-4xl leading-none tracking-wider uppercase sm:text-5xl md:text-6xl'>
+                <h1 className='font-bebas-neue mt-2 text-4xl leading-none tracking-wider text-balance uppercase sm:text-5xl md:text-6xl'>
                     <span className='text-gradient-silver'>Welcome back,</span>{' '}
                     <span className='text-gradient-gold'>{firstName}</span>
                 </h1>
-                <p className='text-slr-muted mt-2 text-sm md:text-base'>
+                <p className='text-slr-muted mt-2 text-sm text-pretty md:text-base'>
                     Here&apos;s your membership &amp; draw summary.
                 </p>
             </div>

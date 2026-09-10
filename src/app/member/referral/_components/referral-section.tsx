@@ -85,7 +85,7 @@ export function ReferralSection({ referral }: { referral: ReferralStatus }) {
                 </div>
                 <p className='text-slr-muted mt-3 text-sm leading-relaxed'>
                     {tier_type === 'paid'
-                        ? 'Share your code with friends. Every 10 successful referrals earns you +3 bonus tokens.'
+                        ? 'Share your code with friends. Every 10 successful referrals earns you +3 bonus entries.'
                         : 'Share your code with friends. Referral milestones are gifted manually by our team.'}
                 </p>
             </section>
@@ -140,7 +140,7 @@ export function ReferralSection({ referral }: { referral: ReferralStatus }) {
                                           <tr key={i} className='text-white/90'>
                                               <td className='py-2.5 pr-4'>{formatShortDate(entry.triggered_at)}</td>
                                               <td className='py-2.5 pr-4 tabular-nums'>{entry.referral_count}</td>
-                                              <td className='py-2.5 pr-4 tabular-nums'>+{entry.bonus_token} tokens</td>
+                                              <td className='py-2.5 pr-4 tabular-nums'>+{entry.bonus_token} entries</td>
                                               <td className='py-2.5 capitalize'>{entry.status}</td>
                                           </tr>
                                       ))

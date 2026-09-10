@@ -1,9 +1,9 @@
 import { EntryStatusBadge } from '@/components/common/entry-status-badge';
 import { TierBadge } from '@/components/common/tier-badge';
-import type { EntryCycle } from '@/lib/api/resources/entries';
-import type { SubTierCode } from '@/types/member';
+import { type EntryCycle, isCycleExpired } from '@/lib/api/resources/entries';
+import type { EntryStatus, SubTierCode } from '@/types/member';
 
-function tokenText(value: number, prefix = ''): string {
+function entryText(value: number, prefix = ''): string {
     return value > 0 ? `${prefix}${value}` : '-';
 }
 
@@ -27,7 +27,25 @@ function formatDateRange(startStr: string | null | undefined, endStr: string | n
     return `${fmt.format(start)} – ${fmt.format(end)}`;
 }
 
-export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
+interface CycleState {
+    isCurrent: boolean;
+    status: EntryStatus | 'expired';
+}
+
+// Cycle status is derived from end_at — the API reports every cycle as `active`.
+function cycleState(cycle: EntryCycle, currentCycleId: string | null | undefined): CycleState {
+    const isCurrent = !!currentCycleId && cycle.cycle_id === currentCycleId && !isCycleExpired(cycle);
+
+    return { isCurrent, status: isCurrent ? cycle.entry_status : 'expired' };
+}
+
+export function EntryHistoryTable({
+    entries,
+    currentCycleId
+}: {
+    entries: EntryCycle[];
+    currentCycleId?: string | null;
+}) {
     if (!entries.length) return null;
 
     return (
@@ -49,16 +67,13 @@ export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
                             <tr key={e.cycle_id} className='border-slr-navy-border/50 border-b last:border-0'>
                                 <td className='px-4 py-3'>
                                     <p className='font-medium text-white'>
-                                        {index === 0 ? 'Current Cycle' : 'Past Cycle'}
+                                        {cycleState(e, currentCycleId).isCurrent ? 'Current Cycle' : 'Past Cycle'}
                                     </p>
                                     <p className='text-slr-dim text-xs'>{formatDateRange(e.start_at, e.end_at)}</p>
                                 </td>
                                 <td className='px-4 py-3'>
                                     <div className='flex items-center gap-2'>
-                                        <TierBadge
-                                            subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'}
-                                            size='sm'
-                                        />
+                                        <TierBadge subTier={(e.tier?.toUpperCase() as SubTierCode) || 'R1'} size='sm' />
                                     </div>
                                     {tierChangeLabel(entries, index) && (
                                         <p className='text-slr-gold-label mt-1 text-[10px] uppercase'>
@@ -67,16 +82,16 @@ export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
                                     )}
                                 </td>
                                 <td className='px-4 py-3 text-right text-white/90 tabular-nums'>
-                                    {tokenText(e.base_token)}
+                                    {entryText(e.base_token)}
                                 </td>
                                 <td className='px-4 py-3 text-right text-white/90 tabular-nums'>
-                                    {tokenText(e.referral_bonus, '+')}
+                                    {entryText(e.referral_bonus, '+')}
                                 </td>
                                 <td className='px-4 py-3 text-right font-semibold text-white tabular-nums'>
                                     {e.total_token || 0}
                                 </td>
                                 <td className='px-4 py-3'>
-                                    <EntryStatusBadge status={e.entry_status} />
+                                    <EntryStatusBadge status={cycleState(e, currentCycleId).status} />
                                 </td>
                             </tr>
                         ))}
@@ -89,17 +104,16 @@ export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
                     <div key={e.cycle_id} className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-4'>
                         <div className='flex items-start justify-between gap-2'>
                             <div>
-                                <p className='font-medium text-white'>{index === 0 ? 'Current Cycle' : 'Past Cycle'}</p>
+                                <p className='font-medium text-white'>
+                                    {cycleState(e, currentCycleId).isCurrent ? 'Current Cycle' : 'Past Cycle'}
+                                </p>
                                 <p className='text-slr-dim text-xs'>{formatDateRange(e.start_at, e.end_at)}</p>
                             </div>
-                            <EntryStatusBadge status={e.entry_status} />
+                            <EntryStatusBadge status={cycleState(e, currentCycleId).status} />
                         </div>
 
                         <div className='mt-3 flex flex-wrap items-center gap-2'>
-                            <TierBadge
-                                subTier={((e.tier?.toUpperCase() || 'VISITOR') as SubTierCode) || 'VISITOR'}
-                                size='sm'
-                            />
+                            <TierBadge subTier={(e.tier?.toUpperCase() as SubTierCode) || 'R1'} size='sm' />
                             {tierChangeLabel(entries, index) && (
                                 <span className='text-slr-gold-label text-[10px] uppercase'>
                                     {tierChangeLabel(entries, index)}
@@ -110,11 +124,11 @@ export function EntryHistoryTable({ entries }: { entries: EntryCycle[] }) {
                         <div className='mt-3 grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-center'>
                             <div>
                                 <p className='text-slr-dim text-xs uppercase'>Base</p>
-                                <p className='text-white tabular-nums'>{tokenText(e.base_token)}</p>
+                                <p className='text-white tabular-nums'>{entryText(e.base_token)}</p>
                             </div>
                             <div>
                                 <p className='text-slr-dim text-xs uppercase'>Referral</p>
-                                <p className='text-white tabular-nums'>{tokenText(e.referral_bonus, '+')}</p>
+                                <p className='text-white tabular-nums'>{entryText(e.referral_bonus, '+')}</p>
                             </div>
                             <div>
                                 <p className='text-slr-dim text-xs uppercase'>Total</p>

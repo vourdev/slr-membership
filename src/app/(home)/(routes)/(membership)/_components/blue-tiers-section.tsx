@@ -5,6 +5,7 @@ import Image from 'next/image';
 import GoldCtaButton from '@/components/common/gold-cta-button';
 import SectionEyebrow from '@/components/common/section-eyebrow';
 import SectionHeading from '@/components/common/section-heading';
+import { BENY_MONTHLY_PRICE } from '@/constant/tiers';
 import type { TierDisplay } from '@/lib/api/resources/memberships';
 import { GOLD_BAR_GRADIENT } from '@/lib/styles';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { Disc3 } from 'lucide-react';
 
 const mainBenefits = [
-    '9 Draws Weekly/Monthly with bigger prizes',
+    'Draws Weekly/Monthly with bigger prizes',
     'Monthly bonus prize',
     'Community Discounts',
     'Access to E-books in Finance and Wellbeing',
@@ -79,8 +80,8 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-blue-reward-1.webp',
         name: 'Standard',
         code: 'B1',
-        price: '$26',
-        tokens: '1 Token',
+        price: '$12',
+        tokens: '1 Entry',
         spin: null,
         beny: false,
         cardStyle: blueCardStyle,
@@ -94,9 +95,9 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-blue-reward-2.webp',
         name: 'Plus',
         code: 'B4',
-        price: '$39',
-        tokens: '4 Tokens',
-        spin: '$10 Off',
+        price: '$19',
+        tokens: '4 Entries',
+        spin: '$3 Off',
         beny: true,
         cardStyle: silverCardStyle,
         tokenBoxStyle: { background: 'transparent', border: '1.5px solid #55606E' },
@@ -111,9 +112,9 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-blue-reward-3.webp',
         name: 'Premium',
         code: 'B7',
-        price: '$52',
-        tokens: '7 Tokens',
-        spin: '$15 Off',
+        price: '$27',
+        tokens: '7 Entries',
+        spin: '$6 Off',
         beny: true,
         cardStyle: goldCardStyle,
         tokenBoxStyle: { background: 'transparent', border: '1.5px solid #000000' },
@@ -127,9 +128,9 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-blue-reward-4.webp',
         name: 'Elite',
         code: 'B10',
-        price: '$65',
-        tokens: '10 Tokens',
-        spin: '$20 Off',
+        price: '$35',
+        tokens: '10 Entries',
+        spin: '$9 Off',
         beny: true,
         cardStyle: blackCardStyle,
         tokenBoxStyle: { background: 'transparent', border: '1.5px solid #D4AF37' },
@@ -197,12 +198,12 @@ const BlueTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispl
                                             Start From
                                         </span>
                                         <span className='text-gradient-gold font-bebas-neue text-3xl font-extrabold xl:text-4xl'>
-                                            {startFrom ?? '$26'}
+                                            {startFrom ?? '$3'}
                                         </span>
-                                        <span className='text-xs text-white/60'>/mo</span>
+                                        <span className='text-xs text-white/60'>/week</span>
                                     </div>
                                     <p className='text-slr-muted mt-1 text-xs'>
-                                        1 token = 1 weekly draw entry · Full platform access
+                                        1 entry = 1 weekly draw entry · Full platform access
                                     </p>
                                 </div>
                             </div>
@@ -224,7 +225,7 @@ const BlueTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispl
                                     </div>
                                     <div className='flex flex-col items-center justify-center pt-0.75 pb-1.5'>
                                         <span className='text-[10px] leading-tight font-black text-[#363A3D] sm:text-xs md:text-sm'>
-                                            BENY $4
+                                            BENY {`$${BENY_MONTHLY_PRICE}`}
                                         </span>
                                     </div>
                                 </div>
@@ -247,7 +248,7 @@ const BlueTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispl
 
                             <div className='mt-6'>
                                 <p className='text-center text-xs font-bold tracking-widest text-white uppercase sm:text-sm'>
-                                    Extra Saving with Benny
+                                    Extra Saving with Beny
                                 </p>
                                 <div className='mt-4 flex divide-x divide-white/15'>
                                     {extraSavings.map(([line1, line2]) => (
@@ -313,7 +314,7 @@ const BlueTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispl
                                                     {l?.price ?? tier.price}
                                                 </span>
                                                 <span className={cn('text-xs font-medium xl:text-lg', tier.labelClass)}>
-                                                    /month
+                                                    /4 weeks
                                                 </span>
                                             </p>
                                         </div>
@@ -334,7 +335,7 @@ const BlueTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispl
                                                 'mt-1.5 text-[9px] font-semibold tracking-widest whitespace-nowrap uppercase sm:text-[14px] xl:text-sm',
                                                 tier.labelClass
                                             )}>
-                                            All Access
+                                            Each Draw
                                         </span>
                                     </div>
                                 </div>
@@ -343,7 +344,7 @@ const BlueTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispl
                     </div>
                 </div>
                 <div className='text-slr-dim mt-12 w-full rounded-xl border border-[#1A62C033] bg-[#1A62C014] p-4 text-center text-sm md:text-base'>
-                    Each token gives you <span className='font-bold text-[#6AB0F0]'>one entry</span> into the weekly
+                    Each entry gives you <span className='font-bold text-[#6AB0F0]'>one entry</span> into the weekly
                     member prize draws. Higher tiers = more chances to win every week.
                 </div>
             </div>

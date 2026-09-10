@@ -7,6 +7,7 @@ import SectionEyebrow from '@/components/common/section-eyebrow';
 import { Button } from '@/components/ui/button';
 import { type Discount, getPublicDiscounts } from '@/lib/api/resources/discounts';
 import { goldButtonStyle } from '@/lib/styles';
+import { getTierPricing, minPriceOf } from '@/lib/tier-pricing';
 
 import PageHero from '../_components/page-hero';
 import SavingTodaySection from '../membership/_components/saving-today-section';
@@ -34,15 +35,15 @@ export const metadata: Metadata = {
 const stats = [
     { icon: Map, label: 'States & territories', value: '8' },
     { icon: CalendarCheck, label: 'Draws per week', value: 'Up to 7' },
-    { icon: Layers, label: 'Membership tiers', value: '3' },
+    { icon: Layers, label: 'Membership tiers', value: '2' },
     { icon: ShieldCheck, label: 'Backed by', value: 'TPAL' }
 ];
 
-const howItWorks = [
+const buildHowItWorks = (redFrom: number, blueFrom: number) => [
     {
         icon: UserPlus,
         title: 'Sign up',
-        body: 'Pick your tier — free Visitor, $10 Red, or $26 Premium. Tell us your state for the draw pool.'
+        body: `Pick your tier — from $${redFrom} Red or $${blueFrom} Premium. Tell us your state for the draw pool.`
     },
     {
         icon: Ticket,
@@ -106,6 +107,8 @@ const accentStyles = {
 const STATIC_PARTNER_LOGOS = Array.from({ length: 10 }, (_, i) => `/images/list-partner-logo-${i + 1}.webp`);
 
 const AboutPage = async () => {
+    const pricing = await getTierPricing();
+    const howItWorks = buildHowItWorks(minPriceOf(pricing, 'red') / 100, minPriceOf(pricing, 'blue') / 100);
     const publicDiscounts = await getPublicDiscounts().catch(() => [] as Discount[]);
     const fetchedLogos = publicDiscounts.map((d) => d.logo_url?.trim()).filter((url): url is string => Boolean(url));
     const partnerLogos = fetchedLogos.length > 0 ? fetchedLogos : STATIC_PARTNER_LOGOS;

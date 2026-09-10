@@ -13,6 +13,7 @@ import { formatAdminTierName, subTierFromGroupAndName } from '@/lib/member';
 import type { TierGroup } from '@/types/member';
 
 import { MemberAdminActions } from './_components/member-admin-actions';
+import { MemberConsentsCard } from './_components/member-consents-card';
 import { MemberProfileForm } from './_components/member-profile-form';
 import { ArrowLeft, CircleAlert } from 'lucide-react';
 
@@ -67,6 +68,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
     }
 
     const { membership, subscription, cycles, wins } = member;
+    const consents = member.consents ?? [];
 
     return (
         <div className='mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6'>
@@ -125,6 +127,8 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                 currentTierCode={membership?.tier_code ?? ''}
             />
 
+            <MemberConsentsCard consents={consents} />
+
             <InfoCard title='Subscription'>
                 {subscription ? (
                     <>
@@ -153,8 +157,8 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                                         <TableHead className='text-muted-foreground font-medium'>Tier</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>Start</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>End</TableHead>
-                                        <TableHead className='text-muted-foreground font-medium'>Tokens</TableHead>
-                                        <TableHead className='text-muted-foreground font-medium'>Entry</TableHead>
+                                        <TableHead className='text-muted-foreground font-medium'>Entries</TableHead>
+                                        <TableHead className='text-muted-foreground font-medium'>Entry Status</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>Status</TableHead>
                                     </TableRow>
                                 </TableHeader>

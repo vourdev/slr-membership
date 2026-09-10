@@ -14,7 +14,7 @@ import { Lock } from 'lucide-react';
 
 function GiveawayGrid({ items }: { items: Giveaway[] }) {
     if (items.length === 0) {
-        return <p className='text-slr-dim py-10 text-center text-sm'>No active giveaways here right now.</p>;
+        return <p className='text-slr-dim py-10 text-center text-sm'>No active prize draws here right now.</p>;
     }
 
     return (
@@ -36,20 +36,9 @@ export function GiveawaysBoard({
     nextRenewalIso?: string | null;
 }) {
     const memberGroup = tierGroupOf(memberSubTier);
-    const tabs = visibleGiveawayTabs(memberGroup);
+    const tabs = visibleGiveawayTabs();
 
     const [active, setActive] = useState<TierGroup>(tabs.includes(memberGroup) ? memberGroup : (tabs[0] ?? 'red'));
-
-    if (tabs.length === 0) {
-        return (
-            <div className='space-y-4'>
-                <p className='text-slr-muted text-sm'>
-                    Your weekly Visitor draw. Upgrade to RED or BLUE to unlock cash draws and more.
-                </p>
-                <GiveawayGrid items={giveaways.filter((g) => g.tier_group === 'visitor')} />
-            </div>
-        );
-    }
 
     return (
         <div className='space-y-5'>

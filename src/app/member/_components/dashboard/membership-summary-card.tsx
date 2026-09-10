@@ -28,24 +28,15 @@ function Row({ icon, label, children }: { icon: ReactNode; label: string; childr
     );
 }
 
-export function MembershipSummaryCard({
-    summary,
-    isVisitor = false,
-    className
-}: {
-    summary: MembershipSummary;
-
-    isVisitor?: boolean;
-    className?: string;
-}) {
+export function MembershipSummaryCard({ summary, className }: { summary: MembershipSummary; className?: string }) {
     const meta = SUB_TIERS[summary.sub_tier];
     const visual = TIER_VISUALS[meta.group];
 
     const billing = summary.billing_status ? BILLING[summary.billing_status] : null;
     const isCancelled = summary.cancel_at_period_end ?? false;
 
-    const tierName = meta.group === 'visitor' ? 'Visitor Pass' : formatTierName(summary.sub_tier);
-    const price = meta.price_cents === 0 ? 'Free' : formatAud(meta.price_cents);
+    const tierName = formatTierName(summary.sub_tier);
+    const price = summary.price_cents === 0 ? 'Free' : formatAud(summary.price_cents);
 
     return (
         <div className={cn('relative isolate rounded-2xl p-px', className)}>
@@ -76,35 +67,31 @@ export function MembershipSummaryCard({
                         </h3>
                         <p className='text-slr-muted mt-1 text-sm'>
                             <span className='text-gradient-gold font-bebas-neue text-[32px] leading-none'>{price}</span>
-                            {meta.price_cents > 0 && <span className='ml-1.5'>/ 28-day cycle</span>}
+                            {summary.price_cents > 0 && <span className='ml-1.5'>/ 28-day cycle</span>}
                         </p>
                     </div>
                 </div>
                 <div aria-hidden className='mt-4 h-0.5 w-10 bg-[#997314]' />
 
                 <div className='mt-2 divide-y divide-white/5'>
-                    {!isVisitor && (
-                        <>
-                            <Row icon={<CreditCard className='size-4' />} label='Billing'>
-                                {billing ? (
-                                    <span className={cn('inline-flex items-center gap-1.5', billing.text)}>
-                                        <span className={cn('size-1.5 rounded-full', billing.dot)} />
-                                        {billing.label}
-                                    </span>
-                                ) : (
-                                    <span className='text-slr-dim inline-flex items-center gap-1.5'>
-                                        <span className='bg-slr-dim size-1.5 rounded-full' />
-                                        Unavailable
-                                    </span>
-                                )}
-                            </Row>
-                            <Row
-                                icon={<CalendarClock className='size-4' />}
-                                label={isCancelled ? 'Access ends' : 'Next payment'}>
-                                {formatShortDate(summary.next_payment_date)}
-                            </Row>
-                        </>
-                    )}
+                    <Row icon={<CreditCard className='size-4' />} label='Billing'>
+                        {billing ? (
+                            <span className={cn('inline-flex items-center gap-1.5', billing.text)}>
+                                <span className={cn('size-1.5 rounded-full', billing.dot)} />
+                                {billing.label}
+                            </span>
+                        ) : (
+                            <span className='text-slr-dim inline-flex items-center gap-1.5'>
+                                <span className='bg-slr-dim size-1.5 rounded-full' />
+                                Unavailable
+                            </span>
+                        )}
+                    </Row>
+                    <Row
+                        icon={<CalendarClock className='size-4' />}
+                        label={isCancelled ? 'Access ends' : 'Next payment'}>
+                        {formatShortDate(summary.next_payment_date)}
+                    </Row>
 
                     <Row icon={<Ticket className='size-4' />} label='Entries per draw'>
                         <span className='tabular-nums'>{meta.tokens}</span>

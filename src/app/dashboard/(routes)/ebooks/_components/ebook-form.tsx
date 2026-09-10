@@ -17,6 +17,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { WysiwygEditor } from '@/components/ui/wysiwyg-editor';
 import type { EbookChapter, EbookTier } from '@/lib/api/resources/ebooks';
+import { type EbookContentMode, isExternalReadUrl, resolveEbookMode } from '@/lib/ebook-mode';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { createEbookAction, deleteChapterAction, updateEbookAction } from '../actions';
@@ -69,9 +70,8 @@ export function EbookForm({ initialData }: EbookFormProps) {
     const [selectedChapter, setSelectedChapter] = useState<EbookChapter | null>(null);
     const [chapterPendingDelete, setChapterPendingDelete] = useState<EbookChapter | null>(null);
 
-    const isPdfEbook = Boolean(initialData?.pdfUrl);
-    const [contentMode, setContentMode] = useState<'chapters' | 'pdf'>(
-        initialData ? (isPdfEbook ? 'pdf' : 'chapters') : 'chapters'
+    const [contentMode, setContentMode] = useState<EbookContentMode>(
+        initialData ? resolveEbookMode(initialData.pdfUrl) : 'chapters'
     );
     const isEditing = Boolean(initialData);
 
@@ -154,10 +154,40 @@ export function EbookForm({ initialData }: EbookFormProps) {
             return;
         }
 
-        const payload: FormValues =
-            contentMode === 'pdf'
-                ? { ...values, pdfUrl: values.pdfUrl, description: '' }
-                : { ...values, pdfUrl: null as unknown as string };
+        const externalUrl = values.pdfUrl?.trim() ?? '';
+
+        if (contentMode === 'external') {
+            // The summary is the entire member-facing page for this mode, so an empty
+            // one would publish a landing page with nothing on it but a button.
+            if (!values.description?.replace(/<[^>]*>/g, '').trim()) {
+                form.setError('description', { message: 'Write the summary members read before following the link.' });
+
+                return;
+            }
+
+            if (!externalUrl) {
+                form.setError('pdfUrl', { message: 'Paste the URL where members read this book.' });
+
+                return;
+            }
+
+            if (!isExternalReadUrl(externalUrl)) {
+                form.setError('pdfUrl', {
+                    message: 'Use a full http(s) link to a reading page. A .pdf link belongs in the PDF mode.'
+                });
+
+                return;
+            }
+        }
+
+        let payload: FormValues;
+        if (contentMode === 'pdf') {
+            payload = { ...values, pdfUrl: values.pdfUrl, description: '' };
+        } else if (contentMode === 'external') {
+            payload = { ...values, pdfUrl: externalUrl };
+        } else {
+            payload = { ...values, pdfUrl: null as unknown as string };
+        }
 
         startTransition(async () => {
             const res = initialData
@@ -194,17 +224,18 @@ export function EbookForm({ initialData }: EbookFormProps) {
                                 type='single'
                                 value={contentMode}
                                 onValueChange={(v) => {
-                                    if (v && !isEditing) setContentMode(v as 'chapters' | 'pdf');
+                                    if (v && !isEditing) setContentMode(v as EbookContentMode);
                                 }}
                                 disabled={isEditing}
                                 className='w-fit'>
                                 <ToggleGroupItem value='chapters'>Chapters</ToggleGroupItem>
                                 <ToggleGroupItem value='pdf'>PDF</ToggleGroupItem>
+                                <ToggleGroupItem value='external'>External link</ToggleGroupItem>
                             </ToggleGroup>
                             <p className='text-xs text-white/40'>
                                 {isEditing
                                     ? 'Content type is fixed after creation.'
-                                    : 'Choose whether this ebook is a multi-chapter reader or a single uploaded PDF.'}
+                                    : 'Multi-chapter reader, a single uploaded PDF, or a summary that sends members to the original source to read.'}
                             </p>
                         </div>
 
@@ -237,16 +268,22 @@ export function EbookForm({ initialData }: EbookFormProps) {
                             />
                         </div>
 
-                        {contentMode === 'chapters' && (
+                        {contentMode !== 'pdf' && (
                             <FormField
                                 control={form.control}
                                 name='description'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Content / Description</FormLabel>
+                                        <FormLabel>
+                                            {contentMode === 'external' ? 'Summary' : 'Content / Description'}
+                                        </FormLabel>
                                         <FormControl>
                                             <WysiwygEditor
-                                                placeholder='Write the ebook content or description...'
+                                                placeholder={
+                                                    contentMode === 'external'
+                                                        ? 'Summarise the book — this is all members read before the Read More button...'
+                                                        : 'Write the ebook content or description...'
+                                                }
                                                 onImageUpload={uploadEbookAsset}
                                                 {...field}
                                             />
@@ -271,6 +308,32 @@ export function EbookForm({ initialData }: EbookFormProps) {
                                                 onUpload={uploadEbookAsset}
                                             />
                                         </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        {contentMode === 'external' && (
+                            <FormField
+                                control={form.control}
+                                name='pdfUrl'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Source URL</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type='url'
+                                                inputMode='url'
+                                                placeholder='https://www.free-ebooks.net/self-help/Becoming-Mindful'
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <p className='text-xs text-white/40'>
+                                            Members read the summary above, then “Read More” opens this source site in a
+                                            new tab. A URL ending in .pdf is not accepted here — upload it through the
+                                            PDF mode instead.
+                                        </p>
                                         <FormMessage />
                                     </FormItem>
                                 )}

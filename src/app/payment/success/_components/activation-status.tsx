@@ -82,7 +82,7 @@ export function ActivationStatus() {
             <EmptyState
                 icon={CheckCircle2}
                 title='Payment Successful'
-                description={`Your ${tier} membership is now active — tokens and draw entries are allocated for this cycle.${renewal}`}
+                description={`Your ${tier} membership is now active — draw entries are allocated for this cycle.${renewal}`}
                 action={
                     <div className='flex flex-col items-center gap-3'>
                         <GoldCtaButton href='/member' className='w-full max-w-xs'>

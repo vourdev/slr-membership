@@ -39,6 +39,7 @@ export const API = {
         benyPending: '/api/v1/admin/beny/pending',
         benyActivate: (id: string) => `/api/v1/admin/beny/${id}/activate`,
         benyList: '/api/v1/admin/beny',
+        consents: '/api/v1/admin/consents',
         benyDeactivate: (id: string) => `/api/v1/admin/beny/${id}/deactivate`,
         csvGenerate: '/api/v1/admin/csv/generate',
         csvHistory: '/api/v1/admin/csv/history',
@@ -86,8 +87,19 @@ export const API = {
         detail: (id: string) => `/api/v1/giveaways/${id}`,
         winners: '/api/v1/giveaways/winners'
     },
+    announcements: {
+        // Live path is /public/announcements — the integration guide's /announcements 404s.
+        public: (type?: string) =>
+            type ? `/api/v1/public/announcements?type=${encodeURIComponent(type)}` : '/api/v1/public/announcements',
+        adminList: '/api/v1/admin/announcements',
+        adminDetail: (id: string) => `/api/v1/admin/announcements/${id}`
+    },
     entries: {
         history: '/api/v1/entries/'
+    },
+    consents: {
+        me: '/api/v1/consents/me',
+        update: '/api/v1/consents'
     },
     prizes: {
         member: '/api/v1/prizes/'

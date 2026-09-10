@@ -5,7 +5,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { register } from '@/lib/api/resources/auth';
+import { signUpConsents } from '@/lib/api/resources/consents';
 import { ApiError, apiErrorCode, apiErrorMessage } from '@/lib/api/types';
+import { type TierPricing, isSpinEligible, spinDiscountOf } from '@/lib/tier-pricing';
 import { cn } from '@/lib/utils';
 
 import StepAccount from './step-account';
@@ -15,7 +17,7 @@ import StepSpinWheel from './step-spin-wheel';
 import StepSuccess from './step-success';
 import StepTier from './step-tier';
 import Stepper from './stepper';
-import { SignUpFormData, SpinPrize, isSpinEligible, spinDiscountFor } from './types';
+import { SignUpFormData, SpinPrize } from './types';
 import { Loader2Icon } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { toast } from 'sonner';
@@ -31,9 +33,11 @@ const initialData: SignUpFormData = {
     name: '',
     email: '',
     password: '',
-    state: 'VIC',
+    state: '',
     phone: '',
     dob: '',
+    agreedToTerms: false,
+    marketingOptIn: false,
     tier: null,
     sub_tier: null
 };
@@ -57,7 +61,9 @@ const stepIndexForLabel = (step: Step): number => {
     }
 };
 
-export function RegisterForm({ className, ...props }: React.ComponentProps<'div'>) {
+type RegisterFormProps = React.ComponentProps<'div'> & { pricing: TierPricing };
+
+export function RegisterForm({ pricing, className, ...props }: RegisterFormProps) {
     const router = useRouter();
     const [data, setData] = useState<SignUpFormData>(initialData);
     const [spinPrize, setSpinPrize] = useState<SpinPrize | null>(null);
@@ -78,11 +84,16 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
         const subTier = patch.sub_tier ?? data.sub_tier;
 
         const goPay = (spinAvailable: boolean) =>
-            setStep(spinAvailable && isSpinEligible(subTier) ? 'spin' : 'checkout');
+            setStep(spinAvailable && isSpinEligible(pricing, subTier) ? 'spin' : 'checkout');
+
+        if (!tier || !subTier) {
+            setStep('tier');
+
+            return;
+        }
 
         if (userId && registeredEmail === data.email) {
-            if (tier === 'visitor') setStep('otp');
-            else goPay(true);
+            goPay(true);
 
             return;
         }
@@ -95,8 +106,9 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                 state: data.state as Exclude<SignUpFormData['state'], ''>,
                 phone: data.phone,
                 dob: data.dob,
-                tier: tier ?? 'visitor',
-                sub_tier: tier === 'visitor' ? undefined : subTier?.toLowerCase()
+                tier,
+                sub_tier: subTier.toLowerCase(),
+                consents: signUpConsents(data.agreedToTerms, data.marketingOptIn)
             });
             setUserId(res.user_id);
             setRegisteredEmail(data.email);
@@ -156,11 +168,13 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                     />
                 );
             case 'tier':
-                return <StepTier data={data} onNext={goNextFromTier} onBack={() => setStep('account')} />;
+                return (
+                    <StepTier data={data} pricing={pricing} onNext={goNextFromTier} onBack={() => setStep('account')} />
+                );
             case 'spin':
                 return (
                     <StepSpinWheel
-                        winDiscount={spinDiscountFor(data.sub_tier)}
+                        winDiscount={data.sub_tier ? spinDiscountOf(pricing, data.sub_tier) : 0}
                         token={checkoutToken}
                         onNext={goSpinDone}
                         onBack={() => setStep('tier')}
@@ -179,13 +193,14 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<'div'
                 return (
                     <StepCheckout
                         data={data}
+                        pricing={pricing}
                         spinPrize={spinPrize}
                         token={checkoutToken}
-                        onBack={() => setStep(isSpinEligible(data.sub_tier) ? 'spin' : 'tier')}
+                        onBack={() => setStep(isSpinEligible(pricing, data.sub_tier) ? 'spin' : 'tier')}
                     />
                 );
             case 'success':
-                return <StepSuccess data={data} spinPrize={spinPrize} />;
+                return <StepSuccess data={data} pricing={pricing} spinPrize={spinPrize} />;
         }
     };
 

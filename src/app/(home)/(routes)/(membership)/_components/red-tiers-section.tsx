@@ -5,6 +5,7 @@ import Image from 'next/image';
 import GoldCtaButton from '@/components/common/gold-cta-button';
 import SectionEyebrow from '@/components/common/section-eyebrow';
 import SectionHeading from '@/components/common/section-heading';
+import { BENY_MONTHLY_PRICE } from '@/constant/tiers';
 import type { TierDisplay } from '@/lib/api/resources/memberships';
 import { GOLD_BAR_GRADIENT } from '@/lib/styles';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { Disc3 } from 'lucide-react';
 
 const mainBenefits = [
-    '9 Draws Weekly/Monthly',
+    'Draws Weekly/Monthly',
     'Monthly bonus prize',
     'Community Discounts',
     'Access to E-books in Finance and Wellbeing',
@@ -60,8 +61,8 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-red-reward-1.webp',
         name: 'Standard',
         code: 'R1',
-        price: '$10',
-        tokens: '1 Token',
+        price: '$6',
+        tokens: '1 Entry',
         spin: null,
         beny: false,
         cardStyle: redCardStyle,
@@ -73,9 +74,9 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-red-reward-2.webp',
         name: 'Plus',
         code: 'R4',
-        price: '$20',
-        tokens: '4 Tokens',
-        spin: '$5 Off',
+        price: '$12',
+        tokens: '4 Entries',
+        spin: '$3 Off',
         beny: true,
         cardStyle: goldCardStyle,
         tokenBoxStyle: { border: '1.5px solid #000000', background: 'transparent' },
@@ -86,9 +87,9 @@ const tiers: TierRow[] = [
         icon: '/icons/ic-list-slr-red-reward-3.webp',
         name: 'Premium',
         code: 'R7',
-        price: '$30',
-        tokens: '7 Tokens',
-        spin: '$10 Off',
+        price: '$18',
+        tokens: '7 Entries',
+        spin: '$6 Off',
         beny: true,
         cardStyle: blackCardStyle,
         tokenBoxStyle: { border: '1.5px solid #D4AF37', background: 'transparent' },
@@ -128,7 +129,7 @@ const RedTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispla
                     </SectionHeading>
 
                     <p className='text-slr-muted mt-2 text-center text-sm leading-relaxed xl:text-base'>
-                        Member prize tokens are based on your tier level.
+                        Member prize entries are based on your tier level.
                     </p>
                 </div>
 
@@ -156,11 +157,11 @@ const RedTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispla
                                             Start From
                                         </span>
                                         <span className='text-gradient-gold font-bebas-neue text-3xl font-extrabold xl:text-4xl'>
-                                            {startFrom ?? '$10'}
+                                            {startFrom ?? '$1.50'}
                                         </span>
-                                        <span className='text-xs text-white/60'>/mo</span>
+                                        <span className='text-xs text-white/60'>/week</span>
                                     </div>
-                                    <p className='text-slr-muted mt-1 text-xs'>1 to 7 draw token/entry</p>
+                                    <p className='text-slr-muted mt-1 text-xs'>1 to 7 draw entries</p>
                                 </div>
                             </div>
 
@@ -181,7 +182,7 @@ const RedTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispla
                                     </div>
                                     <div className='flex flex-col items-center justify-center pt-0.75 pb-1.5'>
                                         <span className='text-[10px] leading-tight font-black text-[#363A3D] sm:text-xs md:text-sm'>
-                                            BENY $4
+                                            BENY {`$${BENY_MONTHLY_PRICE}`}
                                         </span>
                                     </div>
                                 </div>
@@ -265,7 +266,7 @@ const RedTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispla
                                                         'text-xs font-medium xl:text-lg',
                                                         isPlus ? 'text-black/85' : 'text-white/70'
                                                     )}>
-                                                    /month
+                                                    /4 weeks
                                                 </span>
                                             </p>
                                         </div>
@@ -286,8 +287,8 @@ const RedTiersSection = ({ live, startFrom }: { live?: Record<string, TierDispla
                                                 'mt-1.5 flex flex-col items-center text-[9px] leading-snug font-semibold tracking-[0.2em] uppercase sm:text-[14px] xl:text-sm',
                                                 tier.labelClass
                                             )}>
-                                            <span>Member</span>
-                                            <span>Entries</span>
+                                            <span>Each</span>
+                                            <span>Draw</span>
                                         </div>
                                     </div>
                                 </div>

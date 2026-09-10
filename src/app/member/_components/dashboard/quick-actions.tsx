@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { SectionTitle } from './section-title';
-import { ArrowRight, BookOpen, CreditCard, Gift, type LucideIcon, TicketPercent, UserCircle } from 'lucide-react';
+import { ArrowRight, BookOpen, Gift, type LucideIcon, TicketPercent, UserCircle } from 'lucide-react';
 
 interface QuickAction {
     title: string;
@@ -12,28 +12,17 @@ interface QuickAction {
 
 const ACTIONS: QuickAction[] = [
     { title: 'Discounts', href: '/member/discounts', icon: TicketPercent, desc: 'Partner offers & BENY' },
-    { title: 'Giveaways', href: '/member/giveaways', icon: Gift, desc: 'Active draws by tier' },
+    { title: 'Prize Draws', href: '/member/giveaways', icon: Gift, desc: 'Active draws by tier' },
     { title: 'E-Books', href: '/member/ebooks', icon: BookOpen, desc: 'Digital library' },
     { title: 'Profile', href: '/member/profile', icon: UserCircle, desc: 'Account & membership' }
 ];
 
-const VISITOR_MEMBERSHIP_ACTION: QuickAction = {
-    title: 'Membership',
-    href: '/member/membership',
-    icon: CreditCard,
-    desc: 'Upgrade your plan'
-};
-
-export function QuickActions({ isVisitor = false }: { isVisitor?: boolean }) {
-    const actions = isVisitor
-        ? ACTIONS.map((action) => (action.href === '/member/discounts' ? VISITOR_MEMBERSHIP_ACTION : action))
-        : ACTIONS;
-
+export function QuickActions() {
     return (
         <section>
             <SectionTitle>Quick Actions</SectionTitle>
             <div className='grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4'>
-                {actions.map((action) => (
+                {ACTIONS.map((action) => (
                     <Link
                         key={action.href}
                         href={action.href}

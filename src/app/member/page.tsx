@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import EmptyState from '@/components/common/empty-state';
-import { SPIN_ELIGIBLE_SUB_TIERS, SUB_TIERS } from '@/constant/tiers';
+import { SPIN_ELIGIBLE_SUB_TIERS } from '@/constant/tiers';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { type Discount, getPublicDiscounts } from '@/lib/api/resources/discounts';
@@ -19,6 +19,7 @@ import {
     subTierCodeOf,
     tierGroupOf
 } from '@/lib/member';
+import { getTierPricing } from '@/lib/tier-pricing';
 import type { DrawStatus, MembershipSummary, UpcomingGiveaway } from '@/types/member';
 
 import { CancelledMembershipBanner } from './_components/dashboard/cancelled-membership-banner';
@@ -30,7 +31,6 @@ import { MembershipSummaryCard } from './_components/dashboard/membership-summar
 import { QuickActions } from './_components/dashboard/quick-actions';
 import { RenewalSpinCard } from './_components/dashboard/renewal-spin-card';
 import { UpcomingGiveaways } from './_components/dashboard/upcoming-giveaways';
-import { VisitorUpgradeBanner } from './_components/dashboard/visitor-upgrade-banner';
 import { CircleAlert, Gift } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -61,8 +61,7 @@ export default async function MemberDashboardPage() {
         if (result?.status === 'rejected') handleApiAuthError(result.reason);
     }
 
-    const publicDiscounts =
-        tierGroupOf(member.sub_tier) === 'visitor' ? [] : await getPublicDiscounts().catch(() => [] as Discount[]);
+    const publicDiscounts = await getPublicDiscounts().catch(() => [] as Discount[]);
 
     const membership = membershipR?.status === 'fulfilled' ? membershipR.value : null;
     const rawCycle = entriesR?.status === 'fulfilled' ? entriesR.value.current_cycle : null;
@@ -78,18 +77,22 @@ export default async function MemberDashboardPage() {
     const spin = spinR?.status === 'fulfilled' ? spinR.value : null;
     const renewalSpin = spin?.available && (spin.moment === 'renewal' || spin.moment === 'pre_renewal') ? spin : null;
 
+    const pricing = await getTierPricing();
     const subTier = membership ? subTierCodeOf(membership.subTierId) : member.sub_tier;
     const memberGroup = tierGroupOf(subTier);
 
-    const isVisitor = memberGroup === 'visitor';
     const memberTokens = cycle?.total_token ?? 0;
 
-    const nextPayment = cycle?.end_at ?? (membership?.activatedAt ? cycleEndFrom(membership.activatedAt) : '');
+    // Stripe period end is the billing source of truth; cycle end_at can drift from it
+    const nextPayment =
+        billing?.next_renewal_at ??
+        cycle?.end_at ??
+        (membership?.activatedAt ? cycleEndFrom(membership.activatedAt) : '');
     const summary: MembershipSummary = {
         sub_tier: subTier,
         state: member.state,
         billing_status: membership ? mapBillingStatus(membership.billingStatus) : null,
-        price_cents: membership?.subTier.priceCents ?? SUB_TIERS[subTier].price_cents,
+        price_cents: membership?.subTier.priceCents ?? pricing[subTier].priceCents,
         next_payment_date: nextPayment,
         beny_addon: null,
         cancel_at_period_end: billing?.cancel_at_period_end ?? false
@@ -136,7 +139,7 @@ export default async function MemberDashboardPage() {
     const isCancelled = summary.billing_status === 'canceled';
 
     const drawEyebrow = giveawayDraw ? 'Current Draw' : 'Current Cycle';
-    const drawDateWord = isVisitor || isCancelled ? 'Ends' : giveawayDraw ? 'Draws' : 'Renews';
+    const drawDateWord = isCancelled ? 'Ends' : giveawayDraw ? 'Draws' : 'Renews';
 
     const featuredDiscounts: Discount[] = publicDiscounts
         .filter((d) => d.is_featured && (d.title?.trim() || d.partner_name?.trim()))
@@ -169,11 +172,9 @@ export default async function MemberDashboardPage() {
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-8 px-4 py-6 md:space-y-12 md:px-6 md:py-8'>
             <Greeting member={member} />
 
-            {isVisitor ? <VisitorUpgradeBanner /> : null}
+            {!member.email_verified_at ? <EmailVerificationBanner /> : null}
 
-            {!isVisitor && !member.email_verified_at ? <EmailVerificationBanner /> : null}
-
-            {!isVisitor && billing?.cancel_at_period_end && cycle?.end_at ? (
+            {billing?.cancel_at_period_end && cycle?.end_at ? (
                 <CancelledMembershipBanner accessEndsAt={cycle.end_at} />
             ) : null}
 
@@ -183,7 +184,7 @@ export default async function MemberDashboardPage() {
 
             <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                 {membership || cycle ? (
-                    <MembershipSummaryCard summary={summary} isVisitor={isVisitor} className='lg:col-span-1' />
+                    <MembershipSummaryCard summary={summary} className='lg:col-span-1' />
                 ) : (
                     <EmptyState
                         icon={CircleAlert}
@@ -217,22 +218,22 @@ export default async function MemberDashboardPage() {
                 )}
             </div>
 
-            <QuickActions isVisitor={isVisitor} />
+            <QuickActions />
 
-            {!isVisitor && featuredDiscounts.length > 0 && <FeaturedDiscounts discounts={featuredDiscounts} />}
+            {featuredDiscounts.length > 0 && <FeaturedDiscounts discounts={featuredDiscounts} />}
 
             {upcomingGiveaways.length > 0 ? (
                 <UpcomingGiveaways giveaways={upcomingGiveaways} />
             ) : giveawaysFailed ? (
                 <EmptyState
                     icon={CircleAlert}
-                    title='Giveaways Unavailable'
+                    title='Prize Draws Unavailable'
                     description='We couldn’t load the active draws right now. Please try again shortly.'
                 />
-            ) : isVisitor ? null : (
+            ) : (
                 <EmptyState
                     icon={Gift}
-                    title='No Active Giveaways'
+                    title='No Active Prize Draws'
                     description='Active draws for your tier will show here soon.'
                 />
             )}

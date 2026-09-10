@@ -3,18 +3,30 @@ import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { BENY_MONTHLY_PRICE } from '@/constant/tiers';
+
 const goldPillStyle: CSSProperties = {
     background: 'linear-gradient(119.74deg, #FFE8A3 16.57%, #F1C94F 94.27%)'
 };
 
 const apps = [
-    { icon: '/icons/ic-apple.png', tagline: 'Download on the', name: 'App Store', href: '#' },
-    { icon: '/icons/ic-play-store.png', tagline: 'Get it on', name: 'Google Play', href: '#' }
+    {
+        icon: '/icons/ic-apple.png',
+        tagline: 'Download on the',
+        name: 'App Store',
+        href: 'https://apps.apple.com/au/app/beny/id1624827208'
+    },
+    {
+        icon: '/icons/ic-play-store.png',
+        tagline: 'Get it on',
+        name: 'Google Play',
+        href: 'https://play.google.com/store/apps/details?id=user.beny.com.au&hl=en_AU'
+    }
 ];
 
 const SaveMoreWithBenySection = () => {
     return (
-        <section className='bg-slr-ink relative isolate overflow-hidden py-16 md:py-24'>
+        <section id='beny' className='bg-slr-ink relative isolate scroll-mt-24 overflow-hidden py-16 md:py-24'>
             <div
                 aria-hidden='true'
                 className='pointer-events-none absolute top-1/2 left-1/2 -z-10 h-105 w-105 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(190,40,120,0.35)_0%,transparent_70%)] blur-3xl'
@@ -30,12 +42,12 @@ const SaveMoreWithBenySection = () => {
                             <span
                                 style={goldPillStyle}
                                 className='rounded-full px-3 py-1 text-[11px] font-bold tracking-wider text-[#0C1132] uppercase'>
-                                Add-ons $4
+                                Add-ons {`$${BENY_MONTHLY_PRICE}`}
                             </span>
                         </div>
 
                         <div className='relative mt-5 inline-block'>
-                            <span className='block bg-[linear-gradient(91deg,#F4A6C0_0%,#ED5C97_45%,#E0309A_100%)] bg-clip-text text-[88px] leading-none font-extrabold text-transparent sm:text-[112px] lg:text-[128px]'>
+                            <span className='block bg-[linear-gradient(91deg,#F4A6C0_0%,#ED5C97_45%,#E0309A_100%)] bg-clip-text pb-2 text-[88px] leading-[1.12] font-extrabold text-transparent sm:text-[112px] lg:text-[128px]'>
                                 Beny
                             </span>
                             <span
@@ -63,6 +75,8 @@ const SaveMoreWithBenySection = () => {
                                 <Link
                                     key={app.name}
                                     href={app.href}
+                                    target='_blank'
+                                    rel='noopener noreferrer'
                                     className='inline-flex items-center gap-3 rounded-xl border border-[#2A2D31] bg-[#16191D] px-5 py-3 transition-colors hover:border-[#403314]'>
                                     <Image src={app.icon} alt='' width={24} height={24} className='h-6 w-6 shrink-0' />
                                     <span className='leading-tight'>

@@ -1,13 +1,17 @@
 import type { Metadata } from 'next';
 
+import { DrawRulesBody } from '@/components/common/draw-rules-body';
 import EmptyState from '@/components/common/empty-state';
-import { SUB_TIERS, TIER_VISUALS } from '@/constant/tiers';
+import { TIER_VISUALS } from '@/constant/tiers';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
+import { getDrawRules } from '@/lib/api/resources/announcements';
+import { GIVEAWAY_RULES } from '@/lib/api/resources/giveaways';
 import { getPrizePool } from '@/lib/api/resources/prizes';
 import { getAccessToken } from '@/lib/api/server';
-import { tierGroupOf } from '@/lib/member';
-import type { PrizeContent, PrizeTierBreakdown, TierGroup } from '@/types/member';
+import { formatShortDate, tierGroupOf } from '@/lib/member';
+import { type TierPricing, getTierPricing, minPriceOf } from '@/lib/tier-pricing';
+import type { PrizeContent, PrizeTierBreakdown } from '@/types/member';
 
 import { PrizeTierCard } from './_components/prize-tier-card';
 import { CircleAlert, Sparkles } from 'lucide-react';
@@ -16,37 +20,25 @@ export const metadata: Metadata = {
     title: 'Prizes · SLR Member'
 };
 
-const TIER_ORDER: TierGroup[] = ['visitor', 'red', 'blue'];
+const TIER_ORDER = ['red', 'blue'] as const;
 
-function priceLabel(group: TierGroup): string {
-    if (group === 'visitor') return 'Free to join';
-
-    const cents = Math.min(
-        ...Object.values(SUB_TIERS)
-            .filter((tier) => tier.group === group)
-            .map((tier) => tier.price_cents)
-    );
-
-    return `from $${cents / 100}/month`;
-}
-
-function toTierBreakdown(content: PrizeContent): PrizeTierBreakdown[] {
+function toTierBreakdown(content: PrizeContent, pricing: TierPricing): PrizeTierBreakdown[] {
     return TIER_ORDER.map((group) => ({
         tier_group: group,
-        tier_label: group === 'visitor' ? 'Visitor' : `SLR ${TIER_VISUALS[group].label}`,
-        price_label: priceLabel(group),
-        weekly:
-            group === 'visitor' ? content.visitor_prize : group === 'red' ? content.red_weekly : content.blue_weekly,
-        monthly: group === 'visitor' ? null : group === 'red' ? content.red_monthly : content.blue_monthly
+        tier_label: `SLR ${TIER_VISUALS[group].label}`,
+        price_label: `from $${minPriceOf(pricing, group) / 100}/4 weeks`,
+        weekly: group === 'red' ? content.red_weekly : content.blue_weekly,
+        monthly: group === 'red' ? content.red_monthly : content.blue_monthly
     }));
 }
 
 export default async function PrizesPage() {
-    const [token, member] = await Promise.all([getAccessToken(), getCurrentMember()]);
+    const [token, member, drawRules] = await Promise.all([getAccessToken(), getCurrentMember(), getDrawRules()]);
     const memberGroup = tierGroupOf(member.sub_tier);
 
     let content: PrizeContent | null = null;
     let failed = !token;
+    const pricing = await getTierPricing();
 
     if (token) {
         try {
@@ -97,8 +89,8 @@ export default async function PrizesPage() {
                             </h2>
                             <span className='text-slr-dim text-xs'>Your tier is highlighted</span>
                         </div>
-                        <div className='grid gap-4 md:grid-cols-3'>
-                            {toTierBreakdown(content).map((tier) => (
+                        <div className='grid gap-4 md:grid-cols-2'>
+                            {toTierBreakdown(content, pricing).map((tier) => (
                                 <PrizeTierCard
                                     key={tier.tier_group}
                                     tier={tier}
@@ -108,10 +100,21 @@ export default async function PrizesPage() {
                         </div>
                     </section>
 
-                    <p className='text-slr-dim mx-auto max-w-2xl text-center text-xs leading-relaxed'>
-                        Prize pool figures are indicative and updated by SLR each membership stage. All prizes are drawn
-                        externally at randomdraws.com.au under TPAL certification.
-                    </p>
+                    <section>
+                        <div className='mb-3 flex flex-wrap items-center justify-between gap-2'>
+                            <h2 className='font-bebas-neue text-xl tracking-wide text-white uppercase md:text-2xl'>
+                                Draw Rules
+                            </h2>
+                            {drawRules?.updated_at ? (
+                                <span className='text-slr-dim text-xs'>
+                                    Updated {formatShortDate(drawRules.updated_at)}
+                                </span>
+                            ) : null}
+                        </div>
+                        <div className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-5 md:p-6'>
+                            <DrawRulesBody html={drawRules?.content} fallback={GIVEAWAY_RULES} />
+                        </div>
+                    </section>
                 </>
             )}
         </div>

@@ -4,6 +4,7 @@ import type { AuStateCode } from '@/constant/au-states';
 
 import { API } from '../endpoints';
 import { apiFetch, apiFetchPaginated } from '../http';
+import type { MemberConsentSummary } from './consents';
 
 export interface TierCount {
     tier: string;
@@ -45,6 +46,7 @@ export interface AdminMemberListItem {
     billing_status?: string;
     created_at: string;
     draw_pass?: number | null;
+    consents?: MemberConsentSummary[];
 }
 
 export interface AdminMemberDetailMembership {
@@ -90,6 +92,7 @@ export interface AdminMemberDetail {
     status: 'active' | 'suspended' | 'deactivated' | string;
     created_at: string;
     membership: AdminMemberDetailMembership;
+    consents?: MemberConsentSummary[];
     subscription: AdminMemberDetailSubscription | null;
     cycles: AdminMemberDetailCycle[];
     wins: AdminMemberDetailWin[];
@@ -143,7 +146,12 @@ export interface BenySubscriptionItem {
     status: 'pending_activation' | 'active' | 'pending_deactivation' | 'cancelled' | 'canceled' | string;
     created_at: string;
     activated_at?: string | null;
+
+    // Live api-dev returns `expires_at` / `cancelled_at`; the earlier contract named them
+    // `access_ends_at` / `deactivated_at`. Both are kept so either shape maps cleanly.
+    expires_at?: string | null;
     access_ends_at?: string | null;
+    cancelled_at?: string | null;
     deactivated_at?: string | null;
     deactivation_reason?: string | null;
 }

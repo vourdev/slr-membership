@@ -10,6 +10,17 @@ import { motion, useAnimationFrame, useMotionValue } from 'motion/react';
 
 const SPEED = 30;
 
+function repeatToFill(logos: { src: string; alt: string }[]): { src: string; alt: string }[] {
+    if (logos.length === 0) return [];
+
+    let items = [...logos];
+    while (items.length < 35) {
+        items = [...items, ...logos];
+    }
+
+    return items;
+}
+
 export interface LogoMarqueeProps {
     logos: { src: string; alt: string }[];
 
@@ -38,14 +49,19 @@ const LogoMarquee = ({
         );
     }, [logos]);
 
-    const multipliedLogos = React.useMemo(() => {
+    const row1Logos = React.useMemo(() => {
         if (validLogos.length === 0) return [];
-        let items = [...validLogos];
-        while (items.length < 35) {
-            items = [...items, ...validLogos];
-        }
+        if (validLogos.length === 1) return repeatToFill(validLogos);
 
-        return items;
+        return repeatToFill(validLogos.slice(0, Math.ceil(validLogos.length / 2)));
+    }, [validLogos]);
+
+    const row2Logos = React.useMemo(() => {
+        if (validLogos.length === 0) return [];
+        if (validLogos.length === 1) return repeatToFill(validLogos);
+        const secondHalf = validLogos.slice(Math.ceil(validLogos.length / 2));
+
+        return repeatToFill(secondHalf.length > 0 ? secondHalf : validLogos);
     }, [validLogos]);
 
     useEffect(() => {
@@ -54,19 +70,22 @@ const LogoMarquee = ({
                 const half = row1Ref.current.scrollWidth / 2;
                 if (half > 0) {
                     xRow1.set(-half);
-
-                    xRow2.set(-half / 3);
                     setMounted(true);
                 }
             } else {
                 setMounted(true);
+            }
+
+            if (row2Ref.current) {
+                const half2 = row2Ref.current.scrollWidth / 2;
+                if (half2 > 0) xRow2.set(-half2);
             }
         };
 
         const t = window.requestAnimationFrame(init);
 
         return () => window.cancelAnimationFrame(t);
-    }, [xRow1, xRow2, multipliedLogos]);
+    }, [xRow1, xRow2, row1Logos, row2Logos]);
 
     useAnimationFrame((_time, delta) => {
         if (draggingRef.current) return;
@@ -76,9 +95,9 @@ const LogoMarquee = ({
         if (row1Ref.current) {
             const half = row1Ref.current.scrollWidth / 2;
             if (half > 0) {
-                let next = xRow1.get() + dx;
-                while (next >= 0) next -= half;
-                while (next < -half) next += half;
+                let next = xRow1.get() - dx;
+                while (next <= -half) next += half;
+                while (next > 0) next -= half;
                 xRow1.set(next);
             }
         }
@@ -109,7 +128,7 @@ const LogoMarquee = ({
         xRow2.set(xRow2.get() + info.delta.x);
     };
 
-    if (multipliedLogos.length === 0) return null;
+    if (row1Logos.length === 0) return null;
 
     return (
         <motion.div
@@ -117,7 +136,7 @@ const LogoMarquee = ({
             animate={{ opacity: mounted ? 1 : 0 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
             className={cn(
-                'overflow-hidden transition-opacity duration-300 select-none',
+                'flex flex-col overflow-hidden transition-opacity duration-300 select-none',
                 isDragging ? 'cursor-grabbing' : 'cursor-grab',
                 mounted ? 'opacity-100' : 'opacity-0'
             )}
@@ -126,7 +145,7 @@ const LogoMarquee = ({
             onPanEnd={handlePanEnd}
             style={{ touchAction: 'pan-y' }}>
             <motion.div ref={row1Ref} className='flex w-max will-change-transform' style={{ x: xRow1 }}>
-                {[...multipliedLogos, ...multipliedLogos].map((logo, idx) => (
+                {[...row1Logos, ...row1Logos].map((logo, idx) => (
                     <LogoCard
                         key={`row1-${idx}`}
                         src={logo.src}
@@ -138,7 +157,7 @@ const LogoMarquee = ({
             </motion.div>
 
             <motion.div ref={row2Ref} className='flex w-max will-change-transform' style={{ x: xRow2 }}>
-                {[...multipliedLogos, ...multipliedLogos].map((logo, idx) => (
+                {[...row2Logos, ...row2Logos].map((logo, idx) => (
                     <LogoCard
                         key={`row2-${idx}`}
                         src={logo.src}

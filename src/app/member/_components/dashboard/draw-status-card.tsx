@@ -1,9 +1,11 @@
 import { CountdownBoxes } from '@/components/common/countdown';
 import { EntryStatusBadge } from '@/components/common/entry-status-badge';
+import { LIVE_DRAW_URL } from '@/constant/links';
+import { goldButtonStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import type { DrawStatus } from '@/types/member';
 
-import { MapPin, Ticket, Trophy } from 'lucide-react';
+import { ExternalLink, Ticket, Trophy } from 'lucide-react';
 
 interface DrawStatusCardProps {
     draw: DrawStatus;
@@ -51,9 +53,6 @@ export function DrawStatusCard({
             </h3>
             <div className='mt-2 flex flex-wrap items-center gap-2'>
                 <span className='text-slr-muted inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-xs'>
-                    <MapPin className='text-slr-gold-label size-3.5' /> {draw.draw_pool}
-                </span>
-                <span className='text-slr-muted inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-xs'>
                     <Ticket className='text-slr-gold-label size-3.5' />
                     <span className='tabular-nums'>{draw.total_entries.toLocaleString('en-AU')}</span> entries
                 </span>
@@ -62,6 +61,15 @@ export function DrawStatusCard({
             <div className='mt-5'>
                 <CountdownBoxes targetIso={draw.draws_at} />
             </div>
+
+            <a
+                href={LIVE_DRAW_URL}
+                target='_blank'
+                rel='noopener noreferrer'
+                style={goldButtonStyle}
+                className='mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold uppercase transition-opacity hover:opacity-90'>
+                Watch Live Draw <ExternalLink className='size-4' />
+            </a>
 
             <div className='mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-4'>
                 {hasPrize ? (

@@ -3,7 +3,7 @@ export type FaqCategory = {
     items: { question: string; answer: string }[];
 };
 
-export const categories: FaqCategory[] = [
+export const buildCategories = (redFrom: number, blueFrom: number, benyPrice: number): FaqCategory[] => [
     {
         title: 'Getting Started',
         items: [
@@ -21,7 +21,7 @@ export const categories: FaqCategory[] = [
             },
             {
                 question: 'Is there a free option?',
-                answer: 'Yes. The Visitor tier is completely free, no credit card required. Visitor members are entered into a weekly $50 draw and can browse public pages and e-book listings.'
+                answer: `No. Membership is paid only — SLR Red starts at $${redFrom} per 4 weeks and SLR Premium (Blue) at $${blueFrom} per 4 weeks. You can browse public pages and e-book listings without an account.`
             }
         ]
     },
@@ -30,7 +30,7 @@ export const categories: FaqCategory[] = [
         items: [
             {
                 question: 'What are the membership tiers?',
-                answer: 'There are three tiers: Visitor (free), SLR Red (from $10/month) with basic discounts and Red draws, and SLR Premium / Blue (from $26/month) with full access to all draws, e-books, and member-only deals. Red and Premium members can also add the BENY discount platform for an extra $4/month.'
+                answer: `There are two tiers: SLR Red (from $${redFrom} per 4 weeks) with basic discounts and Red draws, and SLR Premium / Blue (from $${blueFrom} per 4 weeks) with full access to all draws, e-books, and member-only deals. Red and Premium members can also add the BENY discount platform for an extra $${benyPrice}/month.`
             },
             {
                 question: 'How does billing work?',
@@ -76,11 +76,11 @@ export const categories: FaqCategory[] = [
         items: [
             {
                 question: 'What discounts do members get?',
-                answer: 'Red and Blue members can browse the Discounts directory to find partner deals across fuel, groceries, dining, travel, and more. Each deal includes a code you can copy with one click. Visitor members see the directory but need to upgrade to use the codes.'
+                answer: 'Red and Blue members can browse the Discounts directory to find partner deals across fuel, groceries, dining, travel, and more. Each deal includes a code you can copy with one click.'
             },
             {
                 question: 'What is BENY?',
-                answer: 'BENY is a separate third-party discount platform with thousands of additional offers. It is available to Red and Premium members as an optional add-on for $4/month — it is not included in any tier by default. You can add BENY during checkout or later from the BENY page. Activation requires a phone number.'
+                answer: `BENY is a separate third-party discount platform with thousands of additional offers. It is available to Red and Premium members as an optional add-on for $${benyPrice}/month — it is not included in any tier by default. You can add BENY during checkout or later from the BENY page. Activation requires a phone number.`
             }
         ]
     },
@@ -93,7 +93,7 @@ export const categories: FaqCategory[] = [
             },
             {
                 question: 'Who can access e-books?',
-                answer: 'Everyone can browse e-book listings (covers, titles, descriptions). Full content is available to Red and Blue members and can be read in your browser. Visitor members see an upgrade prompt.'
+                answer: 'Everyone can browse e-book listings (covers, titles, descriptions). Full content is available to Red and Blue members and can be read in your browser.'
             }
         ]
     },

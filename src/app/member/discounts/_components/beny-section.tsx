@@ -4,14 +4,16 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Input } from '@/components/ui/input';
+import { BENY_MONTHLY_PRICE, isBenyEligibleSubTier } from '@/constant/tiers';
 import { BENY_CATEGORIES } from '@/data/discounts';
 import { type BenyStatusValue, isBenyCancelled, isBenyWindingDown } from '@/lib/api/resources/beny';
+import { AU_PHONE_MESSAGE, isAuPhone, toAuE164 } from '@/lib/au-phone';
 import { goldButtonStyle, inputClassName } from '@/lib/styles';
 import { cn } from '@/lib/utils';
-import type { MemberProfile } from '@/types/member';
+import type { MemberProfile, SubTierCode } from '@/types/member';
 
 import { cancelBenyAction, subscribeBenyAction } from '../beny-actions';
-import { Check, Clock, Fuel, Heart, Loader2Icon, type LucideIcon, ShoppingBag, Sparkles } from 'lucide-react';
+import { Check, Clock, CreditCard, Fuel, Heart, Loader2Icon, type LucideIcon, ShoppingBag, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CATEGORY_ICON: Record<string, LucideIcon> = {
@@ -33,14 +35,27 @@ function formatExpiryLongDate(iso: string | null | undefined): string {
     return `${day} ${month} ${year}`;
 }
 
+function ReadOnlyField({ label, value }: { label: string; value: string }) {
+    return (
+        <div>
+            <p className='text-slr-muted text-xs font-semibold'>{label}</p>
+            <p className='border-slr-navy-border text-slr-muted mt-1.5 truncate rounded-md border bg-black/20 px-3 py-2 text-sm'>
+                {value || '-'}
+            </p>
+        </div>
+    );
+}
+
 export function BenySection({
     status: initialStatus,
     userProfile,
+    subTier,
     cancelledAt = null,
     expiresAt = null
 }: {
     status: BenyStatusValue;
     userProfile?: MemberProfile | null;
+    subTier?: SubTierCode | string | null;
     cancelledAt?: string | null;
     expiresAt?: string | null;
 }) {
@@ -67,17 +82,27 @@ export function BenySection({
         }
     }, [userProfile]);
 
-    const canSubscribe = status === 'inactive' || isBenyCancelled(status);
+    const effectiveSubTier = subTier ?? userProfile?.sub_tier;
+    const isEligible = isBenyEligibleSubTier(effectiveSubTier);
+    const canSubscribe = isEligible && (status === 'inactive' || isBenyCancelled(status));
+
+    const [phoneError, setPhoneError] = useState<string | null>(null);
 
     const handleSubmitAttempt = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isAuPhone(form.phone)) {
+            setPhoneError(AU_PHONE_MESSAGE);
+
+            return;
+        }
+        setPhoneError(null);
         setConfirmOpen(true);
     };
 
     const handleConfirmSubscribe = () => {
         setConfirmOpen(false);
         startTransition(async () => {
-            const res = await subscribeBenyAction(form);
+            const res = await subscribeBenyAction({ ...form, phone: toAuE164(form.phone) });
             if (res.ok) {
                 setStatus(res.status);
                 setShowForm(false);
@@ -86,12 +111,7 @@ export function BenySection({
                     email: userProfile?.email ?? '',
                     phone: userProfile?.phone ?? ''
                 });
-                if (res.checkoutUrl) {
-                    window.open(res.checkoutUrl, '_blank', 'noopener,noreferrer');
-                    toast.success('Complete your $4/month payment in the new tab to finish adding BENY.');
-                } else {
-                    toast.success('BENY requested — pending admin activation.');
-                }
+                toast.success('BENY requested — pending admin activation.');
             } else {
                 toast.error(res.code ? `${res.message} (${res.code})` : res.message);
             }
@@ -132,7 +152,7 @@ export function BenySection({
                 <span
                     className='text-slr-gold-label shrink-0 rounded-md border border-[#D4AF3759] px-2.5 py-1 text-sm font-semibold'
                     style={{ background: '#291F0A' }}>
-                    $4/month
+                    {`$${BENY_MONTHLY_PRICE}/month`}
                 </span>
             </div>
 
@@ -167,18 +187,20 @@ export function BenySection({
                         ) : (
                             <span className='inline-flex items-start gap-2 text-sm text-white/90'>
                                 <Clock className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
-                                Pending activation — you&apos;ll receive access details by email shortly, then download
-                                the BENY app to start saving.
+                                Pending activation — your BENY access will be activated within 1 business day.
+                                We&apos;ll email your access details, then download the BENY app to start saving.
                             </span>
                         )}
-                        <button
-                            type='button'
-                            onClick={() => setConfirmCancelOpen(true)}
-                            disabled={isPending}
-                            className='inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60'>
-                            {isPending ? <Loader2Icon className='size-4 animate-spin' /> : null}
-                            Cancel BENY
-                        </button>
+                        {status === 'active' ? (
+                            <button
+                                type='button'
+                                onClick={() => setConfirmCancelOpen(true)}
+                                disabled={isPending}
+                                className='inline-flex shrink-0 items-center gap-2 rounded-lg border border-white/15 px-4 py-1.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60'>
+                                {isPending ? <Loader2Icon className='size-4 animate-spin' /> : null}
+                                Cancel BENY
+                            </button>
+                        ) : null}
                     </div>
                 ) : null}
 
@@ -193,33 +215,38 @@ export function BenySection({
                     (showForm ? (
                         <form onSubmit={handleSubmitAttempt} className='space-y-3'>
                             <p className='text-slr-muted text-sm'>
-                                Enter your details to add BENY. You&apos;ll be redirected to secure checkout for the
-                                $4/month subscription.
+                                We&apos;ll use these details to activate your BENY account. The ${BENY_MONTHLY_PRICE.toFixed(2)}/month
+                                fee will be charged directly to your card on file.
                             </p>
-                            <div className='grid gap-3 sm:grid-cols-3'>
+                            {/* Name and email come from the account so billing and BENY stay on one identity. */}
+                            <div className='grid gap-3 sm:grid-cols-2'>
+                                <ReadOnlyField label='Full name' value={form.name} />
+                                <ReadOnlyField label='Email' value={form.email} />
+                            </div>
+                            <div>
+                                <label htmlFor='beny-phone' className='text-slr-muted text-xs font-semibold'>
+                                    Phone number for BENY activation
+                                </label>
                                 <Input
                                     required
-                                    className={inputClassName}
-                                    placeholder='Full name'
-                                    value={form.name}
-                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                />
-                                <Input
-                                    required
-                                    type='email'
-                                    className={inputClassName}
-                                    placeholder='Email'
-                                    value={form.email}
-                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                />
-                                <Input
-                                    required
+                                    id='beny-phone'
                                     type='tel'
-                                    className={inputClassName}
-                                    placeholder='Phone'
+                                    className={`${inputClassName} mt-1.5`}
+                                    placeholder='0412 345 678'
+                                    aria-invalid={phoneError ? true : undefined}
                                     value={form.phone}
-                                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                                    onChange={(e) => {
+                                        setForm({ ...form, phone: e.target.value });
+                                        if (phoneError) setPhoneError(null);
+                                    }}
                                 />
+                                {phoneError ? (
+                                    <p className='mt-1 text-xs text-red-400'>{phoneError}</p>
+                                ) : (
+                                    <p className='text-slr-dim mt-1 text-xs'>
+                                        This is the number our admin uses to invite you on BENY.
+                                    </p>
+                                )}
                             </div>
                             <div className='flex items-center gap-2'>
                                 <button
@@ -228,7 +255,7 @@ export function BenySection({
                                     className='inline-flex h-10 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold uppercase disabled:opacity-60'
                                     style={goldButtonStyle}>
                                     {isPending ? <Loader2Icon className='size-4 animate-spin' /> : null}
-                                    Continue to checkout
+                                    Confirm &amp; Add BENY
                                 </button>
                                 <button
                                     type='button'
@@ -252,21 +279,49 @@ export function BenySection({
                                     'inline-flex h-10 items-center justify-center rounded-xl px-5 text-sm font-bold uppercase'
                                 )}
                                 style={goldButtonStyle}>
-                                Add BENY — $4/mo
+                                Add BENY — {`$${BENY_MONTHLY_PRICE}/mo`}
                             </button>
                         </div>
                     ))}
+
+                {!isEligible && (status === 'inactive' || isBenyCancelled(status)) && (
+                    <div className='flex flex-wrap items-center justify-between gap-3'>
+                        <span className='text-slr-muted text-sm'>
+                            BENY add-on is available exclusively for Plus, Premium, and Elite plans.
+                        </span>
+                    </div>
+                )}
             </div>
 
             <ConfirmDialog
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
-                title='Add BENY Add-on?'
-                confirmText={isPending ? 'Adding...' : 'Yes, add addon'}
-                cancelBtnText='Keep membership only'
+                title='Confirm BENY Subscription'
+                confirmText={isPending ? 'Processing...' : 'Confirm & Charge Card'}
+                cancelBtnText='Cancel'
                 isLoading={isPending}
                 handleConfirm={handleConfirmSubscribe}
-                desc='This will add the helper BENY savings addon. Confirming this will charge an extra $4.00 AUD per month recursively on Stripe.'
+                desc={
+                    <div className='space-y-3 pt-1 text-sm'>
+                        <p className='text-white/90'>
+                            You are subscribing to the <strong>BENY savings add-on</strong> for{' '}
+                            <span className='text-slr-gold-label font-semibold'>
+                                ${BENY_MONTHLY_PRICE.toFixed(2)} AUD / month
+                            </span>
+                            .
+                        </p>
+                        <div className='flex items-start gap-3 rounded-xl border border-[#D4AF3759] bg-[#D4AF371A]/15 p-3.5 text-left'>
+                            <CreditCard className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
+                            <div>
+                                <p className='text-xs font-semibold text-[#FFDC75]'>Direct Card Charge</p>
+                                <p className='mt-0.5 text-xs leading-relaxed text-white/80'>
+                                    This payment will be charged directly to the credit/debit card on your account.
+                                    Access will be activated by an SLR Admin within 1 business day.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
             />
 
             <ConfirmDialog
@@ -278,7 +333,7 @@ export function BenySection({
                 cancelBtnText='Keep BENY addon'
                 isLoading={isPending}
                 handleConfirm={handleConfirmCancel}
-                desc='Are you sure you want to cancel your BENY savings add-on? Your $4.00 AUD monthly charge will stop at the end of the paid period.'
+                desc={`Are you sure you want to cancel your BENY savings add-on? Your $${BENY_MONTHLY_PRICE.toFixed(2)} AUD monthly charge will stop at the end of the paid period.`}
             />
         </section>
     );
