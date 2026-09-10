@@ -1,22 +1,15 @@
 import { authConfig } from '@/auth.config';
 import { login as apiLogin, getMe } from '@/lib/api/resources/auth';
-import { ApiError, apiErrorCode } from '@/lib/api/types';
-import { type LoginStep, encodeLoginError } from '@/lib/login-error';
+import { ApiError } from '@/lib/api/types';
+import { LOGIN_FALLBACK_MESSAGE } from '@/lib/login-error';
 
 import NextAuth, { CredentialsSignin } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 class LoginFailed extends CredentialsSignin {
-    constructor(step: LoginStep, error: unknown) {
+    constructor(error: unknown) {
         super();
-        const payload = error instanceof ApiError ? (error.payload as { requestId?: unknown } | undefined) : undefined;
-        this.code = encodeLoginError({
-            step,
-            message: error instanceof ApiError ? error.message : 'Sign-in failed. Please try again.',
-            code: error instanceof ApiError ? apiErrorCode(error) : null,
-            status: error instanceof ApiError ? error.status : null,
-            requestId: typeof payload?.requestId === 'string' ? payload.requestId : null
-        });
+        this.code = error instanceof ApiError ? error.message : LOGIN_FALLBACK_MESSAGE;
     }
 }
 
@@ -51,7 +44,7 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
                 try {
                     session = await apiLogin(email, password);
                 } catch (error) {
-                    throw new LoginFailed('login', error);
+                    throw new LoginFailed(error);
                 }
 
                 // A valid password can still fail here if the profile lookup errors, so keep
@@ -60,7 +53,7 @@ export const { auth, handlers, signIn, signOut, unstable_update } = NextAuth({
                 try {
                     me = await getMe(session.access_token);
                 } catch (error) {
-                    throw new LoginFailed('profile', error);
+                    throw new LoginFailed(error);
                 }
 
                 return {

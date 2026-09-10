@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { decodeLoginError, describeLoginError } from '@/lib/login-error';
+import { loginErrorMessage } from '@/lib/login-error';
 import { goldBgStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import { SignInSchema } from '@/lib/zod';
@@ -63,9 +63,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         const res = await signIn('credentials', { ...parsed.data, redirect: false });
         if (!res || res.error) {
             setBusy(false);
-            const detail = decodeLoginError(res?.code);
-            setError(detail.message);
-            toast.error(detail.message, { description: describeLoginError(detail) });
+            const message = loginErrorMessage(res?.code);
+            setError(message);
+            toast.error(message);
 
             return;
         }
