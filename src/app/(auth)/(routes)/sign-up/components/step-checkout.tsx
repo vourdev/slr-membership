@@ -6,16 +6,17 @@ import { SafeHoursNotice } from '@/components/common/safe-hours-notice';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { isBenyEligibleSubTier } from '@/constant/tiers';
 import { useSafeHours } from '@/hooks/use-safe-hours';
 import { createMembershipCheckout } from '@/lib/api/resources/stripe';
 import { ApiError, apiErrorMessage } from '@/lib/api/types';
 import { AU_PHONE_MESSAGE, isAuPhone, toAuE164 } from '@/lib/au-phone';
+import { CHECKOUT_UNAVAILABLE_MESSAGE, isTrialWindowError } from '@/lib/checkout-errors';
 import { SAFE_HOURS_MESSAGE, isSafeHoursError } from '@/lib/safe-hours';
 import { goldButtonStyle, inputClassName } from '@/lib/styles';
 import { type TierPricing, dollarsOf } from '@/lib/tier-pricing';
 
 import { BENY_PRICE, SignUpFormData, SpinPrize, subTierLabel } from './types';
-import { isBenyEligibleSubTier } from '@/constant/tiers';
 import { ArrowLeft, CreditCard, Loader2Icon, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -62,6 +63,13 @@ const StepCheckout = ({ data, pricing, spinPrize, token, onBack }: StepCheckoutP
         setBenyPhoneError(null);
         setRedirecting(true);
         try {
+            const { url } = await createMembershipCheckout(token, {
+                sub_tier: subTier.toLowerCase(),
+                beny: willAddBeny
+            });
+
+            // Only after checkout is confirmed: a failed checkout used to leave an orphan
+            // BENY record pointing at a membership that was never paid for.
             if (willAddBeny) {
                 const { subscribeBeny } = await import('@/lib/api/resources/beny');
                 await subscribeBeny(token, {
@@ -71,10 +79,6 @@ const StepCheckout = ({ data, pricing, spinPrize, token, onBack }: StepCheckoutP
                 });
             }
 
-            const { url } = await createMembershipCheckout(token, {
-                sub_tier: subTier.toLowerCase(),
-                beny: willAddBeny
-            });
             if (process.env.NODE_ENV === 'development') {
                 console.log('[SignUp Checkout Created]', {
                     endpoint: 'POST /api/v1/membership/checkout',
@@ -96,6 +100,7 @@ const StepCheckout = ({ data, pricing, spinPrize, token, onBack }: StepCheckoutP
             }
 
             if (isSafeHoursError(err)) toast.error(SAFE_HOURS_MESSAGE);
+            else if (isTrialWindowError(err)) toast.error(CHECKOUT_UNAVAILABLE_MESSAGE);
             else
                 toast.error(
                     err instanceof ApiError ? apiErrorMessage(err) : 'Could not open checkout. Please try again.'
@@ -182,9 +187,10 @@ const StepCheckout = ({ data, pricing, spinPrize, token, onBack }: StepCheckoutP
                             Add BENY Add-on — +${BENY_PRICE.toFixed(2)}/month
                         </label>
                         <p className='text-slr-muted text-xs leading-relaxed'>
-                            Access premium brand discounts through the BENY app. Billed directly to your card on Stripe (+$
-                            {BENY_PRICE.toFixed(2)}/mo). Access requires manual activation and confirmation by an SLR Admin
-                            after registration.
+                            Access premium brand discounts through the BENY app. Billed directly to your card on Stripe
+                            (+$
+                            {BENY_PRICE.toFixed(2)}/mo). Access requires manual activation and confirmation by an SLR
+                            Admin after registration.
                         </p>
 
                         {addBeny ? (
@@ -208,8 +214,8 @@ const StepCheckout = ({ data, pricing, spinPrize, token, onBack }: StepCheckoutP
                                     <p className='mt-1 text-xs text-red-400'>{benyPhoneError}</p>
                                 ) : (
                                     <p className='text-slr-dim mt-1 text-xs'>
-                                        This is the number our admin uses to invite you on BENY. Change it if BENY should
-                                        reach you on a different number.
+                                        This is the number our admin uses to invite you on BENY. Change it if BENY
+                                        should reach you on a different number.
                                     </p>
                                 )}
                             </div>
