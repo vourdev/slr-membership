@@ -1,5 +1,6 @@
 import { AU_STATE_CODES } from '@/constant/au-states';
 import { MIN_PASSWORD_LENGTH } from '@/constant/password';
+import { AU_PHONE_MESSAGE, isAuPhone } from '@/lib/au-phone';
 import { MIN_AGE_YEARS, isAdultDob } from '@/lib/dob';
 
 import { boolean, email, literal, object, string, union, enum as zEnum } from 'zod';
@@ -21,8 +22,8 @@ export const SignUpSchema = object({
         .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
     state: zEnum(AU_STATE_CODES, { message: 'Select your state or territory' }),
     phone: string()
-        .min(8, 'Enter a valid Australian phone number')
-        .regex(/^[0-9 +()-]+$/, 'Only digits, spaces, +, -, () allowed'),
+        .regex(/^[0-9 +()-]+$/, 'Only digits, spaces, +, -, () allowed')
+        .refine(isAuPhone, AU_PHONE_MESSAGE),
     dob: string()
         .min(1, 'Date of birth is required')
         .refine(isAdultDob, { message: `You must be at least ${MIN_AGE_YEARS} years old` }),
