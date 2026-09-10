@@ -91,7 +91,6 @@ export interface GiveawayEntryRow {
 export interface GiveawayDetail extends Giveaway {
     prize_description: string;
     rules: string[];
-    tpal_note: string;
     entry_history: GiveawayEntryRow[];
 }
 
