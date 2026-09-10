@@ -3,6 +3,7 @@
 import { createMembershipCheckout } from '@/lib/api/resources/stripe';
 import { getAccessToken } from '@/lib/api/server';
 import { ApiError, apiErrorMessage } from '@/lib/api/types';
+import { CHECKOUT_UNAVAILABLE_MESSAGE, isTrialWindowError } from '@/lib/checkout-errors';
 import { SAFE_HOURS_MESSAGE, isSafeHoursError } from '@/lib/safe-hours';
 
 export async function startMembershipCheckout(
@@ -17,6 +18,7 @@ export async function startMembershipCheckout(
         return { ok: true, url };
     } catch (error) {
         if (isSafeHoursError(error)) return { ok: false, message: SAFE_HOURS_MESSAGE };
+        if (isTrialWindowError(error)) return { ok: false, message: CHECKOUT_UNAVAILABLE_MESSAGE };
 
         return {
             ok: false,
