@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import EmptyState from '@/components/common/empty-state';
+import { LIVE_DRAW_URL } from '@/constant/links';
 import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { getBillingStatus } from '@/lib/api/resources/billing';
@@ -19,7 +20,7 @@ import type { Giveaway } from '@/types/member';
 
 import { GiveawaysBoard } from './_components/giveaways-board';
 import { PastDraws } from './_components/past-draws';
-import { ArrowLeft, CircleAlert, Gift } from 'lucide-react';
+import { ArrowLeft, CircleAlert, ExternalLink, Gift } from 'lucide-react';
 
 export const metadata: Metadata = {
     title: 'Prize Draws · SLR Member'
@@ -63,11 +64,21 @@ export default async function GiveawaysPage() {
 
     return (
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
-            <header className='space-y-1'>
-                <h1 className='font-bebas-neue text-3xl tracking-wide uppercase sm:text-4xl'>Prize Draws</h1>
-                <p className='text-slr-muted text-sm md:text-base'>
-                    Active draws for your tier. Entries are allocated automatically each cycle — no manual entry needed.
-                </p>
+            <header className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
+                <div className='space-y-1'>
+                    <h1 className='font-bebas-neue text-3xl tracking-wide uppercase sm:text-4xl'>Prize Draws</h1>
+                    <p className='text-slr-muted text-sm md:text-base'>
+                        Active draws for your tier. Entries are allocated automatically each cycle — no manual entry
+                        needed.
+                    </p>
+                </div>
+                <a
+                    href={LIVE_DRAW_URL}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#FFD147] bg-[#FFD1471A] px-5 text-sm font-bold tracking-wide text-[#FFDC75] uppercase shadow-[inset_0_1px_5px_rgba(255,220,117,0.15)] transition-colors hover:bg-[#FFD147]/20'>
+                    Visit Live Draw / Winners <ExternalLink className='size-4' />
+                </a>
             </header>
 
             {failed ? (
