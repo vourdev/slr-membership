@@ -146,7 +146,12 @@ export interface BenySubscriptionItem {
     status: 'pending_activation' | 'active' | 'pending_deactivation' | 'cancelled' | 'canceled' | string;
     created_at: string;
     activated_at?: string | null;
+
+    // Live api-dev returns `expires_at` / `cancelled_at`; the earlier contract named them
+    // `access_ends_at` / `deactivated_at`. Both are kept so either shape maps cleanly.
+    expires_at?: string | null;
     access_ends_at?: string | null;
+    cancelled_at?: string | null;
     deactivated_at?: string | null;
     deactivation_reason?: string | null;
 }

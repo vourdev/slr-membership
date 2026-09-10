@@ -204,7 +204,7 @@ export function ManageMembershipActions({
                                 <span className='font-semibold text-white'>{opt.price}</span>
                                 <span className='text-slr-dim'>
                                     {' '}
-                                    / 28 days · {opt.tokens} {opt.tokens === 1 ? 'token' : 'tokens'}
+                                    / 28 days · {opt.tokens} {opt.tokens === 1 ? 'entry' : 'entries'}
                                 </span>
                             </span>
                         </label>

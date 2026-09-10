@@ -89,7 +89,11 @@ export function BenyClient({
                     activatedAt: b.activated_at ? formatDateTime(b.activated_at) : null,
                     accessEndsAt: b.access_ends_at ? formatDateTime(b.access_ends_at) : null,
                     accessEndsAtIso: b.access_ends_at ?? null,
-                    deactivatedAt: b.deactivated_at ? formatDateTime(b.deactivated_at) : null,
+                    deactivatedAt: (() => {
+                        const at = b.deactivated_at ?? b.cancelled_at;
+
+                        return at ? formatDateTime(at) : null;
+                    })(),
                     deactivationReason: b.deactivation_reason || null
                 }));
                 setRows(mapped);
