@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AU_NATIONAL_LENGTH, AU_PHONE_MESSAGE, isAuNational, toAuNational } from '@/lib/au-phone';
 import { MIN_AGE_YEARS, isAdultDob, latestAdultDob } from '@/lib/dob';
 import { formatShortDate } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
@@ -23,21 +24,11 @@ interface PersonalInfoSectionProps {
 
 const PHONE_PREFIX = '+61';
 
-const LOCAL_MIN = 6;
-const LOCAL_MAX = 13;
-
-function toLocalDigits(raw: string): string {
-    const digits = raw.replace(/\D/g, '');
-    const national = digits.startsWith('61') ? digits.slice(2) : digits;
-
-    return national.replace(/^0+/, '').slice(0, LOCAL_MAX);
-}
-
 export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
     const [editing, setEditing] = useState(false);
     const [pending, startTransition] = useTransition();
     const [fullName, setFullName] = useState(profile.name);
-    const [phoneLocal, setPhoneLocal] = useState(toLocalDigits(profile.phone ?? ''));
+    const [phoneLocal, setPhoneLocal] = useState(toAuNational(profile.phone ?? ''));
     const [dob, setDob] = useState(profile.dob ? profile.dob.slice(0, 10) : '');
 
     const save = () => {
@@ -46,8 +37,8 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
 
             return;
         }
-        if (phoneLocal.length < LOCAL_MIN || phoneLocal.length > LOCAL_MAX) {
-            toast.error(`Enter a valid phone number — ${LOCAL_MIN}–${LOCAL_MAX} digits after ${PHONE_PREFIX}.`);
+        if (!isAuNational(phoneLocal)) {
+            toast.error(AU_PHONE_MESSAGE);
 
             return;
         }
@@ -102,7 +93,10 @@ export function PersonalInfoSection({ profile }: PersonalInfoSectionProps) {
                             </span>
                             <Input
                                 value={phoneLocal}
-                                onChange={(e) => setPhoneLocal(toLocalDigits(e.target.value))}
+                                onChange={(e) =>
+                                    setPhoneLocal(toAuNational(e.target.value).slice(0, AU_NATIONAL_LENGTH))
+                                }
+                                maxLength={AU_NATIONAL_LENGTH}
                                 disabled={pending}
                                 type='tel'
                                 inputMode='numeric'
