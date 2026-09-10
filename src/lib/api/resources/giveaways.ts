@@ -69,11 +69,9 @@ export interface ApiGiveawayDetail {
 export const GIVEAWAY_RULES = [
     'Entries are allocated automatically each 28-day cycle — no manual entry needed.',
     'Your number of entries is set by your membership sub-tier.',
-    'Winners are drawn externally and certified via TPAL (randomdraws.com.au).',
+    'Winners are drawn externally and published on the SLR live draw page.',
     'Entries reset every cycle and do not carry over.'
 ];
-const TPAL_NOTE =
-    'Draws are conducted externally and certified via TPAL (randomdraws.com.au). Entry lists are exported per tier each cycle.';
 
 export function tierGroupFromApi(tier: string | undefined): TierGroup {
     const t = tier?.toUpperCase();
@@ -177,7 +175,6 @@ export function toGiveawayDetail(
         ...base,
         prize_description: d.prize?.trim() || '-',
         rules: GIVEAWAY_RULES,
-        tpal_note: TPAL_NOTE,
         entry_history: toEntryHistory(currentCycle, base.entered)
     };
 }
