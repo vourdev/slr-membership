@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { decodeLoginError, describeLoginError } from '@/lib/login-error';
 import { goldBgStyle } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import { SignInSchema } from '@/lib/zod';
 
 import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
 import { getSession, signIn } from 'next-auth/react';
+import { toast } from 'sonner';
 
 const glassStyle: React.CSSProperties = {
     background: 'linear-gradient(117.58deg, rgba(215, 237, 237, 0.16) -47.79%, rgba(204, 235, 235, 0) 100%)',
@@ -61,7 +63,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         const res = await signIn('credentials', { ...parsed.data, redirect: false });
         if (!res || res.error) {
             setBusy(false);
-            setError('Invalid credentials. Please try again.');
+            const detail = decodeLoginError(res?.code);
+            setError(detail.message);
+            toast.error(detail.message, { description: describeLoginError(detail) });
 
             return;
         }
