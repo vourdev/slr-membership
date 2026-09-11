@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { NotificationTemplate } from '@/types/member';
 
 import { TemplateEditDialog } from './_components/template-edit-dialog';
-import { MailX, Pencil, TriangleAlert } from 'lucide-react';
+import { TemplatePreviewDialog } from './_components/template-preview-dialog';
+import { Eye, MailX, Pencil, TriangleAlert } from 'lucide-react';
 
 export function TemplatesClient({
     templates,
@@ -18,6 +19,7 @@ export function TemplatesClient({
     isPlaceholder: boolean;
 }) {
     const [editing, setEditing] = useState<NotificationTemplate | null>(null);
+    const [previewing, setPreviewing] = useState<NotificationTemplate | null>(null);
 
     return (
         <div className='space-y-4'>
@@ -63,19 +65,31 @@ export function TemplatesClient({
                                     </Badge>
                                 </div>
                             </div>
-                            <Button
-                                type='button'
-                                size='sm'
-                                variant='outline'
-                                onClick={() => setEditing(template)}
-                                title={
-                                    isPlaceholder
-                                        ? 'This is a placeholder — the editor opens, but saving will very likely fail.'
-                                        : undefined
-                                }>
-                                <Pencil className='size-3.5' />
-                                Edit
-                            </Button>
+                            <div className='flex shrink-0 items-center gap-1.5'>
+                                <Button
+                                    type='button'
+                                    size='sm'
+                                    variant='outline'
+                                    onClick={() => setPreviewing(template)}
+                                    className='border-slr-navy-border text-slr-dim hover:bg-white/10 hover:text-white'
+                                    title='Preview as HTML'>
+                                    <Eye className='size-3.5' />
+                                    Preview
+                                </Button>
+                                <Button
+                                    type='button'
+                                    size='sm'
+                                    variant='outline'
+                                    onClick={() => setEditing(template)}
+                                    title={
+                                        isPlaceholder
+                                            ? 'This is a placeholder — the editor opens, but saving will very likely fail.'
+                                            : undefined
+                                    }>
+                                    <Pencil className='size-3.5' />
+                                    Edit
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <div
@@ -93,6 +107,15 @@ export function TemplatesClient({
                 onOpenChange={(open) => {
                     if (!open) setEditing(null);
                 }}
+            />
+
+            <TemplatePreviewDialog
+                template={previewing}
+                open={previewing !== null}
+                onOpenChange={(open) => {
+                    if (!open) setPreviewing(null);
+                }}
+                onEdit={(tpl) => setEditing(tpl)}
             />
         </div>
     );
