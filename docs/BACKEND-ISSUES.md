@@ -1374,3 +1374,36 @@ GET /memberships/me  → billingStatus=INACTIVE  activatedAt=null
 | slrfe-verify-1787718542@ebflyai.com | 01a03c54-2941-7628-a248-b8bc1c6bbf22 | — (tidak terbentuk) | — (tidak terbentuk) | red / r1        | 2026-08-26 09:09 |
 
 Keduanya dibayar lunas lewat Stripe Checkout test mode dari `https://dev.smartliferewards.com.au`.
+
+---
+
+## 🎯 Prize Draw Issues (DRAW-03 / DRAW-04 / DRAW-05 / DRAW-06)
+
+**Captured:** 2026-09-11
+
+### DRAW-03 — Rogue scheduler creates premature winners
+
+A backend cron/scheduler appears to automatically create winner records **before** an admin has run the live draw. This results in spurious winners appearing in the member-facing Past Draws section.
+
+- **Backend fix required:** Identify and disable or gate the scheduler so winner records are only created after the admin triggers the draw.
+- **Frontend mitigation:** Drawn giveaways with no winner record now show a "Results Pending" card instead of vanishing silently.
+
+### DRAW-04 — Drawn giveaways remain in the active board
+
+`giveawayPhase` only compared `draws_at` against the clock. If the API marks a giveaway as `DRAWN`/`COMPLETED`/`CLOSED` via its `status` field, or if winners already exist, the giveaway could still appear as "active".
+
+- **Frontend fix applied:** `giveawayPhase()` now checks `status` and `hasWinner` before falling through to the clock comparison. The member board and dashboard both filter out `phase === 'drawn'`.
+
+### DRAW-05 — Duplicate / phantom winners from scheduler
+
+Related to DRAW-03. The scheduler may create multiple winner records for the same giveaway or assign winners to the wrong draw pool.
+
+- **Backend fix required:** Add uniqueness constraints and pool-membership validation on the winner-creation endpoint.
+- **Frontend mitigation:** Same as DRAW-03 — drawn giveaways are moved to Past Draws with a pending state when no legitimate winner exists.
+
+### DRAW-06 — No admin UI to delete / void a winner
+
+The `DELETE /admin/winners/:id` endpoint exists and works, but the admin panel only exposed delete from the list table row actions. The edit form had no delete option.
+
+- **Frontend fix applied:** Added a "Void Winner" destructive button with confirmation dialog on the winner edit form (`WinnerForm`).
+- **Note:** Deleting a winner does **not** restore the member's draw entry automatically — that requires a backend change.

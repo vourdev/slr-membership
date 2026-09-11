@@ -45,6 +45,10 @@ export interface ApiGiveaway {
     draws_at: string | null;
     is_entered: boolean;
     entry_status: EntryStatus | null;
+    /** Backend status — present on some list responses (admin always has it). */
+    status?: string | null;
+    /** Number of recorded winners — set on admin responses. */
+    winner_count?: number;
 }
 
 export interface ApiGiveawayWinnerRow {
@@ -93,7 +97,16 @@ function toEntryHistory(cycle: EntryCycle | null, entered: boolean): GiveawayEnt
     ];
 }
 
-export function giveawayPhase(opensAt: string | null | undefined, drawsAt: string | null | undefined): GiveawayPhase {
+export function giveawayPhase(
+    opensAt: string | null | undefined,
+    drawsAt: string | null | undefined,
+    status?: string | null,
+    hasWinner = false
+): GiveawayPhase {
+    // Authoritative status from the API takes priority
+    const s = (status || '').toUpperCase();
+    if (s === 'DRAWN' || s === 'COMPLETED' || s === 'CLOSED' || hasWinner) return 'drawn';
+
     const now = Date.now();
     const draws = Date.parse(drawsAt ?? '');
     if (!Number.isNaN(draws) && now >= draws) return 'drawn';
@@ -106,7 +119,7 @@ export function giveawayPhase(opensAt: string | null | undefined, drawsAt: strin
 export function toGiveaway(g: ApiGiveaway, memberGroup: TierGroup, memberState: string, memberTokens = 0): Giveaway {
     const group = tierGroupFromApi(g.tier);
     const locked = isGiveawayLocked(group, memberGroup);
-    const phase = giveawayPhase(g.opens_at, g.draws_at);
+    const phase = giveawayPhase(g.opens_at, g.draws_at, g.status, (g.winner_count ?? 0) > 0);
     const entered = phase === 'active' && (g.is_entered ?? false);
     const type = g.type?.toLowerCase();
 

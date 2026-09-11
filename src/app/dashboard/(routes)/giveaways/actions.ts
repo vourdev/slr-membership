@@ -107,7 +107,10 @@ export async function updateWinnerAction(id: string, payload: AdminWinnerPayload
 
 export async function deleteWinnerAction(id: string): Promise<ActionResult<null>> {
     const res = await withToken((t) => deleteWinner(t, id), 'Winner removed.');
-    if (res.ok) revalidatePath('/dashboard/winners');
+    if (res.ok) {
+        revalidatePath('/dashboard/winners');
+        revalidatePath('/member/giveaways');
+    }
 
     return res;
 }
