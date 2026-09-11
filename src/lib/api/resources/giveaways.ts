@@ -68,6 +68,7 @@ export interface ApiGiveawayDetail {
     closes_at: string | null;
     draws_at: string | null;
     winners: ApiGiveawayWinnerRow[];
+    status?: string | null;
 }
 
 export const GIVEAWAY_RULES = [
@@ -177,7 +178,9 @@ export function toGiveawayDetail(
             closes_at: d.closes_at,
             draws_at: d.draws_at,
             is_entered: listItem?.is_entered ?? false,
-            entry_status: listItem?.entry_status ?? 'inactive'
+            entry_status: listItem?.entry_status ?? 'inactive',
+            status: d.status ?? listItem?.status,
+            winner_count: (d.winners?.length ?? 0) > 0 ? d.winners.length : listItem?.winner_count
         },
         memberGroup,
         memberState,
@@ -192,8 +195,13 @@ export function toGiveawayDetail(
     };
 }
 
-export const getGiveaways = cache((token: string) =>
-    apiFetch<ApiGiveaway[]>(API.giveaways.list, { token, cache: 'no-store' })
+export type MemberGiveawayStatus = 'OPEN' | 'CLOSED' | 'PROCESSING' | 'COMPLETED';
+
+export const getGiveaways = cache((token: string, status?: MemberGiveawayStatus) =>
+    apiFetch<ApiGiveaway[]>(status ? `${API.giveaways.list}?status=${status}` : API.giveaways.list, {
+        token,
+        cache: 'no-store'
+    })
 );
 
 export const getGiveaway = cache((id: string, token: string) =>

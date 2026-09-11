@@ -8,6 +8,7 @@ import { handleApiAuthError } from '@/lib/api/guard';
 import { getBillingStatus } from '@/lib/api/resources/billing';
 import { getEntryHistory } from '@/lib/api/resources/entries';
 import {
+    type ApiGiveaway,
     type GiveawayWinner,
     compareGiveaways,
     getGiveawayWinners,
@@ -37,20 +38,35 @@ export default async function GiveawaysPage() {
     let pastWinners: GiveawayWinner[] = [];
 
     if (token) {
-        const [giveawaysRes, entriesRes, billingRes, winnersRes] = await Promise.allSettled([
-            getGiveaways(token),
+        const [openRes, completedRes, closedRes, entriesRes, billingRes, winnersRes] = await Promise.allSettled([
+            getGiveaways(token, 'OPEN'),
+            getGiveaways(token, 'COMPLETED'),
+            getGiveaways(token, 'CLOSED'),
             getEntryHistory(token),
             getBillingStatus(token),
             getGiveawayWinners(token)
         ]);
 
-        if (giveawaysRes.status === 'fulfilled') {
+        const rawGiveaways: ApiGiveaway[] = [];
+        const seenIds = new Set<string>();
+        for (const res of [openRes, completedRes, closedRes]) {
+            if (res.status === 'fulfilled') {
+                for (const g of res.value) {
+                    if (g.giveaway_id && !seenIds.has(g.giveaway_id)) {
+                        seenIds.add(g.giveaway_id);
+                        rawGiveaways.push(g);
+                    }
+                }
+            }
+        }
+
+        if (openRes.status === 'fulfilled' || completedRes.status === 'fulfilled') {
             const tokens = entriesRes.status === 'fulfilled' ? (entriesRes.value.current_cycle?.total_token ?? 0) : 0;
-            giveaways = giveawaysRes.value
+            giveaways = rawGiveaways
                 .map((g) => toGiveaway(g, memberGroup, member.state, tokens))
                 .sort(compareGiveaways);
         } else {
-            handleApiAuthError(giveawaysRes.reason);
+            handleApiAuthError(openRes.reason);
             failed = true;
         }
         if (billingRes.status === 'fulfilled') nextRenewalIso = billingRes.value.next_renewal_at ?? null;
