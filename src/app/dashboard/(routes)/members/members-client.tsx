@@ -8,6 +8,7 @@ import { StatusFilter, type StatusFilterValue } from '@/app/dashboard/_component
 import { TierFilter, type TierFilterValue } from '@/app/dashboard/_components/tier-filter';
 import { DataTable } from '@/components/data-table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { isTpalEligible } from '@/lib/tpal';
 import type { TierGroup } from '@/types/member';
 
 import { membersColumns } from './_components/columns';
@@ -58,8 +59,7 @@ export function MembersClient({ data }: { data: MemberRow[] }) {
                 if (billing === 'inactive' && b === 'active') return false;
             }
             if (tpal !== 'all') {
-                const dp = typeof r.draw_pass === 'number' ? r.draw_pass : Number(r.draw_pass);
-                const isEligible = dp > 0 || dp === -1;
+                const isEligible = isTpalEligible(r.draw_pass, r.billing_status);
                 if (tpal === 'eligible' && !isEligible) return false;
                 if (tpal === 'excluded' && isEligible) return false;
             }

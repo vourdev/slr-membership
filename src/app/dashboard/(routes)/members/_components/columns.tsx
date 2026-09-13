@@ -1,4 +1,5 @@
 import { Column } from '@/components/data-table';
+import { isTpalEligible } from '@/lib/tpal';
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLE: Record<string, string> = {
@@ -74,7 +75,7 @@ export const membersColumns: Column[] = [
         render: (row) => {
             const dp = typeof row.draw_pass === 'number' ? row.draw_pass : Number(row.draw_pass);
 
-            const isEligible = dp > 0 || dp === -1;
+            const isEligible = isTpalEligible(row.draw_pass, row.billing_status);
 
             if (isNaN(dp) || row.draw_pass === '-' || row.draw_pass === null) {
                 return <span className='text-slr-dim whitespace-nowrap'>-</span>;
