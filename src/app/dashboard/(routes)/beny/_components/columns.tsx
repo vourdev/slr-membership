@@ -32,6 +32,11 @@ export function benyColumnsFor(tab: BenyTab, { onActivate, onDeactivate }: Handl
         base.push({ key: 'activatedAt', label: 'Activated At', render: (row) => row.activatedAt || '-' });
     }
 
+    if (tab === 'pending_deactivation') {
+        // Mark as Deactivated stays locked until this date, so the admin needs to see it.
+        base.push({ key: 'accessEndsAt', label: 'Access Ends', render: (row) => row.accessEndsAt || '-' });
+    }
+
     if (tab === 'cancelled') {
         base.push({ key: 'deactivatedAt', label: 'Deactivated Date', render: (row) => row.deactivatedAt || '-' });
     }
@@ -60,7 +65,7 @@ export function benyColumnsFor(tab: BenyTab, { onActivate, onDeactivate }: Handl
                     <span
                         title={
                             !due
-                                ? 'Cannot deactivate until paid access ends.'
+                                ? `Available once paid access ends${row.accessEndsAt ? ` on ${row.accessEndsAt}` : ''}.`
                                 : 'Record that you have revoked this account in the BENY portal.'
                         }>
                         <Button

@@ -5,6 +5,8 @@ import { apiFetch } from '../http';
 
 export type BenyStatusValue =
     | 'inactive'
+    // Returned right after subscribe while the backend completes payment on its side.
+    | 'pending_payment'
     | 'pending_activation'
     | 'active'
     | 'pending_deactivation'
