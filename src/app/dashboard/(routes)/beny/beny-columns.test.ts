@@ -1,5 +1,4 @@
 import { benyColumnsFor } from './_components/columns';
-
 import { describe, expect, it, vi } from 'vitest';
 
 describe('benyColumnsFor', () => {
@@ -43,5 +42,18 @@ describe('benyColumnsFor', () => {
         const columns = benyColumnsFor('pending_deactivation', handlers);
         const keys = columns.map((c) => c.key);
         expect(keys).toContain('rowAction');
+    });
+
+    it('shows when paid access ends on pending_deactivation, before the action', () => {
+        const keys = benyColumnsFor('pending_deactivation', handlers).map((c) => c.key);
+
+        expect(keys).toContain('accessEndsAt');
+        expect(keys.indexOf('accessEndsAt')).toBeLessThan(keys.indexOf('rowAction'));
+    });
+
+    it('does not show Access Ends on other tabs', () => {
+        for (const tab of ['pending_activation', 'active', 'cancelled'] as const) {
+            expect(benyColumnsFor(tab, handlers).map((c) => c.key)).not.toContain('accessEndsAt');
+        }
     });
 });
