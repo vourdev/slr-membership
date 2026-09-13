@@ -13,7 +13,17 @@ import { cn } from '@/lib/utils';
 import type { MemberProfile, SubTierCode } from '@/types/member';
 
 import { cancelBenyAction, subscribeBenyAction } from '../beny-actions';
-import { Check, Clock, CreditCard, Fuel, Heart, Loader2Icon, type LucideIcon, ShoppingBag, Sparkles } from 'lucide-react';
+import {
+    Check,
+    Clock,
+    CreditCard,
+    Fuel,
+    Heart,
+    Loader2Icon,
+    type LucideIcon,
+    ShoppingBag,
+    Sparkles
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 const CATEGORY_ICON: Record<string, LucideIcon> = {
@@ -204,6 +214,14 @@ export function BenySection({
                     </div>
                 ) : null}
 
+                {status === 'pending_payment' ? (
+                    <span className='inline-flex items-start gap-2 text-sm text-white/90'>
+                        <Clock className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
+                        BENY request received — we&apos;re processing your request. Your access will be confirmed by
+                        email.
+                    </span>
+                ) : null}
+
                 {isBenyWindingDown(status) ? (
                     <span className='inline-flex items-start gap-2 text-sm text-white/90'>
                         <Clock className='text-slr-gold-label mt-0.5 size-4 shrink-0' />
@@ -215,8 +233,8 @@ export function BenySection({
                     (showForm ? (
                         <form onSubmit={handleSubmitAttempt} className='space-y-3'>
                             <p className='text-slr-muted text-sm'>
-                                We&apos;ll use these details to activate your BENY account. The ${BENY_MONTHLY_PRICE.toFixed(2)}/month
-                                fee will be charged directly to your card on file.
+                                We&apos;ll use these details to activate your BENY account. The $
+                                {BENY_MONTHLY_PRICE.toFixed(2)}/month fee will be charged directly to your card on file.
                             </p>
                             {/* Name and email come from the account so billing and BENY stay on one identity. */}
                             <div className='grid gap-3 sm:grid-cols-2'>
