@@ -6,7 +6,7 @@ import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { type Discount, getPublicDiscounts } from '@/lib/api/resources/discounts';
 import { getEntryHistory, isCycleExpired } from '@/lib/api/resources/entries';
-import { type ApiGiveaway, getGiveaways, tierGroupFromApi, toGiveaway } from '@/lib/api/resources/giveaways';
+import { type ApiGiveaway, getGiveaways, giveawayPhase, tierGroupFromApi, toGiveaway } from '@/lib/api/resources/giveaways';
 import { getMyMembership } from '@/lib/api/resources/memberships';
 import { getSpinStatus } from '@/lib/api/resources/spin';
 import { getAccessToken } from '@/lib/api/server';
@@ -114,6 +114,8 @@ export default async function MemberDashboardPage() {
     let activeGiveaway: ApiGiveaway | undefined;
     let activeDrawsAt = Infinity;
     for (const g of giveaways) {
+        // Skip giveaways the phase logic already considers drawn
+        if (giveawayPhase(g.opens_at, g.draws_at, g.status, (g.winner_count ?? 0) > 0) === 'drawn') continue;
         const drawsAt = Date.parse(g.draws_at ?? '');
         if (drawsAt > nowMs && drawsAt < activeDrawsAt && tierGroupFromApi(g.tier) === memberGroup) {
             activeGiveaway = g;

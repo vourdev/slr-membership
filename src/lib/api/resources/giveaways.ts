@@ -45,6 +45,10 @@ export interface ApiGiveaway {
     draws_at: string | null;
     is_entered: boolean;
     entry_status: EntryStatus | null;
+    /** Backend status — present on some list responses (admin always has it). */
+    status?: string | null;
+    /** Number of recorded winners — set on admin responses. */
+    winner_count?: number;
 }
 
 export interface ApiGiveawayWinnerRow {
@@ -64,6 +68,7 @@ export interface ApiGiveawayDetail {
     closes_at: string | null;
     draws_at: string | null;
     winners: ApiGiveawayWinnerRow[];
+    status?: string | null;
 }
 
 export const GIVEAWAY_RULES = [
@@ -93,7 +98,16 @@ function toEntryHistory(cycle: EntryCycle | null, entered: boolean): GiveawayEnt
     ];
 }
 
-export function giveawayPhase(opensAt: string | null | undefined, drawsAt: string | null | undefined): GiveawayPhase {
+export function giveawayPhase(
+    opensAt: string | null | undefined,
+    drawsAt: string | null | undefined,
+    status?: string | null,
+    hasWinner = false
+): GiveawayPhase {
+    // Authoritative status from the API takes priority
+    const s = (status || '').toUpperCase();
+    if (s === 'DRAWN' || s === 'COMPLETED' || s === 'CLOSED' || hasWinner) return 'drawn';
+
     const now = Date.now();
     const draws = Date.parse(drawsAt ?? '');
     if (!Number.isNaN(draws) && now >= draws) return 'drawn';
@@ -106,7 +120,7 @@ export function giveawayPhase(opensAt: string | null | undefined, drawsAt: strin
 export function toGiveaway(g: ApiGiveaway, memberGroup: TierGroup, memberState: string, memberTokens = 0): Giveaway {
     const group = tierGroupFromApi(g.tier);
     const locked = isGiveawayLocked(group, memberGroup);
-    const phase = giveawayPhase(g.opens_at, g.draws_at);
+    const phase = giveawayPhase(g.opens_at, g.draws_at, g.status, (g.winner_count ?? 0) > 0);
     const entered = phase === 'active' && (g.is_entered ?? false);
     const type = g.type?.toLowerCase();
 
@@ -164,7 +178,9 @@ export function toGiveawayDetail(
             closes_at: d.closes_at,
             draws_at: d.draws_at,
             is_entered: listItem?.is_entered ?? false,
-            entry_status: listItem?.entry_status ?? 'inactive'
+            entry_status: listItem?.entry_status ?? 'inactive',
+            status: d.status ?? listItem?.status,
+            winner_count: (d.winners?.length ?? 0) > 0 ? d.winners.length : listItem?.winner_count
         },
         memberGroup,
         memberState,
@@ -179,8 +195,13 @@ export function toGiveawayDetail(
     };
 }
 
-export const getGiveaways = cache((token: string) =>
-    apiFetch<ApiGiveaway[]>(API.giveaways.list, { token, cache: 'no-store' })
+export type MemberGiveawayStatus = 'OPEN' | 'CLOSED' | 'PROCESSING' | 'COMPLETED';
+
+export const getGiveaways = cache((token: string, status?: MemberGiveawayStatus) =>
+    apiFetch<ApiGiveaway[]>(status ? `${API.giveaways.list}?status=${status}` : API.giveaways.list, {
+        token,
+        cache: 'no-store'
+    })
 );
 
 export const getGiveaway = cache((id: string, token: string) =>

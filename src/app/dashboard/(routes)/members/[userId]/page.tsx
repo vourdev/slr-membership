@@ -10,6 +10,7 @@ import { handleApiAuthError } from '@/lib/api/guard';
 import { type AdminMemberDetail, getAdminMemberDetail } from '@/lib/api/resources/admin';
 import { getAccessToken } from '@/lib/api/server';
 import { formatAdminTierName, subTierFromGroupAndName } from '@/lib/member';
+import { isTpalEligible } from '@/lib/tpal';
 import type { TierGroup } from '@/types/member';
 
 import { MemberAdminActions } from './_components/member-admin-actions';
@@ -68,6 +69,9 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
     }
 
     const { membership, subscription, cycles, wins } = member;
+    // A cycle's entries count only while it runs and the member is paying — same rule as the list.
+    const isCycleEntryActive = (c: { draw_pass: number; end_at?: string | null }) =>
+        isTpalEligible(c.draw_pass, membership?.billing_status) && !!c.end_at && Date.parse(c.end_at) > Date.now();
     const consents = member.consents ?? [];
 
     return (
@@ -158,7 +162,9 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                                         <TableHead className='text-muted-foreground font-medium'>Start</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>End</TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>Entries</TableHead>
-                                        <TableHead className='text-muted-foreground font-medium'>Entry Status</TableHead>
+                                        <TableHead className='text-muted-foreground font-medium'>
+                                            Entry Status
+                                        </TableHead>
                                         <TableHead className='text-muted-foreground font-medium'>Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -170,8 +176,8 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ u
                                             <TableCell>{day(c.end_at)}</TableCell>
                                             <TableCell className='tabular-nums'>{c.total_token ?? 0}</TableCell>
                                             <TableCell>
-                                                <Badge variant={c.draw_pass > 0 ? 'default' : 'secondary'}>
-                                                    {c.draw_pass > 0 ? 'Active' : 'Inactive'}
+                                                <Badge variant={isCycleEntryActive(c) ? 'default' : 'secondary'}>
+                                                    {isCycleEntryActive(c) ? 'Active' : 'Inactive'}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>{dash(c.status)}</TableCell>

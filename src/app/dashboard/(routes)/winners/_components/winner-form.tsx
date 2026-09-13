@@ -16,10 +16,10 @@ import type { AdminGiveawayTier, AdminWinnerPayload } from '@/lib/api/resources/
 import { tierGroupFromApi } from '@/lib/api/resources/giveaways';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { createWinnerAction, updateWinnerAction } from '../../giveaways/actions';
+import { createWinnerAction, deleteWinnerAction, updateWinnerAction } from '../../giveaways/actions';
 import type { WinnerMemberOption } from '../actions';
 import { MemberPickerDialog } from './member-picker-dialog';
-import { ArrowLeft, Loader2Icon, UserSearch } from 'lucide-react';
+import { ArrowLeft, Loader2Icon, Trash2, UserSearch } from 'lucide-react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -77,6 +77,7 @@ export function WinnerForm({
     });
 
     const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [member, setMember] = useState<WinnerMemberOption | null>(
         initialData?.memberName
@@ -120,6 +121,26 @@ export function WinnerForm({
     };
 
     const onSubmit = (values: FormValues) => (initialData ? submit(values) : setPendingValues(values));
+
+    const handleDelete = () => {
+        if (!initialData) return;
+        startTransition(async () => {
+            try {
+                const res = await deleteWinnerAction(initialData.winnerId);
+                setDeleteOpen(false);
+                if (res.ok) {
+                    toast.success(res.message);
+                    router.push('/dashboard/winners');
+                    router.refresh();
+                } else {
+                    toast.error(res.message);
+                }
+            } catch {
+                setDeleteOpen(false);
+                toast.error('Something went wrong. Please try again.');
+            }
+        });
+    };
 
     const giveawayById = (id: string) => giveaways.find((g) => g.id === id);
     const giveawayLabel = (id: string) => {
@@ -247,14 +268,27 @@ export function WinnerForm({
                             />
                         </div>
 
-                        <div className='flex justify-end gap-3 border-t border-white/10 pt-6'>
-                            <Button variant='outline' asChild>
-                                <Link href='/dashboard/winners'>Cancel</Link>
-                            </Button>
-                            <Button type='submit' disabled={isPending}>
-                                {isPending ? <Loader2Icon className='mr-2 h-4 w-4 animate-spin' /> : null}
-                                {initialData ? 'Save Changes' : 'Record Winner'}
-                            </Button>
+                        <div className='flex justify-between gap-3 border-t border-white/10 pt-6'>
+                            {initialData ? (
+                                <Button
+                                    type='button'
+                                    variant='destructive'
+                                    disabled={isPending}
+                                    onClick={() => setDeleteOpen(true)}>
+                                    <Trash2 className='mr-2 h-4 w-4' /> Void Winner
+                                </Button>
+                            ) : (
+                                <span />
+                            )}
+                            <div className='flex gap-3'>
+                                <Button variant='outline' asChild>
+                                    <Link href='/dashboard/winners'>Cancel</Link>
+                                </Button>
+                                <Button type='submit' disabled={isPending}>
+                                    {isPending ? <Loader2Icon className='mr-2 h-4 w-4 animate-spin' /> : null}
+                                    {initialData ? 'Save Changes' : 'Record Winner'}
+                                </Button>
+                            </div>
                         </div>
                     </form>
                 </Form>
@@ -297,6 +331,28 @@ export function WinnerForm({
                 handleConfirm={() => {
                     if (pendingValues) submit(pendingValues);
                 }}
+            />
+            <ConfirmDialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                className='dashboard-theme dark'
+                title='Void this winner?'
+                isLoading={isPending}
+                confirmText='Void Winner'
+                destructive
+                desc={
+                    <span className='flex flex-col gap-2'>
+                        <span>
+                            Voiding a winner permanently removes this draw result. The member&apos;s entry will
+                            <strong> not</strong> be restored automatically.
+                        </span>
+                        <span className='text-white/80'>
+                            {giveawayLabel(initialData?.giveawayId ?? '')} · {initialData?.prize} ·{' '}
+                            {member?.name ?? initialData?.userId}
+                        </span>
+                    </span>
+                }
+                handleConfirm={handleDelete}
             />
         </div>
     );

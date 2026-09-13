@@ -47,8 +47,8 @@ export default async function BenyPage({ searchParams }: { searchParams: Promise
                 status: b.status || '-',
                 requestedAt: formatDate(b.created_at),
                 activatedAt: b.activated_at ? formatDate(b.activated_at) : null,
-                accessEndsAt: b.access_ends_at ? formatDate(b.access_ends_at) : null,
-                accessEndsAtIso: b.access_ends_at ?? null,
+                accessEndsAt: b.access_ends_at || b.expires_at ? formatDate(b.access_ends_at ?? b.expires_at) : null,
+                accessEndsAtIso: b.access_ends_at ?? b.expires_at ?? null,
                 deactivatedAt:
                     b.deactivated_at || b.cancelled_at ? formatDate(b.deactivated_at ?? b.cancelled_at) : null,
                 deactivationReason: b.deactivation_reason || null

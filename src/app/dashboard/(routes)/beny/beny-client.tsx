@@ -87,8 +87,9 @@ export function BenyClient({
                     status: b.status || '-',
                     requestedAt: formatDateTime(b.created_at),
                     activatedAt: b.activated_at ? formatDateTime(b.activated_at) : null,
-                    accessEndsAt: b.access_ends_at ? formatDateTime(b.access_ends_at) : null,
-                    accessEndsAtIso: b.access_ends_at ?? null,
+                    accessEndsAt:
+                        b.access_ends_at || b.expires_at ? formatDateTime(b.access_ends_at ?? b.expires_at) : null,
+                    accessEndsAtIso: b.access_ends_at ?? b.expires_at ?? null,
                     deactivatedAt: (() => {
                         const at = b.deactivated_at ?? b.cancelled_at;
 

@@ -8,6 +8,7 @@ import { handleApiAuthError } from '@/lib/api/guard';
 import { getBillingStatus } from '@/lib/api/resources/billing';
 import { getEntryHistory } from '@/lib/api/resources/entries';
 import {
+    type ApiGiveaway,
     type GiveawayWinner,
     compareGiveaways,
     getGiveawayWinners,
@@ -37,20 +38,35 @@ export default async function GiveawaysPage() {
     let pastWinners: GiveawayWinner[] = [];
 
     if (token) {
-        const [giveawaysRes, entriesRes, billingRes, winnersRes] = await Promise.allSettled([
-            getGiveaways(token),
+        const [openRes, completedRes, closedRes, entriesRes, billingRes, winnersRes] = await Promise.allSettled([
+            getGiveaways(token, 'OPEN'),
+            getGiveaways(token, 'COMPLETED'),
+            getGiveaways(token, 'CLOSED'),
             getEntryHistory(token),
             getBillingStatus(token),
             getGiveawayWinners(token)
         ]);
 
-        if (giveawaysRes.status === 'fulfilled') {
+        const rawGiveaways: ApiGiveaway[] = [];
+        const seenIds = new Set<string>();
+        for (const res of [openRes, completedRes, closedRes]) {
+            if (res.status === 'fulfilled') {
+                for (const g of res.value) {
+                    if (g.giveaway_id && !seenIds.has(g.giveaway_id)) {
+                        seenIds.add(g.giveaway_id);
+                        rawGiveaways.push(g);
+                    }
+                }
+            }
+        }
+
+        if (openRes.status === 'fulfilled' || completedRes.status === 'fulfilled') {
             const tokens = entriesRes.status === 'fulfilled' ? (entriesRes.value.current_cycle?.total_token ?? 0) : 0;
-            giveaways = giveawaysRes.value
+            giveaways = rawGiveaways
                 .map((g) => toGiveaway(g, memberGroup, member.state, tokens))
                 .sort(compareGiveaways);
         } else {
-            handleApiAuthError(giveawaysRes.reason);
+            handleApiAuthError(openRes.reason);
             failed = true;
         }
         if (billingRes.status === 'fulfilled') nextRenewalIso = billingRes.value.next_renewal_at ?? null;
@@ -61,6 +77,8 @@ export default async function GiveawaysPage() {
         if (winnersRes.status === 'fulfilled') pastWinners = winnersRes.value;
         else handleApiAuthError(winnersRes.reason);
     }
+    const activeGiveaways = giveaways.filter((g) => g.phase !== 'drawn');
+    const drawnGiveaways = giveaways.filter((g) => g.phase === 'drawn');
 
     return (
         <div className='mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8'>
@@ -85,13 +103,13 @@ export default async function GiveawaysPage() {
                 <EmptyState
                     icon={CircleAlert}
                     title='Prize Draws Unavailable'
-                    description='We couldn’t load the draws for your tier right now. Please try again shortly.'
+                    description='We couldn&apos;t load the draws for your tier right now. Please try again shortly.'
                 />
-            ) : giveaways.length === 0 ? (
+            ) : activeGiveaways.length === 0 ? (
                 <EmptyState
                     icon={Gift}
-                    title='No Prize Draws Right Now'
-                    description='Active draws for your tier will appear here soon.'
+                    title='No Active Prize Draws'
+                    description='Completed draws can be found in the Past Draws section below. New draws for your tier will appear here soon.'
                     action={
                         <Link
                             href='/member'
@@ -102,10 +120,10 @@ export default async function GiveawaysPage() {
                     className='border-0 bg-transparent py-16'
                 />
             ) : (
-                <GiveawaysBoard giveaways={giveaways} memberSubTier={member.sub_tier} nextRenewalIso={nextRenewalIso} />
+                <GiveawaysBoard giveaways={activeGiveaways} memberSubTier={member.sub_tier} nextRenewalIso={nextRenewalIso} />
             )}
 
-            <PastDraws winners={pastWinners} />
+            <PastDraws winners={pastWinners} drawnGiveaways={drawnGiveaways} />
         </div>
     );
 }
