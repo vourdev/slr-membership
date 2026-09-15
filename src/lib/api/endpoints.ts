@@ -97,6 +97,13 @@ export const API = {
     entries: {
         history: '/api/v1/entries/'
     },
+    partnerLogos: {
+        // Community Givebacks logos, managed apart from discounts (UAT CMS-01).
+        public: '/api/v1/public/partners/',
+        adminList: '/api/v1/admin/partner-logos',
+        adminDetail: (id: string) => `/api/v1/admin/partner-logos/${id}`,
+        presignedUrl: '/api/v1/admin/partner-logos/presigned-url'
+    },
     consents: {
         me: '/api/v1/consents/me',
         update: '/api/v1/consents'
