@@ -6,11 +6,8 @@ const STATIC_PARTNERS = Array.from({ length: 10 }, (_, idx) => ({
     alt: `Partner Logo ${idx + 1}`
 }));
 
-const PartnersSection = ({ logos }: { logos?: string[] }) => {
-    const partners =
-        logos && logos.length > 0
-            ? logos.map((src, idx) => ({ src, alt: `Partner Logo ${idx + 1}` }))
-            : STATIC_PARTNERS;
+const PartnersSection = ({ logos }: { logos?: { src: string; alt: string }[] }) => {
+    const partners = logos && logos.length > 0 ? logos : STATIC_PARTNERS;
 
     return (
         <section id='partners' className='bg-slr-ink relative overflow-hidden py-16 md:py-24'>
