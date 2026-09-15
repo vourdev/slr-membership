@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { EbookReader, type ReaderChapter } from '@/components/common/ebook-reader';
 import { PdfEbookViewer } from '@/components/common/pdf-ebook-viewer';
+import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import {
     type EbookChapter,
@@ -91,7 +92,7 @@ function BackToLibraryLink() {
     );
 }
 
-function UpgradeGate() {
+function UpgradeGate({ resubscribe = false }: { resubscribe?: boolean }) {
     return (
         <div className='mx-auto w-full max-w-3xl flex-1 px-4 py-6 md:px-6 md:py-10'>
             <BackToLibraryLink />
@@ -104,14 +105,15 @@ function UpgradeGate() {
                     This e-book is a member benefit
                 </h1>
                 <p className='text-slr-muted mt-2 max-w-md text-sm leading-relaxed'>
-                    Full e-book content is unlocked for SLR RED and BLUE members. Upgrade your membership to read the
-                    complete guide.
+                    {resubscribe
+                        ? 'Your membership has ended. Resubscribe to SLR RED or BLUE to read the complete guide again.'
+                        : 'Full e-book content is unlocked for SLR RED and BLUE members. Upgrade your membership to read the complete guide.'}
                 </p>
                 <Link
                     href='/member/membership'
                     className='mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold uppercase'
                     style={goldButtonStyle}>
-                    Upgrade now <ArrowRight className='size-4' />
+                    {resubscribe ? 'Resubscribe' : 'Upgrade now'} <ArrowRight className='size-4' />
                 </Link>
             </div>
         </div>
@@ -123,6 +125,7 @@ export default async function EbookReaderPage({ params }: { params: Promise<{ id
     const token = await getAccessToken();
 
     if (!token) notFound();
+    if ((await getCurrentMember()).is_visitor) return <UpgradeGate resubscribe />;
 
     let list: EbookListItem[] = [];
     try {

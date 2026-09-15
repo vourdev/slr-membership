@@ -6,7 +6,13 @@ import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { type Discount, getPublicDiscounts } from '@/lib/api/resources/discounts';
 import { getEntryHistory, isCycleExpired } from '@/lib/api/resources/entries';
-import { type ApiGiveaway, getGiveaways, giveawayPhase, tierGroupFromApi, toGiveaway } from '@/lib/api/resources/giveaways';
+import {
+    type ApiGiveaway,
+    getGiveaways,
+    giveawayPhase,
+    tierGroupFromApi,
+    toGiveaway
+} from '@/lib/api/resources/giveaways';
 import { getMyMembership } from '@/lib/api/resources/memberships';
 import { getSpinStatus } from '@/lib/api/resources/spin';
 import { getAccessToken } from '@/lib/api/server';
@@ -30,6 +36,7 @@ import { Greeting } from './_components/dashboard/greeting';
 import { MembershipSummaryCard } from './_components/dashboard/membership-summary-card';
 import { QuickActions } from './_components/dashboard/quick-actions';
 import { RenewalSpinCard } from './_components/dashboard/renewal-spin-card';
+import { ResubscribeBanner } from './_components/dashboard/resubscribe-banner';
 import { UpcomingGiveaways } from './_components/dashboard/upcoming-giveaways';
 import { CircleAlert, Gift } from 'lucide-react';
 
@@ -39,6 +46,20 @@ export const metadata: Metadata = {
 
 export default async function MemberDashboardPage() {
     const member = await getCurrentMember();
+
+    // A cancelled member is back on Visitor: no membership, draws or discounts to summarise,
+    // so skip those fetches and point them at resubscribing instead.
+    if (member.is_visitor) {
+        return (
+            <div className='mx-auto w-full max-w-7xl flex-1 space-y-8 px-4 py-6 md:space-y-12 md:px-6 md:py-8'>
+                <Greeting member={member} />
+                {!member.email_verified_at ? <EmailVerificationBanner /> : null}
+                <ResubscribeBanner />
+                <QuickActions isVisitor />
+            </div>
+        );
+    }
+
     const token = await getAccessToken();
 
     const spinEligible = SPIN_ELIGIBLE_SUB_TIERS.has(member.sub_tier);

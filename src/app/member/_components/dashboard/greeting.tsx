@@ -20,7 +20,9 @@ export function Greeting({ member }: { member: CurrentMember }) {
                     <span className='text-gradient-gold'>{firstName}</span>
                 </h1>
                 <p className='text-slr-muted mt-2 text-sm text-pretty md:text-base'>
-                    Here&apos;s your membership &amp; draw summary.
+                    {member.is_visitor
+                        ? 'Your membership has ended — resubscribe anytime to rejoin the draws.'
+                        : 'Here’s your membership & draw summary.'}
                 </p>
             </div>
             <div className='flex items-center gap-2'>

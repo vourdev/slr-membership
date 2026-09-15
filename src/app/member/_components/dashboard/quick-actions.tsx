@@ -1,23 +1,30 @@
 import Link from 'next/link';
 
 import { SectionTitle } from './section-title';
-import { ArrowRight, BookOpen, Gift, type LucideIcon, TicketPercent, UserCircle } from 'lucide-react';
+import { ArrowRight, BookOpen, Gift, Lock, type LucideIcon, TicketPercent, UserCircle } from 'lucide-react';
 
 interface QuickAction {
     title: string;
     href: string;
     icon: LucideIcon;
     desc: string;
+    paidOnly?: boolean;
 }
 
 const ACTIONS: QuickAction[] = [
-    { title: 'Discounts', href: '/member/discounts', icon: TicketPercent, desc: 'Partner offers & BENY' },
-    { title: 'Prize Draws', href: '/member/giveaways', icon: Gift, desc: 'Active draws by tier' },
-    { title: 'E-Books', href: '/member/ebooks', icon: BookOpen, desc: 'Digital library' },
+    {
+        title: 'Discounts',
+        href: '/member/discounts',
+        icon: TicketPercent,
+        desc: 'Partner offers & BENY',
+        paidOnly: true
+    },
+    { title: 'Prize Draws', href: '/member/giveaways', icon: Gift, desc: 'Active draws by tier', paidOnly: true },
+    { title: 'E-Books', href: '/member/ebooks', icon: BookOpen, desc: 'Digital library', paidOnly: true },
     { title: 'Profile', href: '/member/profile', icon: UserCircle, desc: 'Account & membership' }
 ];
 
-export function QuickActions() {
+export function QuickActions({ isVisitor = false }: { isVisitor?: boolean }) {
     return (
         <section>
             <SectionTitle>Quick Actions</SectionTitle>
@@ -39,10 +46,16 @@ export function QuickActions() {
                             {action.title}
                         </span>
                         <span className='text-slr-dim mt-1.5 block text-xs'>{action.desc}</span>
-                        <span className='text-slr-gold-label mt-auto inline-flex items-center gap-1 pt-4 text-[10px] font-semibold tracking-[0.18em] uppercase'>
-                            Explore
-                            <ArrowRight className='size-3 transition-transform duration-200 group-hover:translate-x-0.5' />
-                        </span>
+                        {isVisitor && action.paidOnly ? (
+                            <span className='text-slr-dim mt-auto inline-flex items-center gap-1 pt-4 text-[10px] font-semibold tracking-[0.18em] uppercase'>
+                                <Lock className='size-3' /> Members only
+                            </span>
+                        ) : (
+                            <span className='text-slr-gold-label mt-auto inline-flex items-center gap-1 pt-4 text-[10px] font-semibold tracking-[0.18em] uppercase'>
+                                Explore
+                                <ArrowRight className='size-3 transition-transform duration-200 group-hover:translate-x-0.5' />
+                            </span>
+                        )}
                     </Link>
                 ))}
             </div>

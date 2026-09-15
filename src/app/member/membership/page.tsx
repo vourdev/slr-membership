@@ -21,6 +21,7 @@ import { CancelledMembershipBanner } from '../_components/dashboard/cancelled-me
 import { GraceBanner } from './_components/grace-banner';
 import { ManageBillingButton } from './_components/manage-billing-button';
 import { ManageTier } from './_components/manage-tier';
+import { ResubscribePlans } from './_components/resubscribe-plans';
 import { TierCard } from './_components/tier-card';
 import { CircleAlert, CreditCard, ExternalLink, ReceiptText } from 'lucide-react';
 
@@ -81,41 +82,51 @@ export default async function MembershipPage() {
                 <CancelledMembershipBanner accessEndsAt={billing.next_renewal_at} />
             ) : null}
 
-            <TierCard
-                subTier={subTier}
-                priceCents={priceCents}
-                billingStatus={billing?.billing_status ?? membership?.billingStatus ?? null}
-                nextRenewal={billing?.next_renewal_at ?? null}>
-                <ManageTier
-                    pricing={pricing}
-                    currentSubTier={subTier}
-                    nextRenewalIso={billing?.next_renewal_at ?? null}
-                    scheduledChange={membership?.pending_upgrade ?? null}
+            {member.is_visitor ? (
+                <ResubscribePlans pricing={pricing} />
+            ) : (
+                <TierCard
+                    subTier={subTier}
+                    priceCents={priceCents}
                     billingStatus={billing?.billing_status ?? membership?.billingStatus ?? null}
-                    cancelAtPeriodEnd={Boolean(billing?.cancel_at_period_end)}
-                />
-            </TierCard>
+                    nextRenewal={billing?.next_renewal_at ?? null}>
+                    <ManageTier
+                        pricing={pricing}
+                        currentSubTier={subTier}
+                        nextRenewalIso={billing?.next_renewal_at ?? null}
+                        scheduledChange={membership?.pending_upgrade ?? null}
+                        billingStatus={billing?.billing_status ?? membership?.billingStatus ?? null}
+                        cancelAtPeriodEnd={Boolean(billing?.cancel_at_period_end)}
+                    />
+                </TierCard>
+            )}
 
-            <section className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-5 md:p-6'>
-                <div className='flex flex-wrap items-center justify-between gap-3'>
-                    <div className='flex items-center gap-2'>
-                        <CreditCard className='text-slr-gold-label size-5' />
-                        <h2 className='font-bebas-neue text-xl tracking-wide text-white uppercase'>Payment Method</h2>
-                    </div>
-                    <ManageBillingButton />
-                </div>
-                <p className='text-slr-dim mt-2 text-xs'>
-                    Update your card or cancel via Stripe’s secure billing portal.
-                </p>
-            </section>
+            {member.is_visitor ? null : (
+                <>
+                    <section className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-5 md:p-6'>
+                        <div className='flex flex-wrap items-center justify-between gap-3'>
+                            <div className='flex items-center gap-2'>
+                                <CreditCard className='text-slr-gold-label size-5' />
+                                <h2 className='font-bebas-neue text-xl tracking-wide text-white uppercase'>
+                                    Payment Method
+                                </h2>
+                            </div>
+                            <ManageBillingButton />
+                        </div>
+                        <p className='text-slr-dim mt-2 text-xs'>
+                            Update your card or cancel via Stripe’s secure billing portal.
+                        </p>
+                    </section>
 
-            <BenySection
-                status={benyStatus}
-                userProfile={profile}
-                subTier={subTier}
-                cancelledAt={benyCancelledAt}
-                expiresAt={benyExpiresAt ?? billing?.next_renewal_at ?? null}
-            />
+                    <BenySection
+                        status={benyStatus}
+                        userProfile={profile}
+                        subTier={subTier}
+                        cancelledAt={benyCancelledAt}
+                        expiresAt={benyExpiresAt ?? billing?.next_renewal_at ?? null}
+                    />
+                </>
+            )}
 
             <section className='bg-card-dark-navy border-slr-navy-border rounded-2xl border p-5 md:p-6'>
                 <div className='mb-4 flex items-center gap-2'>

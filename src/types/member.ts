@@ -13,6 +13,8 @@ export interface CurrentMember {
     state: string;
 
     email_verified_at: string | null;
+    /** Cancelled members are moved to Visitor: they can log in but RED/BLUE modules stay locked. */
+    is_visitor: boolean;
 }
 
 export interface MembershipSummary {
