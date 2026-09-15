@@ -19,6 +19,7 @@ import { getAccessToken } from '@/lib/api/server';
 import { tierGroupOf } from '@/lib/member';
 import type { Giveaway } from '@/types/member';
 
+import { MembershipRequired } from '../_components/membership-required';
 import { GiveawaysBoard } from './_components/giveaways-board';
 import { PastDraws } from './_components/past-draws';
 import { ArrowLeft, CircleAlert, ExternalLink, Gift } from 'lucide-react';
@@ -29,6 +30,14 @@ export const metadata: Metadata = {
 
 export default async function GiveawaysPage() {
     const member = await getCurrentMember();
+    if (member.is_visitor)
+        return (
+            <MembershipRequired
+                module='Prize Draws'
+                description="Your membership has ended. Resubscribe to SLR RED or BLUE to enter this cycle's prize draws again."
+            />
+        );
+
     const token = await getAccessToken();
     const memberGroup = tierGroupOf(member.sub_tier);
 
@@ -103,7 +112,7 @@ export default async function GiveawaysPage() {
                 <EmptyState
                     icon={CircleAlert}
                     title='Prize Draws Unavailable'
-                    description='We couldn&apos;t load the draws for your tier right now. Please try again shortly.'
+                    description="We couldn't load the draws for your tier right now. Please try again shortly."
                 />
             ) : activeGiveaways.length === 0 ? (
                 <EmptyState
@@ -120,7 +129,11 @@ export default async function GiveawaysPage() {
                     className='border-0 bg-transparent py-16'
                 />
             ) : (
-                <GiveawaysBoard giveaways={activeGiveaways} memberSubTier={member.sub_tier} nextRenewalIso={nextRenewalIso} />
+                <GiveawaysBoard
+                    giveaways={activeGiveaways}
+                    memberSubTier={member.sub_tier}
+                    nextRenewalIso={nextRenewalIso}
+                />
             )}
 
             <PastDraws winners={pastWinners} drawnGiveaways={drawnGiveaways} />

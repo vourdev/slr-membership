@@ -22,6 +22,7 @@ import { useInitials } from '@/hooks/use-initials';
 import type { CurrentMember } from '@/types/member';
 
 import { MEMBER_NAV } from './member-nav';
+import { Lock } from 'lucide-react';
 
 interface MemberSidebarProps {
     user: { name?: string | null; email?: string | null; image?: string | null } | null;
@@ -78,6 +79,11 @@ export function MemberSidebar({ user, member }: MemberSidebarProps) {
                                     <Link href={item.href} onClick={closeOnMobile}>
                                         <item.icon />
                                         <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
+                                        {member.is_visitor && item.paidOnly ? (
+                                            <span className='ml-auto group-data-[collapsible=icon]:hidden'>
+                                                <Lock aria-label='Locked' className='text-slr-dim size-3.5' />
+                                            </span>
+                                        ) : null}
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

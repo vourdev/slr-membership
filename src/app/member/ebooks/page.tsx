@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import EmptyState from '@/components/common/empty-state';
+import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { type EbookListItem, getEbooks } from '@/lib/api/resources/ebooks';
 import { getAccessToken } from '@/lib/api/server';
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function EbooksPage() {
-    const token = await getAccessToken();
+    const [token, member] = await Promise.all([getAccessToken(), getCurrentMember()]);
 
     let ebooks: EbookListItem[] = [];
     let failed = false;
@@ -21,6 +22,9 @@ export default async function EbooksPage() {
     if (token) {
         try {
             ebooks = await getEbooks(token);
+            // The listing stays open to everyone, but a Visitor never reads the content — lock it
+            // here too rather than trusting the API's per-tier flag for an account it may not gate.
+            if (member.is_visitor) ebooks = ebooks.map((ebook) => ({ ...ebook, is_locked: true }));
         } catch (error) {
             handleApiAuthError(error);
             failed = true;

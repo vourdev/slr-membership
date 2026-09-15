@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 
 import EmptyState from '@/components/common/empty-state';
+import { getCurrentMember } from '@/data/member-dashboard';
 import { handleApiAuthError } from '@/lib/api/guard';
 import { type Discount, getDiscounts } from '@/lib/api/resources/discounts';
 import { getAccessToken } from '@/lib/api/server';
 
+import { MembershipRequired } from '../_components/membership-required';
 import { DiscountsExplorer } from './_components/discounts-explorer';
 import { CircleAlert, Tag } from 'lucide-react';
 
@@ -13,6 +15,15 @@ export const metadata: Metadata = {
 };
 
 export default async function DiscountsPage() {
+    if ((await getCurrentMember()).is_visitor) {
+        return (
+            <MembershipRequired
+                module='Discounts'
+                description='Your membership has ended. Resubscribe to SLR RED or BLUE to unlock partner discounts again.'
+            />
+        );
+    }
+
     let discounts: Discount[] = [];
     let failed = false;
 
