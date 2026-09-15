@@ -21,6 +21,7 @@ import { formatDrawDateTime, formatShortDate, tierGroupOf } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
 import type { GiveawayDetail, GiveawayEntryRow } from '@/types/member';
 
+import { MembershipRequired } from '../../_components/membership-required';
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Lock, MapPin, Ticket, Trophy } from 'lucide-react';
 
 async function loadGiveaway(id: string): Promise<GiveawayDetail | null> {
@@ -68,6 +69,15 @@ function InfoCard({ title, children }: { title: string; children: ReactNode }) {
 
 export default async function GiveawayDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
+    if ((await getCurrentMember()).is_visitor) {
+        return (
+            <MembershipRequired
+                module='Prize Draws'
+                description="Your membership has ended. Resubscribe to SLR RED or BLUE to enter this cycle's prize draws again."
+            />
+        );
+    }
+
     const [giveaway, drawRules] = await Promise.all([loadGiveaway(id), getDrawRules()]);
 
     if (!giveaway) notFound();

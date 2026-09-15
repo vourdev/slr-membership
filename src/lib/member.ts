@@ -30,10 +30,16 @@ export function getSubTierMeta(code: SubTierCode) {
 }
 
 export function tierGroupOf(code: SubTierCode): TierGroup {
-    const group = SUB_TIERS[code].group;
+    return SUB_TIERS[code].group;
+}
 
-    // Visitor was retired. Accounts still carrying it read as the lowest paid tier.
-    return group === 'visitor' ? 'red' : group;
+/**
+ * Visitor is no longer sold at sign-up; a paid member lands on it when their subscription is
+ * cancelled, and keeps logging in without the RED/BLUE modules. Only an explicit "visitor" from
+ * the API counts — an empty tier must not lock a paying member out.
+ */
+export function isVisitorTier(tier: string | null | undefined, subTier?: string | null): boolean {
+    return [tier, subTier].some((value) => value?.trim().toLowerCase() === 'visitor');
 }
 
 const TIER_RANK: Record<TierGroup, number> = { visitor: 0, red: 1, blue: 2 };

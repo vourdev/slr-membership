@@ -1,7 +1,7 @@
 import { handleApiAuthError } from '@/lib/api/guard';
 import { getMe } from '@/lib/api/resources/auth';
 import { getAccessToken } from '@/lib/api/server';
-import { subTierCodeOf } from '@/lib/member';
+import { isVisitorTier, subTierCodeOf } from '@/lib/member';
 import { getSessionIdentity } from '@/lib/session-member';
 import type { CurrentMember } from '@/types/member';
 
@@ -18,7 +18,8 @@ export async function getCurrentMember(): Promise<CurrentMember> {
                 email: me.email || identity.email || '',
                 sub_tier: subTierCodeOf(me.sub_tier ?? undefined),
                 state: me.state || identity.state || '-',
-                email_verified_at: me.email_verified_at
+                email_verified_at: me.email_verified_at,
+                is_visitor: isVisitorTier(me.tier, me.sub_tier)
             };
         } catch (error) {
             handleApiAuthError(error);
@@ -30,6 +31,8 @@ export async function getCurrentMember(): Promise<CurrentMember> {
         email: identity.email ?? '',
         sub_tier: identity.sub_tier ?? 'VISITOR',
         state: identity.state ?? '-',
-        email_verified_at: null
+        email_verified_at: null,
+        // Only a session that explicitly carried Visitor; an unknown tier must not lock anyone out.
+        is_visitor: identity.sub_tier === 'VISITOR'
     };
 }
