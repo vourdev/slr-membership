@@ -540,7 +540,7 @@ const buildSections = (pricing: TierPricing, pool: string, membersCap: string): 
             <>
                 <p>
                     18.1 Unless a Promotion Schedule states otherwise, SLR intends to conduct regular weekly Promotional
-                    Draws every Friday at approximately 7:30 PM AEST/AEDT, as applicable in Victoria.
+                    Draws every Sunday at approximately 7:30 PM AEST/AEDT, as applicable in Victoria.
                 </p>
                 <p>
                     18.2 The applicable entry closing time will be specified on the SLR website or in the relevant
@@ -557,7 +557,7 @@ const buildSections = (pricing: TierPricing, pool: string, membersCap: string): 
                     <Link href='/giveaway-rules' className='text-[#FFDC75] hover:underline'>
                         Competition Rules
                     </Link>{' '}
-                    for the current cycle set entry close at 6:30 PM AEST and the draw at 8:00 PM AEST each Friday.
+                    for the current cycle set entry close at 6:30 PM AEST and the draw at 8:00 PM AEST each Sunday.
                 </p>
             </>
         )

@@ -9,7 +9,7 @@ const FALLBACK_TICKER = [
     '$2,100 PRIZE POOL',
     'ONLY 100 MEMBERS COMPETING',
     'ODDS 9 IN 10 P/A',
-    'UP TO 10 PRIZE DRAWS EVERY FRIDAY'
+    'UP TO 10 PRIZE DRAWS EVERY SUNDAY'
 ];
 
 // The headline pair lands first, then the strapline, then everything below it.

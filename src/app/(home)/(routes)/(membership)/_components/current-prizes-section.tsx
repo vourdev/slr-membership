@@ -20,7 +20,7 @@ import { CurrentPrizesContent, type PrizeTierCard } from './current-prizes-conte
 const FALLBACK = {
     pool: '$7,380',
     stats: [
-        { value: '100 Members', label: 'Competing Capped' },
+        { value: '100 Members', label: 'Prize Pool Base' },
         { value: 'Up To 34 Prizes', label: 'Every Month' },
         { value: '9 In 10 Winning', label: 'Chance Per Year' }
     ],
@@ -38,7 +38,8 @@ const FALLBACK = {
     }
 };
 
-const unlockNote = (members: string) => `Unlocked at ${members} Members`;
+const monthlyUnlockNote = (members: string) => `Monthly Prize Unlocked at ${members} Members`;
+const bonusUnlockNote = (members: string) => `Bonus Prize Pool Unlocked at ${members} Members`;
 
 const perWeekAmount = (price: string) => price.replace('/week', '');
 
@@ -52,8 +53,8 @@ const CurrentPrizesSection = async () => {
     const poolAmount = parseAmount(poolHeadline);
 
     const membersCap = membersCapLabel(content?.stage_label) ?? FALLBACK.membersCap;
-    const monthlyNote = unlockNote(membersCount(content?.stage_label) ?? FALLBACK.membersCount);
-    const bonusNote = unlockNote(GRAND_BONUS.membersCount);
+    const monthlyNote = monthlyUnlockNote(membersCount(content?.stage_label) ?? FALLBACK.membersCount);
+    const bonusNote = bonusUnlockNote(GRAND_BONUS.membersCount);
 
     const redMin = tiers ? minPriceCents(tiers.red) : null;
     const blueMin = tiers ? minPriceCents(tiers.blue) : null;

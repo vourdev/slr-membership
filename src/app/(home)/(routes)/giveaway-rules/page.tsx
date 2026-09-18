@@ -25,9 +25,9 @@ const ELIGIBLE_STATES = 'Victoria, Queensland, Western Australia, Tasmania, and 
 
 const drawDetails = (pool: string): { label: string; value: ReactNode }[] => [
     { label: 'Promotion cycle opens', value: '11 September 2026' },
-    { label: 'Regular draws', value: 'Every Friday, or as announced on the website' },
-    { label: 'Entries close each Friday', value: '6:30 PM AEST' },
-    { label: 'Draw time each Friday', value: '8:00 PM AEST' },
+    { label: 'Regular draws', value: 'Every Sunday, or as announced on the website' },
+    { label: 'Entries close each Sunday', value: '6:30 PM AEST' },
+    { label: 'Draw time each Sunday', value: '8:00 PM AEST' },
     {
         label: 'Prize pool',
         value: (
@@ -157,7 +157,7 @@ const buildSections = (pricing: TierPricing): LegalSection[] => [
         )
     },
     {
-        heading: 'Promotion period & four Friday draws',
+        heading: 'Promotion period & four Sunday draws',
         body: (
             <>
                 <p>
@@ -166,11 +166,11 @@ const buildSections = (pricing: TierPricing): LegalSection[] => [
                     announced by SLR.
                 </p>
                 <p>
-                    4.2 Regular draws take place every Friday or as listed on the website announcement. For regular
-                    Friday draws, entries close at 6:30 PM AEST and the draw takes place at 8:00 PM AEST.
+                    4.2 Regular draws take place every Sunday or as listed on the website announcement. For regular
+                    Sunday draws, entries close at 6:30 PM AEST and the draw takes place at 8:00 PM AEST.
                 </p>
                 <p>
-                    4.3 Only valid Entries recorded before the closing time for the relevant Friday draw will be
+                    4.3 Only valid Entries recorded before the closing time for the relevant Sunday draw will be
                     included in that draw.
                 </p>
                 <p>
@@ -180,7 +180,7 @@ const buildSections = (pricing: TierPricing): LegalSection[] => [
                 </p>
                 <div className='mt-4 space-y-1 rounded-xl border border-white/10 bg-black/20 p-4'>
                     <Fact label='Cycle opens'>11 September 2026</Fact>
-                    <Fact label='Regular draws'>Every Friday, or as announced on the website</Fact>
+                    <Fact label='Regular draws'>Every Sunday, or as announced on the website</Fact>
                     <Fact label='Entries close'>6:30 PM AEST</Fact>
                     <Fact label='Draw time'>8:00 PM AEST</Fact>
                 </div>
@@ -274,8 +274,8 @@ const buildSections = (pricing: TierPricing): LegalSection[] => [
                     allocation except where a specific promotion expressly provides additional Entries.
                 </p>
                 <p>
-                    7.4 Only valid Entries recorded before 6:30 PM AEST on the relevant Friday will be included in that
-                    Friday&rsquo;s draw.
+                    7.4 Only valid Entries recorded before 6:30 PM AEST on the relevant Sunday will be included in that
+                    Sunday&rsquo;s draw.
                 </p>
             </>
         )
@@ -291,7 +291,7 @@ const buildSections = (pricing: TierPricing): LegalSection[] => [
                     and utilise cryptographic SHA-256 verification to ensure transparency and fairness.
                 </p>
                 <p>
-                    8.2 Each draw will be conducted at 8:00 PM AEST in Victoria, Australia, on the applicable Friday
+                    8.2 Each draw will be conducted at 8:00 PM AEST in Victoria, Australia, on the applicable Sunday
                     stated in clause 4.2.
                 </p>
                 <p>

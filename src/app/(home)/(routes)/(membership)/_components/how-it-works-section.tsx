@@ -47,10 +47,10 @@ const buildSteps = (redFrom: number, blueFrom: number, redWeekly: string): Step[
         badge: 'Step 02',
         icon: '/icons/ic-prize-circle.png',
         title: 'Weekly Prize Draws',
-        kicker: 'Live Draws Every Friday Night',
+        kicker: 'Live Draws Every Sunday Night',
         body: (
             <>
-                Get auto-entered into <Strong>up to 10 draws every Friday</Strong>. Spin monthly to win direct discounts
+                Get auto-entered into <Strong>up to 10 draws every Sunday</Strong>. Spin monthly to win direct discounts
                 on your subscription bill &amp; lower your cost.
             </>
         ),
