@@ -66,9 +66,10 @@ describe('splitLines', () => {
 });
 
 describe('membersCapLabel', () => {
+    // "Capped" was dropped for promotion-regulation reasons; the count still comes from the label.
     it('pulls the member cap out of the stage label', () => {
-        expect(membersCapLabel('For 100 Members • Stage 1')).toBe('100 Members Capped');
-        expect(membersCapLabel('for 2,000 members')).toBe('2,000 Members Capped');
+        expect(membersCapLabel('For 100 Members • Stage 1')).toBe('Prizes Based on 100 Members');
+        expect(membersCapLabel('for 2,000 members')).toBe('Prizes Based on 2,000 Members');
     });
 
     it('returns null when the stage label has no member count', () => {
