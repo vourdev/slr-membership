@@ -4,7 +4,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://smartliferewards.co
 const siteName = 'Smart Life Rewards';
 
 const socialMediaUrls = [
-    'https://www.facebook.com/share/1CcxZ86yHn/?mibextid=wwXIfr',
+    'https://www.facebook.com/slraus',
     'https://www.instagram.com/smartliferewards',
     'https://www.tiktok.com/@smartlife.rewards'
 ];
