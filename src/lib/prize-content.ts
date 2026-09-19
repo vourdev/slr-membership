@@ -84,7 +84,7 @@ export function poolLabel(headline: string | null | undefined, fallback: string)
 export function membersCapLabel(stageLabel: string | null | undefined): string | null {
     const count = membersCount(stageLabel);
 
-    return count ? `${count} Members Capped` : null;
+    return count ? `Prizes Based on ${count} Members` : null;
 }
 
 /** Cheapest sub-tier price in cents -> "$2.50/week" over the 28-day cycle. */

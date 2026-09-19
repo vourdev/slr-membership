@@ -2,19 +2,19 @@
 
 import { useEffect, useState } from 'react';
 
-// Draws run Friday 8:00pm AEST. AEST is treated as a fixed UTC+10 offset, so the
+// Draws run SUNDAY 8:00pm AEST. AEST is treated as a fixed UTC+10 offset, so the
 // countdown does not shift when the browser sits in another timezone.
 const AEST_OFFSET_MS = 10 * 60 * 60 * 1000;
 // Competition Rules: cycle opens 11 Sep 2026, first draw 18 Sep 2026 at 8:00 PM AEST.
-const FIRST_DRAW_MS = Date.UTC(2026, 8, 18, 10, 0, 0);
-const FRIDAY = 5;
+const FIRST_DRAW_MS = Date.UTC(2026, 8, 20, 10, 0, 0);
+const SUNDAY = 0;
 const DRAW_HOUR_AEST = 20;
 
 function nextDrawMs(now: number): number {
     if (now < FIRST_DRAW_MS) return FIRST_DRAW_MS;
 
     const aestNow = new Date(now + AEST_OFFSET_MS);
-    let dayOffset = FRIDAY - aestNow.getUTCDay();
+    let dayOffset = SUNDAY - aestNow.getUTCDay();
     if (dayOffset < 0 || (dayOffset === 0 && aestNow.getUTCHours() >= DRAW_HOUR_AEST)) {
         dayOffset += 7;
     }
