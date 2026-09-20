@@ -1,5 +1,6 @@
 import { Column } from '@/components/data-table';
-import { isTpalEligible } from '@/lib/tpal';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { isTpalEligible, tpalExclusionReason } from '@/lib/tpal';
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLE: Record<string, string> = {
@@ -81,10 +82,30 @@ export const membersColumns: Column[] = [
                 return <span className='text-slr-dim whitespace-nowrap'>-</span>;
             }
 
-            return isEligible ? (
-                <span className={cn(pill, 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400')}>Eligible</span>
-            ) : (
-                <span className={cn(pill, 'border-rose-500/40 bg-rose-500/10 text-rose-400')}>Excluded</span>
+            if (isEligible) {
+                return (
+                    <span className={cn(pill, 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400')}>
+                        Eligible
+                    </span>
+                );
+            }
+
+            const reason = tpalExclusionReason(row.draw_pass, row.billing_status);
+
+            return (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span
+                            tabIndex={0}
+                            className={cn(
+                                pill,
+                                'cursor-help border-rose-500/40 bg-rose-500/10 text-rose-400 decoration-dotted underline-offset-4 hover:underline'
+                            )}>
+                            Excluded
+                        </span>
+                    </TooltipTrigger>
+                    <TooltipContent>{reason}</TooltipContent>
+                </Tooltip>
             );
         }
     },
