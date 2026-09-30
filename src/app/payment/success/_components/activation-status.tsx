@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
 
 import EmptyState from '@/components/common/empty-state';
 import GoldCtaButton from '@/components/common/gold-cta-button';
 import { Button } from '@/components/ui/button';
+import { trackSignUp } from '@/lib/analytics';
 import { formatShortDate } from '@/lib/member';
 import { goldButtonStyle } from '@/lib/styles';
 
@@ -28,6 +29,15 @@ export function ActivationStatus() {
     const [phase, setPhase] = useState<Phase>('polling');
     const [detail, setDetail] = useState<ActivationState | null>(null);
     const [attempt, setAttempt] = useState(0);
+    const reportedSuccess = useRef(false);
+
+    // Fired on confirmed activation rather than on page load, so a retry or a refresh of this page
+    // cannot inflate the conversion count.
+    useEffect(() => {
+        if (phase !== 'active' || reportedSuccess.current) return;
+        reportedSuccess.current = true;
+        trackSignUp({ event: 'sign_up_payment_success' });
+    }, [phase]);
 
     useEffect(() => {
         let cancelled = false;

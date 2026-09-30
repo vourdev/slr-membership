@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { trackSignUp } from '@/lib/analytics';
 import { register } from '@/lib/api/resources/auth';
 import { signUpConsents } from '@/lib/api/resources/consents';
 import { ApiError, apiErrorCode, apiErrorMessage } from '@/lib/api/types';
@@ -138,6 +139,11 @@ export function RegisterForm({ pricing, className, ...props }: RegisterFormProps
     };
 
     const goNextFromTier = (patch: Partial<SignUpFormData>) => {
+        const tier = patch.tier ?? data.tier;
+        const subTier = patch.sub_tier ?? data.sub_tier;
+        if (tier && subTier) {
+            trackSignUp({ event: 'sign_up_tier_selected', tier, sub_tier: subTier });
+        }
         patchData(patch);
         createAccount(patch);
     };
@@ -162,6 +168,10 @@ export function RegisterForm({ pricing, className, ...props }: RegisterFormProps
                     <StepAccount
                         data={data}
                         onNext={(patch) => {
+                            trackSignUp({
+                                event: 'sign_up_account_completed',
+                                state: patch.state ?? data.state
+                            });
                             patchData(patch);
                             setStep('tier');
                         }}
