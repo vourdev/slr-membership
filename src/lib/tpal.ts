@@ -14,3 +14,27 @@ export function isTpalEligible(drawPass: number | string | null | undefined, bil
 
     return (dp > 0 || dp === -1) && (billingStatus ?? '').toLowerCase() === 'active';
 }
+
+/**
+ * Which of the two conditions kept a member out of the export, so the admin table can say why
+ * instead of leaving a bare "Excluded" to chase down by hand. draw_pass is internal-only, so the
+ * copy names the cause and never the count.
+ */
+export function tpalExclusionReason(
+    drawPass: number | string | null | undefined,
+    billingStatus: string | null | undefined
+): string | null {
+    // Mirrors the "-" cell in the members table: an absent draw_pass is unknown, not zero.
+    if (drawPass === null || drawPass === undefined) return null;
+
+    const dp = typeof drawPass === 'number' ? drawPass : Number(drawPass);
+    if (Number.isNaN(dp) || isTpalEligible(drawPass, billingStatus)) return null;
+
+    const billingOff = (billingStatus ?? '').toLowerCase() !== 'active';
+    const noEntries = !(dp > 0 || dp === -1);
+
+    if (billingOff && noEntries) return 'Billing is not active, and no entries are left this cycle.';
+    if (billingOff) return `Billing is "${billingStatus || 'unknown'}" — only active billing is exported.`;
+
+    return 'Billing is active, but no entries are left this cycle.';
+}
