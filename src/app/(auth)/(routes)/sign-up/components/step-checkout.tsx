@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { isBenyEligibleSubTier } from '@/constant/tiers';
 import { useSafeHours } from '@/hooks/use-safe-hours';
+import { trackSignUp } from '@/lib/analytics';
 import { createMembershipCheckout } from '@/lib/api/resources/stripe';
 import { ApiError, apiErrorMessage } from '@/lib/api/types';
 import { AU_PHONE_MESSAGE, isAuPhone, toAuE164 } from '@/lib/au-phone';
@@ -61,6 +62,10 @@ const StepCheckout = ({ data, pricing, spinPrize, token, onBack }: StepCheckoutP
             return;
         }
         setBenyPhoneError(null);
+
+        // Fired before the request, not after: the redirect to Stripe can cut the beacon short.
+        trackSignUp({ event: 'sign_up_checkout_initiated', tier, sub_tier: subTier, subtotal, discount });
+
         setRedirecting(true);
         try {
             const { url } = await createMembershipCheckout(token, {
