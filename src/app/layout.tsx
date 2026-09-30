@@ -9,7 +9,7 @@ import { VersionWatcher } from '@/components/common/version-watcher';
 import { Toaster } from '@/components/ui/sonner';
 import { getOrganizationSchema, getWebSiteSchema } from '@/lib/seo/structured-data';
 import { getTierPricing, minPriceOf } from '@/lib/tier-pricing';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 
 const montserrat = Montserrat({
     subsets: ['latin'],
@@ -27,7 +27,7 @@ const bebasNeue = Bebas_Neue({
 
 const siteName = 'Smart Life Rewards';
 const describeSite = (redFrom: number, blueFrom: number) =>
-    `Australia's best-value rewards club. Weekly state-based draws, partner discounts, e-books and digital offers — SLR Red (from $${redFrom} per 4 weeks) and SLR Premium (from $${blueFrom} per 4 weeks).`;
+    `Australia's best-value rewards club. Weekly draws, partner discounts, e-books and digital offers — SLR Red (from $${redFrom} per 4 weeks) and SLR Premium (from $${blueFrom} per 4 weeks).`;
 const ogImage = '/images/background-metadata.webp';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -80,6 +80,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
     const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
     return (
         <html suppressHydrationWarning lang='en'>
@@ -97,6 +98,8 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
                     }}
                 />
             </head>
+            {/* GTM loads ahead of <body> so tags fire before the page paints. */}
+            {gtmId && <GoogleTagManager gtmId={gtmId} />}
             <body
                 suppressHydrationWarning
                 className={`${montserrat.variable} ${bebasNeue.variable} text-foreground bg-slr-ink overscroll-none antialiased`}>
